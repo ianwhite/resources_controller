@@ -2,8 +2,6 @@ ENV["RAILS_ENV"] = "test"
 require File.expand_path(File.join(File.dirname(__FILE__), "../../../../config/environment.rb"))
 require 'spec/rails'
 
-ActiveRecord::Base.logger = Logger.new(File.join(File.dirname(__FILE__), 'debug.log'))
-
 # Even if you're using RSpec, RSpec on Rails is reusing some of the
 # Rails-specific extensions for fixtures and stubbed requests, response
 # and other things (via RSpec's inherit mechanism). These extensions are 
