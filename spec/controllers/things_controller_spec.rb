@@ -4,7 +4,7 @@ class Thing < ActiveRecord::Base
 end
 
 class ThingsController < ActionController::Base
-  rest_for :things
+  rest_controller_for :things
 end
 
 ActionController::Routing::Routes.draw do |map|

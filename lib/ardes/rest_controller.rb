@@ -1,6 +1,6 @@
 module Ardes
   module RestController
-    def rest_for(collection_name, options = {})
+    def rest_controller_for(collection_name, options = {})
       self.class_eval do
         unless included_modules.include?(::Ardes::RestController::InstanceMethods)
           class_inheritable_accessor :collection_name, :element_class, :element_name
