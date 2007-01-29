@@ -38,7 +38,7 @@ module Ardes
 
       # GET /events/new
       def new
-        self.element = element_class.new
+        self.element = new_element
       end
 
       # GET /events/1;edit
@@ -49,7 +49,7 @@ module Ardes
       # POST /events
       # POST /events.xml
       def create
-        self.element = element_class.new(params[element_name])
+        self.element = new_element(params[element_name])
 
         respond_to do |format|
           if element.save
@@ -103,8 +103,12 @@ module Ardes
         element_class.find :all
       end
   
-      def find_element
-        element_class.find params[:id] 
+      def find_element(id = params[:id])
+        element_class.find id
+      end
+      
+      def new_element(attrs = params[element_name])
+        element_class.new(attrs)
       end
       
       def element_url
