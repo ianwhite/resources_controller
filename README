@@ -1,0 +1,43 @@
+= rest_controller
+
+ActionController extension to facilitate inheritance and DRYness in your rest controllers.  REST style actions tend to follow a pattern of
+ * do the action
+ * depending on whether the action succeeded or failed, respond accordingly
+One problem is that, when sharing functionality via inheritance, an action has got too much stuff in it.  You might want to simply offer an extra type of response - say an atom formatted repsonse to 'show'.  Normally you would have to rewrite the show method, duplicating a lot of code.
+
+Simple Usage (see class docs for more)
+
+class ThingsController < ApplicationController
+  rest_for :things
+  
+  respond_to :show do |format, status|
+    format.atom { # add an atom feed to this controller's show action }
+  end
+
+  respond_to :show do |format.status|
+end
+
+=== Specs and Coverage
+* {SPECDOC}[link:files/SPECDOC.html] lists the specifications
+* {RSpec Report}[link:rspec_report.html] is a report of spec pass/fails
+* {RCov Report}[link:coverage/index.html] is the rcov report
+
+=== Dependencies
+* <tt>RCov</tt>               To install do: <tt>gem install rcov</tt>
+* <tt>RSpec</tt>              To install do: <tt>gem install rspec</tt>
+* <tt>rspec rails plugin</tt> see http://rspec.rubyforge.org/documentation/rails/install.html
+
+=== Testing
+RSpec is used for testing, so the tests are in <tt>spec/</tt> rather than
+<tt>test/</tt> To run the tests you need a test database set up,
+edit <tt>spec/database.yml</tt> to provide the details.
+
+=== Rake tasks
+The following tasks are defined:
+
+* <tt>rspec</tt>      (the default task) run the specs
+* <tt>rcov</tt>       generate a coverage report (in doc/coverage)
+* <tt>rspec_rdoc</tt> generate an rdoc formatted spec doc (in SPECDOC)
+* <tt>rspec_rep</tt>  generate a html report of passing/failing test cases (in doc/rspec_report.html)
+* <tt>rdoc</tt>       generate the docs, (including SPECDOC)
+* <tt>rdoc_all</tt>   generate all documentation including coverage and rspec report

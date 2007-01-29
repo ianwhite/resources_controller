@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>File: SPECDOC</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+  <div id="fileHeader">
+    <h1>SPECDOC</h1>
+    <table class="header-table">
+    <tr class="top-aligned-row">
+      <td><strong>Path:</strong></td>
+      <td>SPECDOC
+      </td>
+    </tr>
+    <tr class="top-aligned-row">
+      <td><strong>Last Update:</strong></td>
+      <td>Mon Jan 29 09:23:53 +0000 2007</td>
+    </tr>
+    </table>
+  </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+Routes for the ThingsController should map
+</p>
+<ul>
+<li>{ :controller =&gt; &#8216;things&#8217;, :action =&gt; &#8216;index&#8217;
+} to /things
+
+</li>
+<li>{ :controller =&gt; &#8216;things&#8217;, :action =&gt; &#8216;new&#8217; }
+to /things/new
+
+</li>
+<li>{ :controller =&gt; &#8216;things&#8217;, :action =&gt; &#8216;show&#8217;,
+:id =&gt; 1 } to /things/1
+
+</li>
+<li>{ :controller =&gt; &#8216;things&#8217;, :action =&gt; &#8216;edit&#8217;,
+:id =&gt; 1 } to /things/1;edit
+
+</li>
+<li>{ :controller =&gt; &#8216;things&#8217;, :action =&gt;
+&#8216;update&#8217;, :id =&gt; 1} to /things/1
+
+</li>
+<li>{ :controller =&gt; &#8216;things&#8217;, :action =&gt;
+&#8216;destroy&#8217;, :id =&gt; 1} to /things/1
+
+</li>
+</ul>
+<p>
+Requesting /things using GET
+</p>
+<ul>
+<li>should be successful
+
+</li>
+<li>should render index.rhtml
+
+</li>
+<li>should find all things
+
+</li>
+<li>should assign the found things for the view
+
+</li>
+</ul>
+<p>
+Requesting /things.xml using GET
+</p>
+<ul>
+<li>should be successful
+
+</li>
+<li>should find all things
+
+</li>
+<li>should render the found things as xml
+
+</li>
+</ul>
+<p>
+Requesting /things/1 using GET
+</p>
+<ul>
+<li>should be successful
+
+</li>
+<li>should render show.rhtml
+
+</li>
+<li>should find the thing requested
+
+</li>
+<li>should assign the found thing for the view
+
+</li>
+</ul>
+<p>
+Requesting /things/1.xml using GET
+</p>
+<ul>
+<li>should be successful
+
+</li>
+<li>should find the thing requested
+
+</li>
+<li>should render the found thing as xml
+
+</li>
+</ul>
+<p>
+Requesting /things/new using GET
+</p>
+<ul>
+<li>should be successful
+
+</li>
+<li>should render new.rhtml
+
+</li>
+<li>should create an new thing
+
+</li>
+<li>should not save the new thing
+
+</li>
+<li>should assign the new thing for the view
+
+</li>
+</ul>
+<p>
+Requesting /things/1;edit using GET
+</p>
+<ul>
+<li>should be successful
+
+</li>
+<li>should render edit.rhtml
+
+</li>
+<li>should find the thing requested
+
+</li>
+<li>should assign the found Thing for the view
+
+</li>
+</ul>
+<p>
+Requesting /things using POST
+</p>
+<ul>
+<li>should create a new thing
+
+</li>
+<li>should redirect to the new thing
+
+</li>
+</ul>
+<p>
+Requesting /things/1 using PUT
+</p>
+<ul>
+<li>should find the thing requested
+
+</li>
+<li>should update the found thing
+
+</li>
+<li>should assign the found thing for the view
+
+</li>
+<li>should redirect to the thing
+
+</li>
+</ul>
+<p>
+Requesting /things/1 using DELETE
+</p>
+<ul>
+<li>should find the thing requested
+
+</li>
+<li>should call destroy on the found thing
+
+</li>
+<li>should redirect to the things list
+
+</li>
+</ul>
+
+    </div>
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

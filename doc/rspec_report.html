@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>RSpec results</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <script type="text/javascript">
+  function moveProgressBar(percentDone) {
+    document.getElementById("header").style.width = percentDone +"%";
+  }
+  function makeRed(element_id) {
+    document.getElementById(element_id).style.background = '#C40D0D';
+  }
+  </script>
+  <style type="text/css">
+  body {
+    margin: 0; padding: 0;
+    background: #fff;
+  }
+
+  #header {
+    background: #65C400; color: #fff;
+  }
+
+  h1 {
+    margin: 0 0 10px;
+    padding: 10px;
+    font: bold 18px "Lucida Grande", Helvetica, sans-serif;
+  }
+
+  #summary {
+    margin: 0; padding: 5px 10px;
+    font: bold 10px "Lucida Grande", Helvetica, sans-serif;
+    text-align: right;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+  }
+
+  #summary p {
+    margin: 0 0 2px;
+  }
+
+  #summary #totals {
+    font-size: 14px;
+  }
+
+  .context {
+    margin: 0 10px 5px;
+    background: #fff;
+  }
+
+  dl {
+    margin: 0; padding: 0 0 5px;
+    font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+  }
+
+  dt {
+    padding: 3px;
+    background: #65C400;
+    color: #fff;
+    font-weight: bold;
+  }
+
+  dd {
+    margin: 5px 0 5px 5px;
+    padding: 3px 3px 3px 18px;
+  }
+
+  dd.spec.passed {
+    border-left: 5px solid #65C400;
+    border-bottom: 1px solid #65C400;
+    background: #DBFFB4; color: #3D7700;
+  }
+
+  dd.spec.failed {
+    border-left: 5px solid #C20000;
+    border-bottom: 1px solid #C20000;
+    color: #C20000; background: #FFFBD3;
+  }
+
+  div.backtrace {
+    color: #000;
+    font-size: 12px;
+  }
+
+  a {
+    color: #BE5C00;
+  }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <h1>RSpec Results</h1>
+
+  <div id="summary">
+    <p id="duration">&nbsp;</p>
+    <p id="totals">&nbsp;</p>
+  </div>
+</div>
+
+<div id="results">
+<div class="context">
+  <dl>
+  <dt id="context_1">Routes for the ThingsController should map</dt>
+    <script type="text/javascript">moveProgressBar('2.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">{ :controller =&gt; 'things', :action =&gt; 'index' } to /things</span></dd>
+    <script type="text/javascript">moveProgressBar('5.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">{ :controller =&gt; 'things', :action =&gt; 'new' } to /things/new</span></dd>
+    <script type="text/javascript">moveProgressBar('7.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">{ :controller =&gt; 'things', :action =&gt; 'show', :id =&gt; 1 } to /things/1</span></dd>
+    <script type="text/javascript">moveProgressBar('10.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">{ :controller =&gt; 'things', :action =&gt; 'edit', :id =&gt; 1 } to /things/1;edit</span></dd>
+    <script type="text/javascript">moveProgressBar('13.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">{ :controller =&gt; 'things', :action =&gt; 'update', :id =&gt; 1} to /things/1</span></dd>
+    <script type="text/javascript">moveProgressBar('15.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">{ :controller =&gt; 'things', :action =&gt; 'destroy', :id =&gt; 1} to /things/1</span></dd>
+  </dl>
+</div>
+<div class="context">
+  <dl>
+  <dt id="context_2">Requesting /things using GET</dt>
+    <script type="text/javascript">moveProgressBar('18.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be successful</span></dd>
+    <script type="text/javascript">moveProgressBar('21.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should render index.rhtml</span></dd>
+    <script type="text/javascript">moveProgressBar('23.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should find all things</span></dd>
+    <script type="text/javascript">moveProgressBar('26.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should assign the found things for the view</span></dd>
+  </dl>
+</div>
+<div class="context">
+  <dl>
+  <dt id="context_3">Requesting /things.xml using GET</dt>
+    <script type="text/javascript">moveProgressBar('28.9');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be successful</span></dd>
+    <script type="text/javascript">moveProgressBar('31.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should find all things</span></dd>
+    <script type="text/javascript">moveProgressBar('34.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should render the found things as xml</span></dd>
+  </dl>
+</div>
+<div class="context">
+  <dl>
+  <dt id="context_4">Requesting /things/1 using GET</dt>
+    <script type="text/javascript">moveProgressBar('36.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be successful</span></dd>
+    <script type="text/javascript">moveProgressBar('39.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should render show.rhtml</span></dd>
+    <script type="text/javascript">moveProgressBar('42.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should find the thing requested</span></dd>
+    <script type="text/javascript">moveProgressBar('44.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should assign the found thing for the view</span></dd>
+  </dl>
+</div>
+<div class="context">
+  <dl>
+  <dt id="context_5">Requesting /things/1.xml using GET</dt>
+    <script type="text/javascript">moveProgressBar('47.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be successful</span></dd>
+    <script type="text/javascript">moveProgressBar('50.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should find the thing requested</span></dd>
+    <script type="text/javascript">moveProgressBar('52.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should render the found thing as xml</span></dd>
+  </dl>
+</div>
+<div class="context">
+  <dl>
+  <dt id="context_6">Requesting /things/new using GET</dt>
+    <script type="text/javascript">moveProgressBar('55.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be successful</span></dd>
+    <script type="text/javascript">moveProgressBar('57.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should render new.rhtml</span></dd>
+    <script type="text/javascript">moveProgressBar('60.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should create an new thing</span></dd>
+    <script type="text/javascript">moveProgressBar('63.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not save the new thing</span></dd>
+    <script type="text/javascript">moveProgressBar('65.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should assign the new thing for the view</span></dd>
+  </dl>
+</div>
+<div class="context">
+  <dl>
+  <dt id="context_7">Requesting /things/1;edit using GET</dt>
+    <script type="text/javascript">moveProgressBar('68.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be successful</span></dd>
+    <script type="text/javascript">moveProgressBar('71.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should render edit.rhtml</span></dd>
+    <script type="text/javascript">moveProgressBar('73.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should find the thing requested</span></dd>
+    <script type="text/javascript">moveProgressBar('76.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should assign the found Thing for the view</span></dd>
+  </dl>
+</div>
+<div class="context">
+  <dl>
+  <dt id="context_8">Requesting /things using POST</dt>
+    <script type="text/javascript">moveProgressBar('78.9');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should create a new thing</span></dd>
+    <script type="text/javascript">moveProgressBar('81.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should redirect to the new thing</span></dd>
+  </dl>
+</div>
+<div class="context">
+  <dl>
+  <dt id="context_9">Requesting /things/1 using PUT</dt>
+    <script type="text/javascript">moveProgressBar('84.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should find the thing requested</span></dd>
+    <script type="text/javascript">moveProgressBar('86.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should update the found thing</span></dd>
+    <script type="text/javascript">moveProgressBar('89.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should assign the found thing for the view</span></dd>
+    <script type="text/javascript">moveProgressBar('92.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should redirect to the thing</span></dd>
+  </dl>
+</div>
+<div class="context">
+  <dl>
+  <dt id="context_10">Requesting /things/1 using DELETE</dt>
+    <script type="text/javascript">moveProgressBar('94.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should find the thing requested</span></dd>
+    <script type="text/javascript">moveProgressBar('97.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should call destroy on the found thing</span></dd>
+    <script type="text/javascript">moveProgressBar('100.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should redirect to the things list</span></dd>
+  </dl>
+</div>
+<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>0.868124 seconds</strong>";</script>
+<script type="text/javascript">document.getElementById('totals').innerHTML = "38 specifications, 0 failures";</script>
+</div>
+</body>
+</html>

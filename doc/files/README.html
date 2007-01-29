@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>File: README</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+  <div id="fileHeader">
+    <h1>README</h1>
+    <table class="header-table">
+    <tr class="top-aligned-row">
+      <td><strong>Path:</strong></td>
+      <td>README
+      </td>
+    </tr>
+    <tr class="top-aligned-row">
+      <td><strong>Last Update:</strong></td>
+      <td>Mon Jan 29 09:05:19 +0000 2007</td>
+    </tr>
+    </table>
+  </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <h1>rest_controller</h1>
+<p>
+ActionController extension to facilitate inheritance and DRYness in your
+rest controllers. REST style actions tend to follow a pattern of
+</p>
+<pre>
+ * do the action
+ * depending on whether the action succeeded or failed, respond accordingly
+</pre>
+<p>
+One problem is that, when sharing functionality via inheritance, an action
+has got too much stuff in it. You might want to simply offer an extra type
+of response - say an atom formatted repsonse to &#8216;show&#8217;.
+Normally you would have to rewrite the show method, duplicating a lot of
+code.
+</p>
+<p>
+Simple Usage (see class docs for more)
+</p>
+<p>
+class ThingsController &lt; ApplicationController
+</p>
+<pre>
+  rest_for :things
+
+  respond_to :show do |format, status|
+    format.atom { # add an atom feed to this controller's show action }
+  end
+
+  respond_to :show do |format.status|
+</pre>
+<p>
+end
+</p>
+<h3>Specs and Coverage</h3>
+<ul>
+<li><a href="SPECDOC.html">SPECDOC</a> lists the specifications
+
+</li>
+<li><a href=".././rspec_report.html">RSpec Report</a> is a report of spec
+pass/fails
+
+</li>
+<li><a href="../coverage/index.html">RCov Report</a> is the rcov report
+
+</li>
+</ul>
+<h3>Dependencies</h3>
+<ul>
+<li><tt>RCov</tt> To install do: <tt>gem install rcov</tt>
+
+</li>
+<li><tt>RSpec</tt> To install do: <tt>gem install rspec</tt>
+
+</li>
+<li><tt>rspec rails plugin</tt> see <a
+href="http://rspec.rubyforge.org/documentation/rails/install.html">rspec.rubyforge.org/documentation/rails/install.html</a>
+
+</li>
+</ul>
+<h3>Testing</h3>
+<p>
+RSpec is used for testing, so the tests are in <tt>spec/</tt> rather than
+<tt>test/</tt> To run the tests you need a test database set up, edit
+<tt>spec/database.yml</tt> to provide the details.
+</p>
+<h3>Rake tasks</h3>
+<p>
+The following tasks are defined:
+</p>
+<ul>
+<li><tt>rspec</tt> (the default task) run the specs
+
+</li>
+<li><tt>rcov</tt> generate a coverage report (in doc/coverage)
+
+</li>
+<li><tt>rspec_rdoc</tt> generate an rdoc formatted spec doc (in SPECDOC)
+
+</li>
+<li><tt>rspec_rep</tt> generate a html report of passing/failing test cases (in
+doc/rspec_report.html)
+
+</li>
+<li><tt>rdoc</tt> generate the docs, (including SPECDOC)
+
+</li>
+<li><tt>rdoc_all</tt> generate all documentation including coverage and rspec
+report
+
+</li>
+</ul>
+
+    </div>
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

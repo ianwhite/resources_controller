@@ -1,0 +1,48 @@
+# Routes for the ThingsController should map
+# * { :controller => 'things', :action => 'index' } to /things
+# * { :controller => 'things', :action => 'new' } to /things/new
+# * { :controller => 'things', :action => 'show', :id => 1 } to /things/1
+# * { :controller => 'things', :action => 'edit', :id => 1 } to /things/1;edit
+# * { :controller => 'things', :action => 'update', :id => 1} to /things/1
+# * { :controller => 'things', :action => 'destroy', :id => 1} to /things/1
+# Requesting /things using GET
+# * should be successful
+# * should render index.rhtml
+# * should find all things
+# * should assign the found things for the view
+# Requesting /things.xml using GET
+# * should be successful
+# * should find all things
+# * should render the found things as xml
+# Requesting /things/1 using GET
+# * should be successful
+# * should render show.rhtml
+# * should find the thing requested
+# * should assign the found thing for the view
+# Requesting /things/1.xml using GET
+# * should be successful
+# * should find the thing requested
+# * should render the found thing as xml
+# Requesting /things/new using GET
+# * should be successful
+# * should render new.rhtml
+# * should create an new thing
+# * should not save the new thing
+# * should assign the new thing for the view
+# Requesting /things/1;edit using GET
+# * should be successful
+# * should render edit.rhtml
+# * should find the thing requested
+# * should assign the found Thing for the view
+# Requesting /things using POST
+# * should create a new thing
+# * should redirect to the new thing
+# Requesting /things/1 using PUT
+# * should find the thing requested
+# * should update the found thing
+# * should assign the found thing for the view
+# * should redirect to the thing
+# Requesting /things/1 using DELETE
+# * should find the thing requested
+# * should call destroy on the found thing
+# * should redirect to the things list
