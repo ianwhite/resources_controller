@@ -28,7 +28,7 @@ module Ardes
       # GET /events/1
       # GET /events/1.xml
       def show
-        self.element = find_element(params[:id])
+        self.element = find_element
 
         respond_to do |format|
           format.html # show.rhtml
@@ -38,24 +38,24 @@ module Ardes
 
       # GET /events/new
       def new
-        self.element = new_element
+        self.element = element_class.new
       end
 
       # GET /events/1;edit
       def edit
-        self.element = find_element(params[:id])
+        self.element = find_element
       end
 
       # POST /events
       # POST /events.xml
       def create
-        self.element = new_element(element_params)
+        self.element = element_class.new(params[element_name])
 
         respond_to do |format|
           if element.save
             flash[:notice] = "#{element_name.humanize} was successfully created."
-            format.html { redirect_to element_url(element) }
-            format.xml  { head :created, :location => element_url(element) }
+            format.html { redirect_to element_url }
+            format.xml  { head :created, :location => element_url }
           else
             format.html { render :action => "new" }
             format.xml  { render :xml => element.errors.to_xml, :status => 422 }
@@ -66,12 +66,12 @@ module Ardes
       # PUT /events/1
       # PUT /events/1.xml
       def update
-        self.element = find_element(params[:id])
+        self.element = find_element
   
         respond_to do |format|
-          if element.update_attributes(element_params)
+          if element.update_attributes(params[element_name])
             flash[:notice] = "#{element_name.humanize} was successfully updated."
-            format.html { redirect_to element_url(element) }
+            format.html { redirect_to element_url }
             format.xml  { head :ok }
           else
             format.html { render :action => "edit" }
@@ -83,7 +83,7 @@ module Ardes
       # DELETE /events/1
       # DELETE /events/1.xml
       def destroy
-        self.element = find_element(params[:id])
+        self.element = find_element
         element.destroy
         respond_to do |format|
           flash[:notice] = "#{element_name} was successfully destroyed."
@@ -92,40 +92,22 @@ module Ardes
         end
       end
   
-      def element
-        instance_variable_get("@#{element_name}")
-      end
+      def element; instance_variable_get("@#{element_name}"); end
+      def element=(elem); instance_variable_set("@#{element_name}", elem); end
   
-      def element=(arg)
-        instance_variable_set("@#{element_name}", arg)
-      end
-  
-      def collection
-        instance_variable_get("@#{collection_name}")
-      end
-  
-      def collection=(arg)
-        instance_variable_set("@#{collection_name}", arg)
-      end
+      def collection; instance_variable_get("@#{collection_name}"); end
+      def collection=(coll); instance_variable_set("@#{collection_name}", coll); end
 
     protected  
       def find_collection
-        element_class.find(:all)
+        element_class.find :all
       end
   
-      def find_element(id)
-        element_class.find(id)
+      def find_element
+        element_class.find params[:id] 
       end
-  
-      def new_element(attrs = {})
-        element_class.new(attrs)
-      end
-  
-      def element_params
-        params[element_name]
-      end
-  
-      def element_url(element)
+      
+      def element_url
         send("#{element_name}_url", element)
       end
   
