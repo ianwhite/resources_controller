@@ -3,13 +3,13 @@ module Ardes
     def rest_controller_for(collection_name, options = {})
       self.class_eval do
         unless included_modules.include?(::Ardes::RestController::InstanceMethods)
-          class_inheritable_accessor :collection_name, :element_class, :element_name
+          class_inheritable_accessor :collection_name, :element_service, :element_name
           include InstanceMethods
         end
       
         self.collection_name = collection_name
         self.element_name    = collection_name.to_s.singularize
-        self.element_class   = options[:class] || element_name.classify.constantize
+        self.element_service = options[:class] || element_name.classify.constantize
       end
     end
     
@@ -100,15 +100,15 @@ module Ardes
 
     protected  
       def find_collection
-        element_class.find :all
+        element_service.find :all
       end
   
       def find_element(id = params[:id])
-        element_class.find id
+        element_service.find id
       end
       
       def new_element(attrs = params[element_name])
-        element_class.new(attrs)
+        element_service.new(attrs)
       end
       
       def element_url
