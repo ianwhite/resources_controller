@@ -1,3 +1,3 @@
-require 'ardes/rest_controller'
+require 'ardes/resources_controller'
 
-ActionController::Base.extend Ardes::RestController
+ActionController::Base.extend Ardes::ResourcesController

@@ -20,3 +20,44 @@ module Spec
     end
   end
 end
+
+
+# Testing app setup
+
+class Forum < ActiveRecord::Base
+  has_many :posts
+end
+
+class Post < ActiveRecord::Base
+  belongs_to :forum
+  has_many :comments
+end
+
+class Comment < ActiveRecord::Base
+  belongs_to :post
+end
+
+class ForumsController < ActionController::Base
+  resources_controller_for :forums
+end
+
+class ForumPostsController < ActionController::Base
+  resources_controller_for :posts
+  nested_in :forum
+  
+  def whatever; end
+end
+
+class CommentsController < ActionController::Base
+  resources_controller_for :comments, :in => [:forum, :post]
+
+  def whatever; end
+end
+
+ActionController::Routing::Routes.draw do |map|
+  map.resources :forums do |forums|
+    forums.resources :posts, :name_prefix => 'forum_', :controller => 'forum_posts', :collection => {:whatever => :get} do |posts|
+      posts.resources :comments, :collection => {:whatever => :get}
+    end
+  end
+end
