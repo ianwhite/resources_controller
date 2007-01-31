@@ -1,0 +1,84 @@
+# Requesting /forums/3/posts/2/whatever (testing the before filters)
+# * should find the forum
+# * should assign the found forum for the view
+# * should find the post
+# * should assign the found post for the view
+# * should assign the post_comments association as the comments resource_service
+# Requesting /forums/2/whatever (testing the before filters)
+# * should find the forum
+# * should assign the found forum for the view
+# * should assign the forum_posts association as the posts resource_service
+# Requesting /forums/2/posts using GET
+# * should be successful
+# * should render index.rhtml
+# * should find all posts
+# * should assign the found posts for the view
+# Requesting /forums/2/posts/1 using GET
+# * should be successful
+# * should render show.rhtml
+# * should find the thing requested
+# * should assign the found thing for the view
+# Requesting /forums/2/posts/new using GET
+# * should be successful
+# * should render new.rhtml
+# * should create an new thing
+# * should not save the new thing
+# * should assign the new thing for the view
+# Requesting /forums/2/posts/1;edit using GET
+# * should be successful
+# * should render edit.rhtml
+# * should find the thing requested
+# * should assign the found Thing for the view
+# Requesting /forums/2/posts using POST
+# * should create a new post
+# * should redirect to the new post
+# Requesting /forums/2/posts/1 using PUT
+# * should find the post requested
+# * should update the found post
+# * should assign the found post for the view
+# * should redirect to the post
+# Requesting /forums/2/posts/1 using DELETE
+# * should find the post requested
+# * should call destroy on the found thing
+# * should redirect to the things list
+# Requesting /forums using GET
+# * should be successful
+# * should render index.rhtml
+# * should find all forums
+# * should assign the found forums for the view
+# Requesting /forums.xml using GET
+# * should be successful
+# * should find all forums
+# * should render the found forums as xml
+# Requesting /forums/1 using GET
+# * should be successful
+# * should render show.rhtml
+# * should find the forum requested
+# * should assign the found forum for the view
+# Requesting /forums/1.xml using GET
+# * should be successful
+# * should find the forum requested
+# * should render the found forum as xml
+# Requesting /forums/new using GET
+# * should be successful
+# * should render new.rhtml
+# * should create an new forum
+# * should not save the new forum
+# * should assign the new forum for the view
+# Requesting /forums/1;edit using GET
+# * should be successful
+# * should render edit.rhtml
+# * should find the forum requested
+# * should assign the found Forum for the view
+# Requesting /forums using POST
+# * should create a new forum
+# * should redirect to the new forum
+# Requesting /forums/1 using PUT
+# * should find the forum requested
+# * should update the found forum
+# * should assign the found forum for the view
+# * should redirect to the forum
+# Requesting /forums/1 using DELETE
+# * should find the forum requested
+# * should call destroy on the found forum
+# * should redirect to the forums list
