@@ -1,41 +1,40 @@
 module Ardes
-  module RestController
-    # Specifies that this controller is a REST style controller for the named resource (a collection - like :users)
+  module ResourcesController
+    # Specifies that this controller is a REST style controller for the named resource (a resources - like :users)
     #
-    #  * <tt>:class_name:</tt> The class name of the resource, if it can't be inferred from its name
-    #  * <tt>:route_name:</tt> The name of the route (of the collection, i.e. :users), if it can't be inferred from the name of the controller
-    #  * <tt>:enclosed_by:</tt> Ordered array of singular model names, or array pair when the finder needs to be specified
-    #    * [for the first enclosing only] The class name, if it can't be inferred
-    #    * [for any subsequent enclosings] The collection name used on the previous enclosing, if it can't be inferred
+    # Options:
+    # * <tt>:class_name:</tt> The class name of the resource, if it can't be inferred from its name
+    # * <tt>:route_name:</tt> The name of the route (of the resources, i.e. :users), if it can't be inferred from the name of the controller
+    # * <tt>:in:</tt> Ordered array of singular model names which correspond to nesting a resource. 
     #
-    # Example
+    # Examples:
+    #  resources_controller_for :users
+    #  resources_controller_for :users, :class_name => 'Admin::Users'
+    #  resources_controller_for :users, :route_name => :admin_users
+    #  resources_controller_for :posts, :in => :forum
+    #  resources_controller_for :comments, :in => [:forum, :post]
     #
-    #  for_resources :users
-    #  for_resources :users, :class_name => 'Admin::Users'
-    #  for_resources :users, :route_name => :admin_users
+    # === The :in option
     #
-    #  for_resources :posts, :enclosed_by => :forum
-    #  for_resources :posts, :enclosed_by => [:user, :forum]
+    # The default behavior is to set up before filters that load the enclosing resource, and to use associations on that
+    # model to find and create the resources.  See nested_in for more details on this, and customising the default behaviour
     #
-    #  for_resources :posts, :enclosed_by => [[:user, 'Admin::User'], :forum]
-    #  for_resources :posts, :enclosed_by => [[:user, 'Admin::User'], [:forum, :my_forums]]
-    #
-    def resources_controller_for(collection_name, options = {})
+    def resources_controller_for(resources_name, options = {})
       options.assert_valid_keys(:class_name, :route_name, :in)
       
       self.class_eval do
-        unless included_modules.include?(::Ardes::RestController::InstanceMethods)
-          class_inheritable_accessor :collection_name, :element_name, :element_class, :route_name, :enclosing_names
-          self.enclosing_names ||= []
+        unless included_modules.include?(::Ardes::ResourcesController::InstanceMethods)
+          class_inheritable_accessor :resources_name, :resource_name, :resource_class, :route_name, :enclosing_resource_names
+          self.enclosing_resource_names ||= []
           include InstanceMethods
           include ActionMethods
         end
       end
       
-      self.collection_name = collection_name.to_s
-      self.element_name    = self.collection_name.singularize
+      self.resources_name = resources_name.to_s
+      self.resource_name    = self.resources_name.singularize
       self.route_name      = options[:route_name] || controller_name
-      self.element_class   = (options[:class_name] || self.element_name.classify).constantize
+      self.resource_class   = (options[:class_name] || self.resource_name.classify).constantize
       
       nested_in(*options[:in]) if options[:in]
     end
@@ -50,9 +49,9 @@ module Ardes
   private
     def add_enclosing(name, options = {}, &block)
       name = name.to_s
-      send "add_#{enclosing_names.size == 0 ? 'first' : 'subsequent'}_enclosing", name, options, &block
+      send "add_#{enclosing_resource_names.size == 0 ? 'first' : 'subsequent'}_enclosing", name, options, &block
       attr_accessor name
-      self.enclosing_names << name
+      self.enclosing_resource_names << name
     end
   
     def add_first_enclosing(name, options = {}, &block)
@@ -60,7 +59,7 @@ module Ardes
       
       class_eval do
         define_method :resource_service do
-          @resource_service ||= send(enclosing_names.last).send(collection_name)
+          @resource_service ||= send(enclosing_resource_names.last).send(resources_name)
         end
       end
       
@@ -73,12 +72,12 @@ module Ardes
     end
     
     def add_subsequent_enclosing(name, options = {}, &block)
-      options.assert_valid_keys(:collection_name)
+      options.assert_valid_keys(:resources_name)
       
       if block_given?
         before_filter(&block)
       else
-        prev, coll, fk = enclosing_names.last, options[:collection_name] || name.pluralize, name.foreign_key
+        prev, coll, fk = enclosing_resource_names.last, options[:resources_name] || name.pluralize, name.foreign_key
         before_filter {|c| c.send("#{name}=", c.send(prev).send(coll).find(c.params[fk]))}
       end
     end
@@ -87,48 +86,48 @@ module Ardes
       # GET /events
       # GET /events.xml
       def index
-        self.collection = find_collection
+        self.resources = find_resources
     
         respond_to do |format|
           format.html # index.rhtml
-          format.xml  { render :xml => collection.to_xml }
+          format.xml  { render :xml => resources.to_xml }
         end
       end
 
       # GET /events/1
       # GET /events/1.xml
       def show
-        self.element = find_element
+        self.resource = find_resource
 
         respond_to do |format|
           format.html # show.rhtml
-          format.xml  { render :xml => element.to_xml }
+          format.xml  { render :xml => resource.to_xml }
         end
       end
 
       # GET /events/new
       def new
-        self.element = new_element
+        self.resource = new_resource
       end
 
       # GET /events/1;edit
       def edit
-        self.element = find_element
+        self.resource = find_resource
       end
 
       # POST /events
       # POST /events.xml
       def create
-        self.element = new_element(params[element_name])
+        self.resource = new_resource(params[resource_name])
 
         respond_to do |format|
-          if element.save
-            flash[:notice] = "#{element_name.humanize} was successfully created."
-            format.html { redirect_to element_url }
-            format.xml  { head :created, :location => element_url }
+          if resource.save
+            flash[:notice] = "#{resource_name.humanize} was successfully created."
+            format.html { redirect_to resource_url }
+            format.xml  { head :created, :location => resource_url }
           else
             format.html { render :action => "new" }
-            format.xml  { render :xml => element.errors.to_xml, :status => 422 }
+            format.xml  { render :xml => resource.errors.to_xml, :status => 422 }
           end
         end
       end
@@ -136,16 +135,16 @@ module Ardes
       # PUT /events/1
       # PUT /events/1.xml
       def update
-        self.element = find_element
+        self.resource = find_resource
   
         respond_to do |format|
-          if element.update_attributes(params[element_name])
-            flash[:notice] = "#{element_name.humanize} was successfully updated."
-            format.html { redirect_to element_url }
+          if resource.update_attributes(params[resource_name])
+            flash[:notice] = "#{resource_name.humanize} was successfully updated."
+            format.html { redirect_to resource_url }
             format.xml  { head :ok }
           else
             format.html { render :action => "edit" }
-            format.xml  { render :xml => element.errors.to_xml, :status => 422 }
+            format.xml  { render :xml => resource.errors.to_xml, :status => 422 }
           end
         end
       end
@@ -153,11 +152,11 @@ module Ardes
       # DELETE /events/1
       # DELETE /events/1.xml
       def destroy
-        self.element = find_element
-        element.destroy
+        self.resource = find_resource
+        resource.destroy
         respond_to do |format|
-          flash[:notice] = "#{element_name} was successfully destroyed."
-          format.html { redirect_to collection_url }
+          flash[:notice] = "#{resource_name} was successfully destroyed."
+          format.html { redirect_to resources_url }
           format.xml  { head :ok }
         end
       end
@@ -168,28 +167,28 @@ module Ardes
         base.send :hide_action, *instance_methods
       end
       
-      def element
-        instance_variable_get("@#{element_name}")
+      def resource
+        instance_variable_get("@#{resource_name}")
       end
       
-      def element=(elem)
-        instance_variable_set("@#{element_name}", elem)
+      def resource=(elem)
+        instance_variable_set("@#{resource_name}", elem)
       end
   
-      def collection
-        instance_variable_get("@#{collection_name}")
+      def resources
+        instance_variable_get("@#{resources_name}")
       end
       
-      def collection=(coll)
-        instance_variable_set("@#{collection_name}", coll)
+      def resources=(coll)
+        instance_variable_set("@#{resources_name}", coll)
       end
       
-      def enclosing_elements
-        @enclosing_elements ||= enclosing_names.inject([]){|m, name| m << send(name)}
+      def enclosing_resources
+        @enclosing_resources ||= enclosing_resource_names.inject([]){|m, name| m << send(name)}
       end
       
       def resource_service
-        @resource_service ||= element_class
+        @resource_service ||= resource_class
       end
       
       def resource_service=(service)
@@ -197,24 +196,24 @@ module Ardes
       end
       
     protected  
-      def find_collection()
+      def find_resources()
         resource_service.find :all
       end
   
-      def find_element(id = params[:id])
+      def find_resource(id = params[:id])
         resource_service.find id
       end
       
-      def new_element(attrs = params[element_name])
+      def new_resource(attrs = params[resource_name])
         resource_service.new(attrs)
       end
       
-      def element_url
-        send("#{route_name.singularize}_url", *(enclosing_elements + [element]))
+      def resource_url
+        send("#{route_name.singularize}_url", *(enclosing_resources + [resource]))
       end
   
-      def collection_url
-        send("#{route_name}_url", *enclosing_elements)
+      def resources_url
+        send("#{route_name}_url", *enclosing_resources)
       end
     end
   end

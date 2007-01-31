@@ -42,8 +42,7 @@ class ForumsController < ActionController::Base
 end
 
 class ForumPostsController < ActionController::Base
-  resources_controller_for :posts
-  nested_in :forum
+  resources_controller_for :posts, :in => :forum
   
   def whatever; end
 end
