@@ -86,8 +86,8 @@ module Ardes#:nodoc:
   #  class EventsController < ApplicationController
   #    resources_controller_for :events
   #
-  #    def new_resource(*args)
-  #      returning resource_service.new(*args) do |event|
+  #    def new_resource
+  #      returning resource_service.new(params[resource_name]) do |event|
   #        event.ip_address = request.remote_ip
   #      end
   #    end
@@ -286,18 +286,18 @@ module Ardes#:nodoc:
       
     protected
       # finds the collection of resources
-      def find_resources()
+      def find_resources
         resource_service.find :all
       end
   
       # finds the resource, using the passed id
-      def find_resource(id)
-        resource_service.find id
+      def find_resource
+        resource_service.find params[:id]
       end
       
       # makes a new resource, optionally using the passed hash
-      def new_resource(attrs = {})
-        resource_service.new(attrs)
+      def new_resource
+        resource_service.new params[resource_name]
       end
       
       # returns the url for the passed resource (default is self.resource)
@@ -326,7 +326,7 @@ module Ardes#:nodoc:
       # GET /events/1
       # GET /events/1.xml
       def show
-        self.resource = find_resource(params[:id])
+        self.resource = find_resource
 
         respond_to do |format|
           format.html # show.rhtml
@@ -341,13 +341,13 @@ module Ardes#:nodoc:
 
       # GET /events/1;edit
       def edit
-        self.resource = find_resource(params[:id])
+        self.resource = find_resource
       end
 
       # POST /events
       # POST /events.xml
       def create
-        self.resource = new_resource(params[resource_name])
+        self.resource = new_resource
 
         respond_to do |format|
           if resource.save
@@ -364,7 +364,7 @@ module Ardes#:nodoc:
       # PUT /events/1
       # PUT /events/1.xml
       def update
-        self.resource = find_resource(params[:id])
+        self.resource = find_resource
   
         respond_to do |format|
           if resource.update_attributes(params[resource_name])
@@ -381,7 +381,7 @@ module Ardes#:nodoc:
       # DELETE /events/1
       # DELETE /events/1.xml
       def destroy
-        self.resource = find_resource(params[:id])
+        self.resource = find_resource
         resource.destroy
         respond_to do |format|
           flash[:notice] = "#{resource_name} was successfully destroyed."

@@ -1,6 +1,6 @@
-= rest_controller
+= resources_controller
 
-ActionController extension to facilitate inheritance and DRYness in your rest controllers
+plugin to facilitate inheritance and DRYness in your resources controllers
 
 Simple Usage (see Ardes::ResourcesController for more)
 
