@@ -17,7 +17,7 @@ module CommentsSpecHelper
   end
 end
 
-context "Requesting /forums/3/posts/2/whatever (testing the before filters)" do
+context "Requesting /forums/3/posts/2/something (testing the before filters)" do
   include CommentsSpecHelper
   controller_name :comments
   
@@ -26,7 +26,7 @@ context "Requesting /forums/3/posts/2/whatever (testing the before filters)" do
   end
   
   def do_get
-    get :whatever, :forum_id => '3', :post_id => '2'
+    get :something, :forum_id => '3', :post_id => '2'
   end
     
   specify "should find the forum" do

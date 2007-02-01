@@ -24,6 +24,9 @@ end
 
 # Testing app setup
 
+#
+# Usage with rails compliants naming - default config should just work
+#
 class Forum < ActiveRecord::Base
   has_many :posts
 end
@@ -44,19 +47,19 @@ end
 class ForumPostsController < ActionController::Base
   resources_controller_for :posts, :in => :forum
   
-  def whatever; end
+  def something; end
 end
 
 class CommentsController < ActionController::Base
   resources_controller_for :comments, :in => [:forum, :post]
-
-  def whatever; end
+  
+  def something; end
 end
 
 ActionController::Routing::Routes.draw do |map|
   map.resources :forums do |forums|
-    forums.resources :posts, :name_prefix => 'forum_', :controller => 'forum_posts', :collection => {:whatever => :get} do |posts|
-      posts.resources :comments, :collection => {:whatever => :get}
+    forums.resources :posts, :name_prefix => 'forum_', :controller => 'forum_posts', :collection => {:something => :get} do |posts|
+      posts.resources :comments, :collection => {:something => :get}
     end
   end
 end

@@ -11,7 +11,7 @@ module ForumPostsSpecHelper
   end
 end
 
-context "Requesting /forums/2/whatever (testing the before filters)" do
+context "Requesting /forums/2/something (testing the before filters)" do
   include ForumPostsSpecHelper
   controller_name :forum_posts
   
@@ -20,7 +20,7 @@ context "Requesting /forums/2/whatever (testing the before filters)" do
   end
   
   def do_get
-    get :whatever, :forum_id => '2'
+    get :something, :forum_id => '2'
   end
     
   specify "should find the forum" do

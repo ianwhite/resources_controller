@@ -30,7 +30,6 @@ context "Requesting /forums using GET" do
   specify "should assign the found forums for the view" do
     do_get
     assigns[:forums].should_be @mock_forums
-    
   end
 end
 

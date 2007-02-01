@@ -2,17 +2,17 @@
 
 ActionController extension to facilitate inheritance and DRYness in your rest controllers
 
-Simple Usage (see class docs for more)
+Simple Usage (see Ardes::ResourcesController for more)
 
-class ThingsController < ApplicationController
-  resources_controller_for :things
-end
+  class ThingsController < ApplicationController
+    resources_controller_for :things
+  end
 
 Also supports nested resources
 
-class CommentsController < ApplicationController
-  resources_controller_for :comments, :in => [:forum, :post]
-end
+  class CommentsController < ApplicationController
+    resources_controller_for :comments, :in => [:forum, :post]
+  end
 
 === Specs and Coverage
 * {SPECDOC}[link:files/SPECDOC.html] lists the specifications

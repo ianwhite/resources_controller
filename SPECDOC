@@ -1,10 +1,10 @@
-# Requesting /forums/3/posts/2/whatever (testing the before filters)
+# Requesting /forums/3/posts/2/something (testing the before filters)
 # * should find the forum
 # * should assign the found forum for the view
 # * should find the post
 # * should assign the found post for the view
 # * should assign the post_comments association as the comments resource_service
-# Requesting /forums/2/whatever (testing the before filters)
+# Requesting /forums/2/something (testing the before filters)
 # * should find the forum
 # * should assign the found forum for the view
 # * should assign the forum_posts association as the posts resource_service
