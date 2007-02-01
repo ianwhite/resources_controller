@@ -283,6 +283,16 @@ module Ardes#:nodoc:
       def resource_service=(service)
         @resource_service = service
       end
+    
+      # returns the url for the passed resource (default is self.resource)
+      def resource_url(resource = self.resource)
+        send("#{route_name.singularize}_url", *(enclosing_resources + [resource]))
+      end
+  
+      # returns the url for the resources collection
+      def resources_url
+        send("#{route_name}_url", *enclosing_resources)
+      end
       
     protected
       # finds the collection of resources
@@ -298,16 +308,6 @@ module Ardes#:nodoc:
       # makes a new resource, optionally using the passed hash
       def new_resource
         resource_service.new params[resource_name]
-      end
-      
-      # returns the url for the passed resource (default is self.resource)
-      def resource_url(resource = self.resource)
-        send("#{route_name.singularize}_url", *(enclosing_resources + [resource]))
-      end
-  
-      # returns the url for the resources collection
-      def resources_url
-        send("#{route_name}_url", *enclosing_resources)
       end
     end
     
