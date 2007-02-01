@@ -131,18 +131,21 @@ module Ardes#:nodoc:
       
       self.class_eval do
         unless included_modules.include?(::Ardes::ResourcesController::InstanceMethods)
-          class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_collection_name, :route_name, :enclosing_resource_names
+          class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_collection_name, :route_name, :singular_route_name, :enclosing_resource_names
           self.enclosing_resource_names ||= []
           include InstanceMethods
+          include UrlHelpers
           include Actions unless options[:actions_include] == false
+          helper Helper
         end
         include options[:actions_include] if options[:actions_include]
       end
 
-      self.resources_name = resources_name.to_s
-      self.resource_name  = self.resources_name.singularize
-      self.route_name     = options[:route_name] || controller_name
-      self.resource_class = (options[:class_name] || self.resource_name.classify).constantize
+      self.resources_name           = resources_name.to_s
+      self.resource_name            = self.resources_name.singularize
+      self.route_name               = options[:route_name] || controller_name
+      self.singular_route_name      = self.route_name.singularize
+      self.resource_class           = (options[:class_name] || self.resource_name.classify).constantize
       self.resource_collection_name = options[:collection_name]
       
       nested_in(*options[:in]) if options[:in]
@@ -230,7 +233,45 @@ module Ardes#:nodoc:
       end
       self.enclosing_resource_names << name
     end
-        
+
+    # These methods are provided to aid in writing inheritable controllers.
+    #
+    # When writing an action that redirects to the list of resources, you may use <tt>resources_url</tt> and the controller
+    # will call the url_writer method appropriate to what the controller is a resources controller for.
+    module UrlHelpers
+      def resource_url(resource = self.resource)
+        send("#{singular_route_name}_url", *(enclosing_resources + [resource]))
+      end
+      
+      def edit_resource_url(resource = self.resource)
+        send("edit_#{singular_route_name}_url", *(enclosing_resources + [resource]))
+      end
+      
+      def resources_url
+        send("#{route_name}_url", *enclosing_resources)
+      end
+      
+      def new_resource_url
+        send("new_#{singular_route_name}_url", *enclosing_resources)
+      end
+      
+      def resource_path(resource = self.resource)
+        send("#{singular_route_name}_path", *(enclosing_resources + [resource]))
+      end
+      
+      def edit_resource_path(resource = self.resource)
+        send("edit_#{singular_route_name}_path", *(enclosing_resources + [resource]))
+      end
+      
+      def resources_path
+        send("#{route_name}_path", *enclosing_resources)
+      end
+      
+      def new_resource_path
+        send("new_#{singular_route_name}_path", *enclosing_resources)
+      end
+    end
+    
     module InstanceMethods
       def self.included(base)
         base.send :hide_action, *instance_methods
@@ -282,16 +323,6 @@ module Ardes#:nodoc:
       # * new
       def resource_service=(service)
         @resource_service = service
-      end
-    
-      # returns the url for the passed resource (default is self.resource)
-      def resource_url(resource = self.resource)
-        send("#{route_name.singularize}_url", *(enclosing_resources + [resource]))
-      end
-  
-      # returns the url for the resources collection
-      def resources_url
-        send("#{route_name}_url", *enclosing_resources)
       end
       
     protected
@@ -388,6 +419,70 @@ module Ardes#:nodoc:
           format.html { redirect_to resources_url }
           format.xml  { head :ok }
         end
+      end
+    end
+    
+    # Often it won't be appropriate to re-use views, but
+    # sometimes it is.  These helper methods enable reuse by referencing whatever resource the 
+    # controller is for.
+    #
+    # For example:
+    #
+    # instead of writing:
+    #  <% for event in @events %>
+    #    <%= link_to 'edit', edit_event_path(event) %>
+    #
+    # you may write:
+    #  <% for event in resources %>
+    #    <%= link_to 'edit', edit_resource_path(event) %>
+    #
+    module Helper
+      def resource_name
+        controller.resource_name.humanize
+      end
+      
+      def resources_name
+        resource_name.pluralize
+      end
+      
+      def resource
+        controller.resource
+      end
+      
+      def resources
+        controller.resources
+      end
+      
+      def resource_url(resource = nil)
+        controller.resource_url(resource)
+      end
+      
+      def edit_resource_url(resource = nil)
+        controller.edit_resource_url(resource)
+      end
+      
+      def resources_url
+        controller.resources_url
+      end
+      
+      def new_resource_url
+        controller.new_resource_url
+      end
+      
+      def resource_path(resource = nil)
+        controller.resource_path(resource)
+      end
+      
+      def edit_resource_path(resource = nil)
+        controller.edit_resource_path(resource)
+      end
+      
+      def resources_path
+        controller.resources_path
+      end
+      
+      def new_resource_path
+        controller.new_resource_path
       end
     end
   end
