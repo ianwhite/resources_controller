@@ -1,108 +1,102 @@
 module Ardes#:nodoc:
-  # This plugin adds easy resource controllers for your RESTful models
-  #
-  # === Example Usage
-  #
-  #  class ForumsController < ApplicationController
-  #    resources_controller_for :forums
-  #  end
-  #  
-  #  class PostsController < ApplicationController
-  #    resources_controller_for :posts, :in => :forum
-  #  end
-  #  
-  #  class CommentsController < ApplicationController
-  #    resources_controller_for :comments, :in => [:forum, :post]
-  #  end
-  #
-  # === How it works
+  # With {resources_controller}[link:http://svn.ardes.com/rails_plugins/resources_controller] you can quickly add
+  # an ActiveResource compliant controller for your your RESTful models.
   # 
-  # A RESTful controller needs to find and create resources.  In the case of a non-nested resource, it uses
-  # the resource's class to do this.  In the case of a nested resource, it may use an association to do this.  It so happens
-  # that the API for finding and creating resources is exactly the same for classes and has_many associations. which means:
+  # The intention is not to create an auto-scaffold, although it can be used for that.
+  # The intention is to DRY up some of the repetitive code associated with controllers
+  # and to facilitate inheritance.
   # 
-  # <tt>resource_service</tt> can hold whatever is being used to find or create resources, and can be swapped about to:
-  # * ensure that resources can be found and created the same way (DRY)
-  # * ensure that only the correct resources are found or created
-  #
-  # === What you get
-  #
-  # By including the <tt>resource_controller_for</tt> line the following features are added to the controller:
-  #
-  # * standard CRUD actions, responding to xml and html (this can be changed with <tt>:actions_include:</tt> option)
-  # * compliance with how normal assigns and views works (e.g. PostsController sets a <tt>@posts</tt> instance var in <tt>index</tt>)
-  # * accessors +resource+ and +resources+ - which reference the the assigns for the controller (e.g. in Posts controller resource == @post, resources == @posts,  These aid in creating actions shareable in an inhertiance hierachy
-  # * a few functions to aid in changing the behaviour of your controller without touching the actions (see InstanceMethods: +find_resource+, +find_resources+, +new_resource+)
+  # === Simple Usage
+  # Here's a simple example of how it works with a Forums has many Posts model:
   # 
-  # if you have a nested resource (by specifying :in or nested_in) you get:
-  #
-  # * before_filters to assign the nesting resource (@post and @forum in the above examples)
-  # * code to ensure that the resource is found, or created, from the correct source (@post.comments for example)
-  #
-  # === Writing inheritable controllers
-  #
-  # If you are writing a custom action which is not going be be inherited from, you can write your actions in the usual way, and it will all just work.
+  #   class ForumsController < ApplicationController
+  #     resources_controller_for :forums
+  #   end
   # 
-  # Example:
-  #  def index
-  #    @posts = @forum.find :all
-  #    respond_to do |format|
-  #      format.xml { render :xml => @posts.to_my_weird_xml } # custom xml handling for some reason
-  #    end
-  #  end
+  #   class PostsController < ApplicationController
+  #     resources_controller_for :posts, :in => :forum
+  #   end
+  # 
+  # === Inheritance
+  # But you can also use it to facilitate inheritance.  Let's say you have a Posts, User's Posts, and Forum's Posts controller,
+  # that all respond to an atom feed on the index.  You would do it like this:
+  # 
+  #   class PostsController < ApplicationController
+  #     resources_controller_for :posts
+  # 
+  #     def index
+  #       self.resources = find_resources
+  #       respond_to do |format|
+  #         format.html
+  #         format.xml { render :xml => resources.to_xml }
+  #         # custom atom response here
+  #       end
+  #     end
+  #   end
+  # 
+  #   class UserPostsController < PostsController # notice inhertiance
+  #     nested_in :user
+  #   end
+  # 
+  #   class ForumPostsController < PostsController # notice inhertiance
+  #     nested_in :forum
+  #   end
+  # 
+  # === Customising nesting
+  # If you have some funky stuff going when you set the @forum, you can specify it like this:
+  # 
+  #   class ForumPostsController < PostsController
+  #     nested_in :forum do
+  #       Forum.find_activated params[:forum_id]
+  #     end
+  #   end
+  # 
+  # === Customising finding, and creating
+  # If you want to implement something like query params you can override *find_resources*.  If you want to change the 
+  # way your new resources are created you can override *new_resource*.
   #
-  # However, if you want to do this for a number of posts controllers (say user's posts, all posts, and a forum's posts) then you can write
-  # this action, with it's custom behaviour, once
+  #   class PostsController < ApplicationController
+  #     resources_controller_for :forum
+  # 
+  #     def find_resources
+  #       resource_service.find :all, :order => params[:sort_by]
+  #     end
   #
-  # ===== Example
-  #  class PostsController < ApplicationController  # all posts
-  #    resources_controller_for :posts
+  #     def new_resource
+  #       returning resource_service.new(params[resource_name]) do |post|
+  #         post.ip_address = request.remote_ip
+  #       end
+  #     end
+  #   end
   #
-  #    def index
-  #      self.resources = find_resources
-  #      respond_to do |format|
-  #        format.xml { render :xml => resources.to_my_weird_xml }
-  #      end
-  #    end
-  #  end
+  # In the same way, you can override *find_resource*.
+  # 
+  # === resource_service
+  # Internally, *resource_service* is used to find and create resources.  This is set to the resources
+  # class for a simple, non-nested, resource.  It is set to a has_many collection for nested resources.
+  # 
+  # But you can set it to any object that responds to :find and :new.
   #
-  #  class UserPostsController < PostsController # <= notice inhertiance
-  #    nested_in :user
-  #  end
+  # === Deeply nested resources
   #
-  #  class ForumPostsController < PostsController # <= notice inhertiance
-  #    nested_in :forum
-  #  end
+  # Finally, it works for deeply nested controllers as well:
+  # 
+  #   class CommentsController < ApplicationController
+  #     resources_controller_for :comments, :in => [:forum, :post]
+  #   end
+  # 
+  # The above code will add two before filters:
+  # 
+  #   @forum = Forum.find params[:forum_id]
+  #   @post = @forum.posts.find params[:post_id]
+  # 
+  # And sets the *resource_service* to:
+  # 
+  #   @post.comments
   #
-  # Nice and DRY
-  #
-  #
-  # ===== Another example
-  # In this example we make use of the [find_resource, find_resources, new_resource] layer to abstract some common funtionality.
-  #
-  # The example is that of a Signup, and Login (STI classes descending from Event).  All events log the ip address
-  # from the request.  We can implement this by modifying how a new resource is created.
-  #
-  #  class EventsController < ApplicationController
-  #    resources_controller_for :events
-  #
-  #    def new_resource
-  #      returning resource_service.new(params[resource_name]) do |event|
-  #        event.ip_address = request.remote_ip
-  #      end
-  #    end
-  #  end
-  #
-  #  class SignupsController < EventsController
-  #    resources_controller_for :signups
-  #  end
-  #
-  #  class LoginsController < EventsController
-  #    resources_controller_for :logins
-  #  end
-  #
-  # Changing the behaviour of the <tt>new_resource</tt> method allows us to specify behaviour at a more general level, so we don't have to repeat ourselves in actions, which is error prone and boring.
-  #
+  # === Plays nice
+  # The assigns for the view will all be what you expect them to be (@post, @comment, etc) and the same goes for the params hash.
+  # 
   module ResourcesController
     # Specifies that this controller is a REST style controller for the named resource (a resources plural like :users).  You can specify that the 
     # resource is a nested resource.
@@ -111,8 +105,8 @@ module Ardes#:nodoc:
     # * <tt>:class_name:</tt> The class name of the resource, if it can't be inferred from its name
     # * <tt>:collection_name:</tt> (if using nested resources - see nested_in) The collection that the resources belongs to, if it can't be inferred from its name
     # * <tt>:route_name:</tt> The name of the route (of the resources, i.e. :users), if it can't be inferred from the name of the controller
-    # * <tt>:in:</tt> Ordered array of singular model names which correspond to nesting a resource.
     # * <tt>:actions_include:</tt> A module, which will be included in the class, default is Ardes::ResourcesController::Actions, if set to false, no actions will be included.
+    # * <tt>:in:</tt> Ordered array of singular model names which correspond to nesting a resource.
     #
     # Examples:
     #  resources_controller_for :users
@@ -151,20 +145,18 @@ module Ardes#:nodoc:
       nested_in(*options[:in]) if options[:in]
     end
     
-    # [This can also be called via the <tt>:in</tt> option in <tt>resources_controller_for</tt>]
-    #
     # Specifies that the resource is nested in another resource.  Can be called in two ways:
     #
-    # single: <tt>nested_in :resource[, options] [&block]
-    # 
-    # multiple: <tt>nested_in :resource1[, :resource2]...
+    #   nested_in :resource[, options] [&block]
+    #   nested_in :resource1[, :resource2]...
     #
-    # The multiple version is equivalent to calling <tt>nested_in</tt> multiple times, and can only be used to provide the default functionality.
+    # The latter version is equivalent to calling <tt>nested_in</tt> multiple times, and can only be used to provide the default functionality.
     #
     # Calling <tt>nested_in :foo</tt> will result in the following:
     # * a before_filter which sets @foo according to params[:foo_id]
     # * resource_service will change from being the resource class to being @foo.resources association
     #
+    # === customise before_filter
     # You can customise how the before_filter sets the nesting resource by passing a block which will be evaluated in the controller instance
     # the value of this block is assigned to the nesting resource instance_variable
     #  
@@ -175,8 +167,7 @@ module Ardes#:nodoc:
     #
     # (The above block just happens to be the default behaviour for a single nested controller)
     #
-    #
-    # === Multiple <tt>nested_in</tt>s
+    # === Deep nesting
     # A typical resource that is multiply nested is found in the following way (example is forum has_many posts, each has_many comments):
     # 
     #  @forum = Forum.find(params[:forum_id])
@@ -187,13 +178,13 @@ module Ardes#:nodoc:
     # The first nesting resource is found from the class, and subsequent ones are found from a collection.  Because of this the first, and subsequent
     # calls to nested_in have different options.
     #
-    # First <tt>nested_in</tt> options
-    # * <tt>:class_name:</tt> the name of the class (e.g. 'Forum' in the above example) if it can't be inferred from the name
+    # * First nested_in: <tt>:class_name:</tt> the name of the class (e.g. 'Forum' in the above example) if it can't be inferred from the name
+    # * Subsequent nested_ins:<tt>:collection_name:</tt> the name of the collection (e.g. 'posts' in the above example) if it can't be inferred from the name
     #
-    # Subsequent <tt>nested_in</tt> options
-    # * <tt>:collection_name:</tt> the name of the collection (e.g. 'posts' in the above example) if it can't be inferred from the name
-    #
-    # Example using options (models are in Funky:: module, and collections are name 'the_*'):
+    # === Example using options
+    # If you're not using rails conventions that's ok.  Here's an example of how to do it
+    # 
+    # models are in Funky:: module, and collections are named'the_*':
     #  
     #  class CommentsController < ApplicationController
     #    resources_controller_for :comments, :collection_name => 'the_comments' # @post.the_comments will be used as the resource_service
@@ -236,7 +227,7 @@ module Ardes#:nodoc:
 
     # These methods are provided to aid in writing inheritable controllers.
     #
-    # When writing an action that redirects to the list of resources, you may use <tt>resources_url</tt> and the controller
+    # When writing an action that redirects to the list of resources, you may use *resources_url* and the controller
     # will call the url_writer method appropriate to what the controller is a resources controller for.
     module UrlHelpers
       def resource_url(resource = self.resource)
@@ -342,6 +333,42 @@ module Ardes#:nodoc:
       end
     end
     
+    # standard CRUD actions, with html and xml responses, re-written to mnake best use of resource_cotroller.
+    # This helps if you're writing controllers that you want to share via mixin or inheritance.
+    #
+    # The idea is to decouple the <b>model name</b> from the action code.
+    #
+    # Here's how:
+    #
+    # === finding and making new resources
+    # Instead of this:
+    #   @post = Post.find(params[:id])
+    #   @post = Post.new
+    #   @posts = Post.find(:all)
+    #
+    # do this:
+    #   self.resource = find_resource
+    #   self.resource = new_resource
+    #   self.resources = find_resources
+    #
+    # === referring to resources
+    # Instead of this:
+    #   format.xml { render :xml => @post.to_xml }
+    #   format.xml { render :xml => @posts.to_xml }
+    #   
+    # do this:
+    #   format.xml { render :xml => resource.to_xml }
+    #   format.xml { render :xml => resources.to_xml }
+    #
+    # === urls 
+    # Instead of this:
+    #   redirect_to posts_url
+    #   redirect_to new_post_url
+    #
+    # do this:
+    #   redirect_to resources_url
+    #   redirect_to new_resource_url
+    #
     module Actions
       # GET /events
       # GET /events.xml
