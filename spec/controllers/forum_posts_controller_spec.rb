@@ -5,7 +5,7 @@ module ForumPostsSpecHelper
     @forum = mock('Forum')
     @forum_posts = mock('Assoc: forum_posts')
     @forum.stub!(:posts).and_return(@forum_posts)
-    @forum.stub!(:to_param).and_return(2)
+    @forum.stub!(:to_param).and_return("2")
     
     Forum.stub!(:find).and_return(@forum)
   end
@@ -193,7 +193,7 @@ context "Requesting /forums/2/posts using POST" do
     setup_mocks
     @post = mock('Post')
     @post.stub!(:save).and_return(true)
-    @post.stub!(:to_param).and_return(1)
+    @post.stub!(:to_param).and_return("1")
     @forum_posts.stub!(:new).and_return(@post)
   end
   
@@ -220,7 +220,7 @@ context "Requesting /forums/2/posts/1 using PUT" do
   setup do
     setup_mocks
     @post = mock('Post', :null_object => true)
-    @post.stub!(:to_param).and_return(1)
+    @post.stub!(:to_param).and_return("1")
     @forum_posts.stub!(:find).and_return(@post)
   end
   

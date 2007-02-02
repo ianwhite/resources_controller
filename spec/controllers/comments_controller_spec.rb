@@ -5,12 +5,12 @@ module CommentsSpecHelper
     @forum = mock('Forum')
     @forum_posts = mock('Assoc: forum_posts')
     @forum.stub!(:posts).and_return(@forum_posts)
-    @forum.stub!(:to_param).and_return(3)
+    @forum.stub!(:to_param).and_return("3")
     
     @post = mock('Post')
     @post_comments = mock('Assoc: post_comments')
     @post.stub!(:comments).and_return(@post_comments)
-    @post.stub!(:to_param).and_return(2)
+    @post.stub!(:to_param).and_return("2")
         
     Forum.stub!(:find).and_return(@forum)
     @forum_posts.stub!(:find).and_return(@post)
@@ -210,7 +210,7 @@ context "Requesting /forums/3/posts/3/comments using POST" do
     setup_mocks
     @comment = mock('Comment')
     @comment.stub!(:save).and_return(true)
-    @comment.stub!(:to_param).and_return(1)
+    @comment.stub!(:to_param).and_return("1")
     @post_comments.stub!(:new).and_return(@comment)
   end
   
@@ -237,7 +237,7 @@ context "Requesting /forums/3/posts/3/comments/1 using PUT" do
   setup do
     setup_mocks
     @comment = mock('Comment', :null_object => true)
-    @comment.stub!(:to_param).and_return(1)
+    @comment.stub!(:to_param).and_return("1")
     @post_comments.stub!(:find).and_return(@comment)
   end
   

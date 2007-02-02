@@ -205,7 +205,7 @@ context "Requesting /forums using POST" do
   setup do
     @mock_forum = mock('Forum')
     @mock_forum.stub!(:save).and_return(true)
-    @mock_forum.stub!(:to_param).and_return(1)
+    @mock_forum.stub!(:to_param).and_return("1")
     Forum.stub!(:new).and_return(@mock_forum)
   end
   
@@ -230,7 +230,7 @@ context "Requesting /forums/1 using PUT" do
 
   setup do
     @mock_forum = mock('Forum', :null_object => true)
-    @mock_forum.stub!(:to_param).and_return(1)
+    @mock_forum.stub!(:to_param).and_return("1")
     Forum.stub!(:find).and_return(@mock_forum)
   end
   

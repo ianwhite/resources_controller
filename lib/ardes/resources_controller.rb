@@ -1,5 +1,5 @@
 module Ardes#:nodoc:
-  # With {resources_controller}[link:http://svn.ardes.com/rails_plugins/resources_controller] you can quickly add
+  # With resources_controller (http://svn.ardes.com/rails_plugins/resources_controller) you can quickly add
   # an ActiveResource compliant controller for your your RESTful models.
   # 
   # The intention is not to create an auto-scaffold, although it can be used for that.
