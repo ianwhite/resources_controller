@@ -438,11 +438,11 @@ module Ardes#:nodoc:
     #
     module Helper
       def resource_name
-        controller.resource_name.humanize
+        controller.resource_name
       end
       
       def resources_name
-        resource_name.pluralize
+        controller.resources_name
       end
       
       def resource
