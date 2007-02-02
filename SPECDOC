@@ -4,6 +4,39 @@
 # * should find the post
 # * should assign the found post for the view
 # * should assign the post_comments association as the comments resource_service
+# Requesting /forums/3/posts/2/comments using GET
+# * should be successful
+# * should render index.rhtml
+# * should find comments in post
+# * should assign the found comments for the view
+# Requesting /forums/3/posts/3/comments/1 using GET
+# * should be successful
+# * should render show.rhtml
+# * should find the comment requested
+# * should assign the found comment for the view
+# Requesting /forums/3/posts/3/comments/new using GET
+# * should be successful
+# * should render new.rhtml
+# * should create a new comment
+# * should not save the new comment
+# * should assign the new comment for the view
+# Requesting /forums/3/posts/3/comments/1;edit using GET
+# * should be successful
+# * should render edit.rhtml
+# * should find the comment requested
+# * should assign the found comment for the view
+# Requesting /forums/3/posts/3/comments using POST
+# * should create a new comment
+# * should redirect to the new comment
+# Requesting /forums/3/posts/3/comments/1 using PUT
+# * should find the comment requested
+# * should update the found comment
+# * should assign the found comment for the view
+# * should redirect to the comment
+# Requesting /forums/3/posts/3/comments/1 using DELETE
+# * should find the comment requested
+# * should call destroy on the found comment
+# * should redirect to the comments list
 # Requesting /forums/2/something (testing the before filters)
 # * should find the forum
 # * should assign the found forum for the view
