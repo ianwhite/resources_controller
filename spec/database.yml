@@ -1,0 +1,6 @@
+db:
+  adapter: mysql
+  username: root
+  password:
+  database: plugin_test
+  socket: /opt/local/var/run/mysqld/mysqld.sock
