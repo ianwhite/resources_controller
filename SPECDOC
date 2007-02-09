@@ -115,3 +115,17 @@
 # * should find the forum requested
 # * should call destroy on the found forum
 # * should redirect to the forums list
+# resource_service in ForumsController
+# * should build new forum with new
+# * should find @forum with find(@forum.id)
+# * should find all forums with find(:all)
+# resource_service in ForumPostsController
+# * should build new post with @forum foreign key with new
+# * should find @post with find(@post.id)
+# * should raise RecordNotFound with find(@other_post.id)
+# * should find only posts belonging to @forum with find(:all)
+# resource_service in CommentsController
+# * should build new comment with @post foreign key with new
+# * should find @comment with find(@comment.id)
+# * should raise RecordNotFound with find(@other_post.id)
+# * should find only comments belonging to @post with find(:all)
