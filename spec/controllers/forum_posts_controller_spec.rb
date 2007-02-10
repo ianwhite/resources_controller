@@ -11,16 +11,18 @@ module ForumPostsSpecHelper
   end
 end
 
-context "Requesting /forums/2/something (testing the before filters)" do
+context "Requesting /forums/2/posts (testing the before filters)" do
   include ForumPostsSpecHelper
   controller_name :forum_posts
   
   setup do
     setup_mocks
+    @posts = mock('Posts')
+    @forum_posts.stub!(:find).and_return(@posts)
   end
   
   def do_get
-    get :something, :forum_id => '2'
+    get :index, :forum_id => '2'
   end
     
   specify "should find the forum" do

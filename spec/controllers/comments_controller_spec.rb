@@ -17,16 +17,18 @@ module CommentsSpecHelper
   end
 end
 
-context "Requesting /forums/3/posts/2/something (testing the before filters)" do
+context "Requesting /forums/3/posts/2/comments (testing the before filters)" do
   include CommentsSpecHelper
   controller_name :comments
   
   setup do
     setup_mocks
+    @comments = mock('Comments')
+    @post_comments.stub!(:find).and_return(@comments)
   end
   
   def do_get
-    get :something, :forum_id => '3', :post_id => '2'
+    get :index, :forum_id => '3', :post_id => '2'
   end
     
   specify "should find the forum" do

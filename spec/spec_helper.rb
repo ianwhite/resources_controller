@@ -29,55 +29,76 @@ end
 
 ActiveRecord::Migration.suppress_messages do
   ActiveRecord::Schema.define(:version => 0) do
+    create_table :users, :force => true do |t|
+    end
+
     create_table :forums, :force => true do |t|
     end
 
     create_table :posts, :force => true do |t|
       t.column "forum_id", :integer
+      t.column "user_id", :integer
     end
 
     create_table :comments, :force => true do |t|
       t.column "post_id", :integer
+      t.column "user_id", :integer
     end
   end
 end
 
-#
-# Usage with rails compliants naming - default config should just work
-#
+class User < ActiveRecord::Base
+  has_many :posts
+  has_many :comments
+end
+
 class Forum < ActiveRecord::Base
   has_many :posts
 end
 
 class Post < ActiveRecord::Base
   belongs_to :forum
+  belongs_to :user
   has_many :comments
 end
 
 class Comment < ActiveRecord::Base
+  belongs_to :user
   belongs_to :post
+end
+
+class UsersController < ActionController::Base
+  resources_controller_for :users
 end
 
 class ForumsController < ActionController::Base
   resources_controller_for :forums
 end
 
-class ForumPostsController < ActionController::Base
-  resources_controller_for :posts, :in => :forum
-  
-  def something; end
+class PostsController < ActionController::Base
+  resources_controller_for :posts
+end
+
+class UserPostsController < PostsController
+  nested_in :user
+end
+
+class ForumPostsController < PostsController
+  nested_in :forum
 end
 
 class CommentsController < ActionController::Base
   resources_controller_for :comments, :in => [:forum, :post]
-  
-  def something; end
 end
 
 ActionController::Routing::Routes.draw do |map|
+  map.resources :users do |users|
+    users.resources :posts, :name_prefix => 'user_', :controller => 'user_posts'
+    users.resources :comments, :name_prefix => 'user_', :controller => 'user_comments'
+  end
   map.resources :forums do |forums|
-    forums.resources :posts, :name_prefix => 'forum_', :controller => 'forum_posts', :collection => {:something => :get} do |posts|
-      posts.resources :comments, :collection => {:something => :get}
+    forums.resources :posts, :name_prefix => 'forum_', :controller => 'forum_posts' do |posts|
+      posts.resources :comments
     end
   end
 end

@@ -125,8 +125,21 @@ module Ardes#:nodoc:
       
       self.class_eval do
         unless included_modules.include?(::Ardes::ResourcesController::InstanceMethods)
-          class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_collection_name, :route_name, :singular_route_name, :enclosing_resource_names
+          class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_collection_name, :enclosing_resource_names
           self.enclosing_resource_names ||= []
+          
+          class<<self
+            attr_writer :route_name, :singular_route_name
+            
+            def route_name
+              @route_name ||= controller_name
+            end
+            
+            def singular_route_name
+              @singular_route_name ||= route_name.singularize
+            end
+          end
+          
           include InstanceMethods
           include UrlHelpers
           include Actions unless options[:actions_include] == false
@@ -137,10 +150,9 @@ module Ardes#:nodoc:
 
       self.resources_name           = resources_name.to_s
       self.resource_name            = self.resources_name.singularize
-      self.route_name               = options[:route_name] || controller_name
-      self.singular_route_name      = self.route_name.singularize
       self.resource_class           = (options[:class_name] || self.resource_name.classify).constantize
       self.resource_collection_name = options[:collection_name]
+      self.route_name               = options[:route_name]
       
       nested_in(*options[:in]) if options[:in]
     end
@@ -224,7 +236,7 @@ module Ardes#:nodoc:
       end
       self.enclosing_resource_names << name
     end
-
+    
     # These methods are provided to aid in writing inheritable controllers.
     #
     # When writing an action that redirects to the list of resources, you may use *resources_url* and the controller
@@ -266,6 +278,14 @@ module Ardes#:nodoc:
     module InstanceMethods
       def self.included(base)
         base.send :hide_action, *instance_methods
+      end
+      
+      def route_name
+        self.class.route_name
+      end
+      
+      def singular_route_name
+        self.class.singular_route_name
       end
       
       # returns the controller's current resource
