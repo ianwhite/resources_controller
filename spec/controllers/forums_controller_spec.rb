@@ -1,4 +1,65 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
+
+context "Routing shortcuts for ForumPosts (forums/1) should map" do
+  controller_name :forums
+  
+  setup do
+    @forum = mock('Forum')
+    @forum.stub!(:to_param).and_return('2')
+    Forum.stub!(:find).and_return(@forum)
+    get :show, :id => "2"
+  end
+  
+  specify "resources_path to /forums" do
+    controller.resources_path.should == '/forums'
+  end
+
+  specify "resource_path to /forums/2" do
+    controller.resource_path.should == '/forums/2'
+  end
+  
+  specify "resource_path(9) to /forums/9" do
+    controller.resource_path(9).should == '/forums/9'
+  end
+
+  specify "edit_resource_path to /forums/2;edit" do
+    controller.edit_resource_path.should == '/forums/2;edit'
+  end
+  
+  specify "edit_resource_path(9) to /forums/9;edit" do
+    controller.edit_resource_path(9).should == '/forums/9;edit'
+  end
+  
+  specify "new_resource_path to /forums/new" do
+    controller.new_resource_path.should == '/forums/new'
+  end
+end
+
+context "resource_service in ForumsController" do
+  controller_name :forums
+  
+  setup do
+    @forum = Forum.create
+    
+    get :index
+    @resource_service = controller.send :resource_service
+  end
+  
+  specify "should build new forum with new" do
+    resource = @resource_service.new
+    resource.should_be_kind_of Forum
+  end
+  
+  specify "should find @forum with find(@forum.id)" do
+    resource = @resource_service.find(@forum.id)
+    resource.should_be == @forum
+  end
+
+  specify "should find all forums with find(:all)" do
+    resources = @resource_service.find(:all)
+    resources.should_be == Forum.find(:all)
+  end
+end
 
 context "Requesting /forums using GET" do
   controller_name :forums

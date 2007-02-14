@@ -94,6 +94,56 @@ module Ardes#:nodoc:
   # 
   #   @post.comments
   #
+  # === name_prefix
+  #
+  # For routing to work, the controller must derive, or be told about the name_prefix.  If the name_prefix is not
+  # specified, it is derived by comparing the controller_name with the superclass controller_name.
+  #
+  # You can always set this yourself with self.name_prefix =
+  #
+  # Example
+  #   class PostsController < ApplicationController
+  #     resources_controller_for :posts # will use 'posts' as route_name, and '' as name_prefix
+  #   end
+  #
+  #   class ForumPostsController < PostsController # notice inheritance
+  #     nested_in :forum # will use 'posts' as route_name, and 'forum_' as name_prefix
+  #   end
+  #
+  # === polymorphic, or anonymous, resources
+  #
+  # If you have a controller for a polymorhpic association, you can use one resources controller to service all of the routes.
+  #   class TagsController < ApplicationController
+  #     resources_controller_for :tags
+  #     nested_in :taggable, :polymorphic => true
+  #   end
+  #   # This controller will work for routes with one level of nesting
+  #   # e.g. forums/2/tags and users/2/tags
+  #
+  # If you want to have arbitrary nesting you can specify this with :load_enclosing
+  #   class TagsController < ApplicationController
+  #     resources_controller_for :tags
+  #     nested_in :taggable, :polymorphic => true, :load_enclosing => true
+  #   end
+  #   # This controller will work for routes with multiple level of nesting
+  #   #e.g. forums/2/tags, forums/2/posts/3/tags, forums/3/posts/1/comments/4/tags
+  #
+  # <b>Caveats for :anonymous and :load_enclosing</b>
+  # * This will only work properly if your model names and collections all follow the usual Rails conventions.  If they don't you can use before_filters and the block for nested_in to set things up correctly.
+  # * name_prefix is changed for each controller instance to reflect the way the resource was requested.  The usual conventions apply.
+  #
+  #   ActionController::Routing::Routes.draw do |map|
+  #     map.resources :forums do |forums|
+  #       forums.resources :tags, :name_prefix => 'forum_'
+  #       forums.resources :posts do |posts|
+  #         posts.resources :tags, :name_prefix => 'forum_post_'
+  #         posts.resources :comments do |comments|
+  #           comments.resources :tags, :name_prefix => 'forum_post_comment_'
+  #         end
+  #       end
+  #     end
+  #   end
+  #
   # === Plays nice
   # The assigns for the view will all be what you expect them to be (@post, @comment, etc) and the same goes for the params hash.
   # 
@@ -105,6 +155,7 @@ module Ardes#:nodoc:
     # * <tt>:class_name:</tt> The class name of the resource, if it can't be inferred from its name
     # * <tt>:collection_name:</tt> (if using nested resources - see nested_in) The collection that the resources belongs to, if it can't be inferred from its name
     # * <tt>:route_name:</tt> The name of the route (of the resources, i.e. :users), if it can't be inferred from the name of the controller
+    # * <tt>:name_prefix:</tt> The name_prefix of the named route, if it cannot be inferred from the controller heirachy (see nested_in)
     # * <tt>:actions_include:</tt> A module, which will be included in the class, default is Ardes::ResourcesController::Actions, if set to false, no actions will be included.
     # * <tt>:in:</tt> Ordered array of singular model names which correspond to nesting a resource.
     #
@@ -121,22 +172,23 @@ module Ardes#:nodoc:
     # model to find and create the resources.  See nested_in for more details on this, and customising the default behaviour
     #
     def resources_controller_for(resources_name, options = {})
-      options.assert_valid_keys(:class_name, :collection_name, :actions_include, :route_name, :in)
+      options.assert_valid_keys(:class_name, :collection_name, :actions_include, :route_name, :name_prefix, :in)
       
       self.class_eval do
         unless included_modules.include?(::Ardes::ResourcesController::InstanceMethods)
-          class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_collection_name, :enclosing_resource_names
-          self.enclosing_resource_names ||= []
+          class_inheritable_reader :route_name, :singular_route_name
+          class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_collection_name
           
           class<<self
-            attr_writer :route_name, :singular_route_name
+            attr_writer :name_prefix
             
-            def route_name
-              @route_name ||= controller_name
+            def name_prefix
+              @name_prefix ||= controller_name.sub(route_name, '')
             end
             
-            def singular_route_name
-              @singular_route_name ||= route_name.singularize
+            def route_name=(name)
+              write_inheritable_attribute(:singular_route_name, name.singularize)
+              write_inheritable_attribute(:route_name, name)
             end
           end
           
@@ -145,14 +197,16 @@ module Ardes#:nodoc:
           include Actions unless options[:actions_include] == false
           helper Helper
         end
-        include options[:actions_include] if options[:actions_include]
       end
+
+      include options[:actions_include] if options[:actions_include]
 
       self.resources_name           = resources_name.to_s
       self.resource_name            = self.resources_name.singularize
       self.resource_class           = (options[:class_name] || self.resource_name.classify).constantize
       self.resource_collection_name = options[:collection_name]
-      self.route_name               = options[:route_name]
+      self.route_name               = options[:route_name] || controller_name
+      self.name_prefix              = options[:name_prefix]
       
       nested_in(*options[:in]) if options[:in]
     end
@@ -164,8 +218,22 @@ module Ardes#:nodoc:
     #
     # The latter version is equivalent to calling <tt>nested_in</tt> multiple times, and can only be used to provide the default functionality.
     #
+    # The options for nested_in are
+    # * <tt>:class_name:</tt> The class name of the resource, if it can't be inferred from its name
+    # * <tt>:collection_name:</tt> The collection that the resources belongs to, if it can't be inferred from its name
+    # * <tt>:foreign_key:</tt> The foreign key of the resource, if it can;t be inferred from its name
+    # * <tt>:anonymous:</tt> set true if the nesting resource type should be inferred from the request
+    # * <tt>:polymorphic:</tt> synonym for anonymous
+    # * <tt>:load_enclosing:</tt> set true if you want the enclosing resources to be inferred from the request
+    # * <tt>:name_prefix:</tt> The name_prefix of the named route, if it cannot be inferred from the controller heirachy (see nested_in).
+    #
+    # <b>:anonymouos and :name_prefix</b>If :anonymous has been set to true the name_prefix will be inferred from the request.
+    # Pass a proc (eval'd in instance) to change this behaviour, or pass false to turn it off completely.
+    #
+    # === Example
+    # 
     # Calling <tt>nested_in :foo</tt> will result in the following:
-    # * a before_filter which sets @foo according to params[:foo_id]
+    # * a before_filter which sets @foo according to params[:foo_id] (see load_enclosing_resource)
     # * resource_service will change from being the resource class to being @foo.resources association
     #
     # === customise before_filter
@@ -221,71 +289,44 @@ module Ardes#:nodoc:
   private
     def add_enclosing(name, options = {}, &block)
       name = name.to_s
-      is_first = enclosing_resource_names.size == 0
-      is_first ? options.assert_valid_keys(:class_name) : options.assert_valid_keys(:collection_name)
+      options.assert_valid_keys(:polymorphic, :anonymous, :load_enclosing, :class_name, :collection_name, :foreign_key, :name_prefix)
+      options[:anonymous] = options[:anonymous] || options[:polymorphic]
+      
+      before_filter {|controller| controller.send :load_enclosing_resources} if options[:load_enclosing]
+      
       if block_given?
-        before_filter {|c| c.instance_variable_set("@#{name}", c.instance_eval(&block)) }
+        before_filter {|controller| controller.send :load_enclosing_resource, name, &block}
       else
-        if is_first
-          e_class, fk = (options[:class_name] || name.classify).constantize, name.foreign_key
-          before_filter {|c| c.instance_eval "@#{name} = #{e_class}.find(params[:#{fk}])"}
-        else
-          prev, coll, fk = enclosing_resource_names.last, options[:collection_name] || name.pluralize, name.foreign_key
-          before_filter {|c| c.instance_eval "@#{name} = @#{prev}.#{coll}.find(params[:#{fk}])"}
-        end
-      end
-      self.enclosing_resource_names << name
-    end
-    
-    # These methods are provided to aid in writing inheritable controllers.
-    #
-    # When writing an action that redirects to the list of resources, you may use *resources_url* and the controller
-    # will call the url_writer method appropriate to what the controller is a resources controller for.
-    module UrlHelpers
-      def resource_url(resource = self.resource)
-        send("#{singular_route_name}_url", *(enclosing_resources + [resource]))
-      end
-      
-      def edit_resource_url(resource = self.resource)
-        send("edit_#{singular_route_name}_url", *(enclosing_resources + [resource]))
-      end
-      
-      def resources_url
-        send("#{route_name}_url", *enclosing_resources)
-      end
-      
-      def new_resource_url
-        send("new_#{singular_route_name}_url", *enclosing_resources)
-      end
-      
-      def resource_path(resource = self.resource)
-        send("#{singular_route_name}_path", *(enclosing_resources + [resource]))
-      end
-      
-      def edit_resource_path(resource = self.resource)
-        send("edit_#{singular_route_name}_path", *(enclosing_resources + [resource]))
-      end
-      
-      def resources_path
-        send("#{route_name}_path", *enclosing_resources)
-      end
-      
-      def new_resource_path
-        send("new_#{singular_route_name}_path", *enclosing_resources)
+        before_filter {|controller| controller.send :load_enclosing_resource, name, options}
       end
     end
     
     module InstanceMethods
       def self.included(base)
         base.send :hide_action, *instance_methods
-      end
-      
-      def route_name
-        self.class.route_name
-      end
-      
-      def singular_route_name
-        self.class.singular_route_name
+        
+        # the following accessors are set up to use the class attribute as default
+        # and alos to allow setting on the instance, without affecting the class attribute
+        base.class_eval do
+          attr_writer :name_prefix
+          
+          def route_name=(name)
+            @singular_route_name = nil
+            @route_name = name
+          end
+          
+          def route_name
+            @route_name ||= self.class.route_name
+          end
+          
+          def singular_route_name
+            @singular_route_name ||= route_name.singularize
+          end
+          
+          def name_prefix
+            @name_prefix ||= self.class.name_prefix
+          end
+        end
       end
       
       # returns the controller's current resource
@@ -310,7 +351,8 @@ module Ardes#:nodoc:
       
       # returns an array of the controller's enclosing (nested in) resources
       def enclosing_resources
-        @enclosing_resources ||= enclosing_resource_names.inject([]){|m, name| m << instance_variable_get("@#{name}")}
+        @enclosing_resources ||= []
+      #  @enclosing_resources ||= enclosing_resource_names.inject([]){|m, name| m << instance_variable_get("@#{name}")}.freeze
       end
       
       # returns the current resource service.  This is used to find and create resources (see find_resource, find_resources, new_resource)
@@ -350,6 +392,61 @@ module Ardes#:nodoc:
       # makes a new resource, optionally using the passed hash
       def new_resource
         resource_service.new params[resource_name]
+      end
+
+      # returns [resources_name, resource_id] sections from the request
+      # @TODO - test regexp
+      def resources_request
+        @resources_request ||= request.env['REQUEST_URI'].scan(%r{/(\w+)/(\d*)})
+      end
+
+    private
+      def load_enclosing_resources
+        raise RuntimeError, "you can only specify nested_in :load_enclosing => true once" if @load_enclosing_resources_called
+        @load_enclosing_resources_called = true
+      
+        to = resources_request.find {|(r,_)| r == resources_name}
+        to_idx = (to ? resources_request.index(to) : resources_request.size) - 1
+        if to_idx > 0
+          enclosing_request = resources_request.slice(enclosing_resources.size..to_idx-1)
+          enclosing_request.each {|(name, _)| load_enclosing_resource(name, :anonymous => true)}
+        end
+        true
+      end
+    
+      def load_enclosing_resource(name, options = {}, &block)
+        enclosing_resource = block_given? ? instance_eval(&block) : find_enclosing_resource(name, options)
+        update_name_prefix(options[:name_prefix]) if options[:name_prefix] or (options[:anonymous] && options[:name_prefix] != false)
+        enclosing_resources.push(enclosing_resource)
+        instance_variable_set("@#{name}", enclosing_resource)
+      end
+    
+      def update_name_prefix(name_prefix)
+        name_prefix ||= "#{resources_request[enclosing_resources.size].first.singularize}_"
+        name_prefix = instance_eval(&name_prefix) if name_prefix.is_a?(Proc)
+        self.name_prefix = "#{self.name_prefix}#{name_prefix}"
+      end
+    
+      # This is the default method for finding an enclosing resource, if a block is not given to nested_in
+      def find_enclosing_resource(name, options)
+        # find the resource via class if this is the first one
+        if enclosing_resources.size == 0
+          if options[:anonymous]
+            klass, id = resources_request[0].first.singularize.classify.constantize, resources_request[0].last
+          else
+            klass, id = (options[:class_name] || name.classify).constantize, params[options[:foreign_key] || name.foreign_key]
+          end
+          klass.find(id)
+          
+        # otherwise, find via collection
+        else
+          if options[:anonymous]
+            collection, id = resources_request[enclosing_resources.size].first, resources_request[enclosing_resources.size].last
+          else
+            collection, id = options[:collection_name] || name.pluralize, params[options[:foreign_key] || name.foreign_key]
+          end
+          enclosing_resources.last.send(collection).find(id)
+        end          
       end
     end
     
@@ -466,6 +563,44 @@ module Ardes#:nodoc:
           format.html { redirect_to resources_url }
           format.xml  { head :ok }
         end
+      end
+    end
+    
+    # These methods are provided to aid in writing inheritable controllers.
+    #
+    # When writing an action that redirects to the list of resources, you may use *resources_url* and the controller
+    # will call the url_writer method appropriate to what the controller is a resources controller for.
+    module UrlHelpers
+      def resource_url(resource = self.resource)
+        send("#{name_prefix}#{singular_route_name}_url", *(enclosing_resources + [resource]))
+      end
+      
+      def edit_resource_url(resource = self.resource)
+        send("#{name_prefix}edit_#{singular_route_name}_url", *(enclosing_resources + [resource]))
+      end
+      
+      def resources_url
+        send("#{name_prefix}#{route_name}_url", *enclosing_resources)
+      end
+      
+      def new_resource_url
+        send("#{name_prefix}new_#{singular_route_name}_url", *enclosing_resources)
+      end
+      
+      def resource_path(resource = self.resource)
+        send("#{name_prefix}#{singular_route_name}_path", *(enclosing_resources + [resource]))
+      end
+      
+      def edit_resource_path(resource = self.resource)
+        send("#{name_prefix}edit_#{singular_route_name}_path", *(enclosing_resources + [resource]))
+      end
+      
+      def resources_path
+        send("#{name_prefix}#{route_name}_path", *enclosing_resources)
+      end
+      
+      def new_resource_path
+        send("#{name_prefix}new_#{singular_route_name}_path", *enclosing_resources)
       end
     end
     

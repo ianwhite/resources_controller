@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
 
 module CommentsSpecHelper
   def setup_mocks
@@ -14,6 +14,78 @@ module CommentsSpecHelper
         
     Forum.stub!(:find).and_return(@forum)
     @forum_posts.stub!(:find).and_return(@post)
+  end
+end
+
+context "Routing shortcuts for Comments (forums/3/posts/2/comments/1) should map" do
+  include CommentsSpecHelper
+  controller_name :comments
+  
+  setup do
+    setup_mocks
+    @comment = mock('Comment')
+    @comment.stub!(:to_param).and_return("1")
+    @post_comments.stub!(:find).and_return(@comment)
+    get :show, :forum_id => "3", :post_id => "2", :id => "1"
+  end
+  
+  specify "resources_path to /forums/3/posts/2/comments" do
+    controller.resources_path.should == '/forums/3/posts/2/comments'
+  end
+
+  specify "resource_path to /forums/3/posts/2/comments/1" do
+    controller.resource_path.should == '/forums/3/posts/2/comments/1'
+  end
+  
+  specify "resource_path(9) to /forums/3/posts/2/comments/9" do
+    controller.resource_path(9).should == '/forums/3/posts/2/comments/9'
+  end
+
+  specify "edit_resource_path to /forums/3/posts/2/comments/1;edit" do
+    controller.edit_resource_path.should == '/forums/3/posts/2/comments/1;edit'
+  end
+  
+  specify "edit_resource_path(9) to /forums/3/posts/2/comments/9;edit" do
+    controller.edit_resource_path(9).should == '/forums/3/posts/2/comments/9;edit'
+  end
+  
+  specify "new_resource_path to /forums/3/posts/2/comments/new" do
+    controller.new_resource_path.should == '/forums/3/posts/2/comments/new'
+  end
+end
+
+context "resource_service in CommentsController" do
+  controller_name :comments
+  
+  setup do
+    @forum          = Forum.create
+    @post           = Post.create :forum_id => @forum.id
+    @comment        = Comment.create :post_id => @post.id
+    @other_post     = Post.create :forum_id => @forum.id
+    @other_comment  = Comment.create :post_id => @other_post.id
+    
+    get :index, :forum_id => @forum.id, :post_id => @post.id
+    @resource_service = controller.send :resource_service
+  end
+  
+  specify "should build new comment with @post foreign key with new" do
+    resource = @resource_service.new
+    resource.should_be_kind_of Comment
+    resource.post_id.should == @post.id
+  end
+  
+  specify "should find @comment with find(@comment.id)" do
+    resource = @resource_service.find(@comment.id)
+    resource.should_be == @comment
+  end
+  
+  specify "should raise RecordNotFound with find(@other_post.id)" do
+    lambda{ @resource_service.find(@other_comment.id) }.should_raise ActiveRecord::RecordNotFound
+  end
+
+  specify "should find only comments belonging to @post with find(:all)" do
+    resources = @resource_service.find(:all)
+    resources.should_be == Comment.find(:all, :conditions => "post_id = #{@post.id}")
   end
 end
 

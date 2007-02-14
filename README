@@ -13,6 +13,23 @@ Also supports nested resources
   class CommentsController < ApplicationController
     resources_controller_for :comments, :in => [:forum, :post]
   end
+  
+Also support polymorphic associations, and arbitrary nesting
+
+  class TagsController < ApplicationController
+    resources_controller_for :tags
+    nested_in :taggable, :polymorphic => true, :load_enclosing => true
+  end
+  
+  # this controller will handle
+  #   /forums/1/tags
+  #   /forums/1/posts/2/tags
+  #   /users/3/tags
+  # etc
+
+=== Contributors
+* Ian White
+* Igor Alexeiuk for work on name_prefix and polymorphic routes
 
 === Specs and Coverage
 * {SPECDOC}[link:files/SPECDOC.html] lists the specifications

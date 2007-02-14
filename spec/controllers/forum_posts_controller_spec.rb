@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
 
 module ForumPostsSpecHelper
   def setup_mocks
@@ -8,6 +8,78 @@ module ForumPostsSpecHelper
     @forum.stub!(:to_param).and_return("2")
     
     Forum.stub!(:find).and_return(@forum)
+  end
+end
+
+context "Routing shortcuts for ForumPosts (forums/2/posts/1) should map" do
+  include ForumPostsSpecHelper
+  controller_name :forum_posts
+
+  setup do
+    setup_mocks
+    @post = mock('Post')
+    @post.stub!(:to_param).and_return('1')
+    @forum_posts.stub!(:find).and_return(@post)
+  
+    get :show, :forum_id => "2", :id => "1"
+  end
+  
+  specify "resources_path to /forums/2/posts" do
+    controller.resources_path.should == '/forums/2/posts'
+  end
+
+  specify "resource_path to /forums/2/posts/1" do
+    controller.resource_path.should == '/forums/2/posts/1'
+  end
+  
+  specify "resource_path(9) to /forums/2/posts/9" do
+    controller.resource_path(9).should == '/forums/2/posts/9'
+  end
+
+  specify "edit_resource_path to /forums/2/posts/1;edit" do
+    controller.edit_resource_path.should == '/forums/2/posts/1;edit'
+  end
+  
+  specify "edit_resource_path(9) to /forums/2/posts/9;edit" do
+    controller.edit_resource_path(9).should == '/forums/2/posts/9;edit'
+  end
+  
+  specify "new_resource_path to /forums/2/posts/new" do
+    controller.new_resource_path.should == '/forums/2/posts/new'
+  end
+end
+
+context "resource_service in ForumPostsController" do
+  controller_name :forum_posts
+  
+  setup do
+    @forum        = Forum.create
+    @post         = Post.create :forum_id => @forum.id
+    @other_forum  = Forum.create
+    @other_post   = Post.create :forum_id => @other_forum.id
+    
+    get :index, :forum_id => @forum.id
+    @resource_service = controller.send :resource_service
+  end
+  
+  specify "should build new post with @forum foreign key with new" do
+    resource = @resource_service.new
+    resource.should_be_kind_of Post
+    resource.forum_id.should == @forum.id
+  end
+  
+  specify "should find @post with find(@post.id)" do
+    resource = @resource_service.find(@post.id)
+    resource.should_be == @post
+  end
+  
+  specify "should raise RecordNotFound with find(@other_post.id)" do
+    lambda{ @resource_service.find(@other_post.id) }.should_raise ActiveRecord::RecordNotFound
+  end
+
+  specify "should find only posts belonging to @forum with find(:all)" do
+    resources = @resource_service.find(:all)
+    resources.should_be == Post.find(:all, :conditions => "forum_id = #{@forum.id}")
   end
 end
 
