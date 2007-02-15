@@ -422,18 +422,12 @@ module Ardes#:nodoc:
       # This is the default method for finding an enclosing resource, if a block is not given to nested_in
       def find_enclosing_resource(name, options)
         if options[:anonymous]
-          source_name, id = *current_resources_request
+          source_name, id = *resources_request[enclosing_resources.size]
         else
           source_name, id = options[:class_name] || options[:collection_name] || name, params[options[:foreign_key] || name.foreign_key]
         end
-        
         source = (enclosing_resources.size == 0) ? source_name.classify.constantize : enclosing_resources.last.send(source_name.tableize)
         source.find(id)
-      end
-      
-      # return the request name,id pair which is currently being processed
-      def current_resources_request
-        resources_request[enclosing_resources.size]
       end
     end
     
