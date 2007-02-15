@@ -286,17 +286,11 @@ module Ardes#:nodoc:
     
   private
     def add_enclosing(name, options = {}, &block)
-      name = name.to_s
       options.assert_valid_keys(:polymorphic, :anonymous, :load_enclosing, :class_name, :collection_name, :foreign_key, :name_prefix)
       options[:anonymous] = options[:anonymous] || options[:polymorphic]
       
       before_filter {|controller| controller.send :load_enclosing_resources} if options[:load_enclosing]
-      
-      if block_given?
-        before_filter {|controller| controller.send :load_enclosing_resource, name, &block}
-      else
-        before_filter {|controller| controller.send :load_enclosing_resource, name, options}
-      end
+      before_filter {|controller| controller.send :load_enclosing_resource, name, options, &block }
     end
     
     module InstanceMethods
@@ -399,21 +393,22 @@ module Ardes#:nodoc:
       end
 
     private
+      # load any remaining enclosing resources that nest the current nested_in
       def load_enclosing_resources
         raise RuntimeError, "you can only specify nested_in :load_enclosing => true once" if @_load_enclosing_resources
         @_load_enclosing_resources = true
-      
-        to = resources_request.find {|(r,_)| r == resources_name}
-        to_idx = (to ? resources_request.index(to) : resources_request.size) - 1
-        if to_idx > 0
-          enclosing_request = resources_request.slice(enclosing_resources.size..to_idx-1)
-          enclosing_request.each {|(name, _)| load_enclosing_resource(name, :anonymous => true)}
+        
+        # ignore the last request pair if it is the resources_name
+        enclosing_request = (resources_request.last.first == resources_name) ? resources_request.slice(0..-2) : resources_request
+        
+        # load the rest of the enclosing resources, except the last (which is loaded by the nested_in
+        enclosing_request.slice(enclosing_resources.size..-2).each do |(name, _)|
+          load_enclosing_resource(name, :anonymous => true)
         end
-        true
       end
     
       def load_enclosing_resource(name, options = {}, &block)
-        enclosing_resource = block_given? ? instance_eval(&block) : find_enclosing_resource(name, options)
+        enclosing_resource = block_given? ? instance_eval(&block) : find_enclosing_resource(name.to_s, options)
         update_name_prefix(options[:name_prefix]) if options[:name_prefix] or (options[:anonymous] && options[:name_prefix] != false)
         enclosing_resources.push(enclosing_resource)
         instance_variable_set("@#{name}", enclosing_resource)
@@ -426,24 +421,19 @@ module Ardes#:nodoc:
     
       # This is the default method for finding an enclosing resource, if a block is not given to nested_in
       def find_enclosing_resource(name, options)
-        # find the resource via class if this is the first one
-        if enclosing_resources.size == 0
-          if options[:anonymous]
-            klass, id = resources_request[0].first.singularize.classify.constantize, resources_request[0].last
-          else
-            klass, id = (options[:class_name] || name.classify).constantize, params[options[:foreign_key] || name.foreign_key]
-          end
-          klass.find(id)
-          
-        # otherwise, find via collection
+        if options[:anonymous]
+          source_name, id = *current_resources_request
         else
-          if options[:anonymous]
-            collection, id = resources_request[enclosing_resources.size].first, resources_request[enclosing_resources.size].last
-          else
-            collection, id = options[:collection_name] || name.pluralize, params[options[:foreign_key] || name.foreign_key]
-          end
-          enclosing_resources.last.send(collection).find(id)
-        end          
+          source_name, id = options[:class_name] || options[:collection_name] || name, params[options[:foreign_key] || name.foreign_key]
+        end
+        
+        source = (enclosing_resources.size == 0) ? source_name.classify.constantize : enclosing_resources.last.send(source_name.tableize)
+        source.find(id)
+      end
+      
+      # return the request name,id pair which is currently being processed
+      def current_resources_request
+        resources_request[enclosing_resources.size]
       end
     end
     
