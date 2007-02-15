@@ -616,12 +616,12 @@ module Ardes#:nodoc:
         controller.resources
       end
       
-      def resource_url(resource = nil)
-        controller.resource_url(resource)
+      def resource_url(*resource)
+        controller.resource_url(*resource)
       end
       
-      def edit_resource_url(resource = nil)
-        controller.edit_resource_url(resource)
+      def edit_resource_url(*resource)
+        controller.edit_resource_url(*resource)
       end
       
       def resources_url
@@ -632,12 +632,12 @@ module Ardes#:nodoc:
         controller.new_resource_url
       end
       
-      def resource_path(resource = nil)
-        controller.resource_path(resource)
+      def resource_path(*resource)
+        controller.resource_path(*resource)
       end
       
-      def edit_resource_path(resource = nil)
-        controller.edit_resource_path(resource)
+      def edit_resource_path(*resource)
+        controller.edit_resource_path(*resource)
       end
       
       def resources_path
