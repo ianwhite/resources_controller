@@ -89,15 +89,20 @@ class ForumsController < ApplicationController
 end
 
 class PostsController < ApplicationController
-  resources_controller_for :posts
+  # example of providing options to resources_controller_for
+  resources_controller_for :posts, :class_name => 'Post', :route_name => 'posts', :name_prefix => ''
 end
 
 class UserPostsController < PostsController
-  nested_in :user
+  # example of providing options to nested in
+  nested_in :user, :class_name => 'User', :foreign_key => 'user_id', :name_prefix => 'user_'
 end
 
 class ForumPostsController < PostsController
-  nested_in :forum
+  # example of providing a custom finder for the nesting resource
+  nested_in :forum do
+    Forum.find(params[:forum_id])
+  end
 end
 
 class CommentsController < ApplicationController

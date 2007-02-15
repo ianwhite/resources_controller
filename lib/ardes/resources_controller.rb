@@ -224,11 +224,10 @@ module Ardes#:nodoc:
     # * <tt>:foreign_key:</tt> The foreign key of the resource, if it can;t be inferred from its name
     # * <tt>:anonymous:</tt> set true if the nesting resource type should be inferred from the request
     # * <tt>:polymorphic:</tt> synonym for anonymous
-    # * <tt>:load_enclosing:</tt> set true if you want the enclosing resources to be inferred from the request
+    # * <tt>:load_enclosing:</tt> set true if you want the enclosing resources to be inferred from the request.  This can only be used on the last nested_in.
     # * <tt>:name_prefix:</tt> The name_prefix of the named route, if it cannot be inferred from the controller heirachy (see nested_in).
     #
-    # <b>:anonymouos and :name_prefix</b>If :anonymous has been set to true the name_prefix will be inferred from the request.
-    # Pass a proc (eval'd in instance) to change this behaviour, or pass false to turn it off completely.
+    # <b>:anonymous and :name_prefix</b> If :anonymous has been set to true the name_prefix will be inferred from the request, pass false to not change the name prefix
     #
     # === Example
     # 
@@ -282,7 +281,6 @@ module Ardes#:nodoc:
     def nested_in(*names, &block)
       options = names.last.is_a?(Hash) ? names.pop : {}
       raise ArgumentError "when giving more than one nesting, you may not specify options or a block" if names.length > 1 and (block_given? or options.length > 0)
-      raise ArgumentError "options should not be given when giving a block" if options.length > 0 and block_given?
       names.each {|name| add_enclosing(name, options, &block)}
     end
     
@@ -402,8 +400,8 @@ module Ardes#:nodoc:
 
     private
       def load_enclosing_resources
-        raise RuntimeError, "you can only specify nested_in :load_enclosing => true once" if @load_enclosing_resources_called
-        @load_enclosing_resources_called = true
+        raise RuntimeError, "you can only specify nested_in :load_enclosing => true once" if @_load_enclosing_resources
+        @_load_enclosing_resources = true
       
         to = resources_request.find {|(r,_)| r == resources_name}
         to_idx = (to ? resources_request.index(to) : resources_request.size) - 1
@@ -423,7 +421,6 @@ module Ardes#:nodoc:
     
       def update_name_prefix(name_prefix)
         name_prefix ||= "#{resources_request[enclosing_resources.size].first.singularize}_"
-        name_prefix = instance_eval(&name_prefix) if name_prefix.is_a?(Proc)
         self.name_prefix = "#{self.name_prefix}#{name_prefix}"
       end
     
