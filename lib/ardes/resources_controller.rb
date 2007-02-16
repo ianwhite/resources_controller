@@ -203,7 +203,7 @@ module Ardes#:nodoc:
 
       self.resources_name           = resources_name.to_s
       self.resource_name            = self.resources_name.singularize
-      self.resource_class           = (options[:class_name] || self.resource_name.classify).constantize
+      self.resource_class           = (options[:class_name] || self.resource_name.camelize).constantize
       self.resource_collection_name = options[:collection_name]
       self.route_name               = options[:route_name] || controller_name
       self.name_prefix              = options[:name_prefix]

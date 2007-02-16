@@ -9,6 +9,10 @@ ActiveRecord::Migration.suppress_messages do
     create_table :users, :force => true do |t|
     end
 
+    create_table :addresses, :force => true do |t|
+      t.column "user_id", :integer
+    end
+    
     create_table :forums, :force => true do |t|
     end
 
@@ -51,6 +55,12 @@ class User < ActiveRecord::Base
   has_many :posts
   has_many :comments
   has_many :interests, :as => :interested_in
+  has_many :addresses
+end
+
+class Address < ActiveRecord::Base
+  belongs_to :user
+  has_many :tags, :as => :taggable
 end
 
 class Forum < ActiveRecord::Base
@@ -98,6 +108,10 @@ class UserPostsController < PostsController
   nested_in :user, :class_name => 'User', :foreign_key => 'user_id', :name_prefix => 'user_'
 end
 
+class AddressesController < ApplicationController
+  resources_controller_for :addresses, :in => :user
+end
+
 class ForumPostsController < PostsController
   # example of providing a custom finder for the nesting resource
   nested_in :forum do
@@ -136,6 +150,9 @@ ActionController::Routing::Routes.draw do |map|
     users.resources :interests, :name_prefix => 'user_'
     users.resources :posts, :name_prefix => 'user_', :controller => 'user_posts'
     users.resources :comments, :name_prefix => 'user_', :controller => 'user_comments'
+    users.resources :addresses do |addresses|
+      addresses.resources :tags, :name_prefix => 'user_address_'
+    end
   end
   map.resources :forums do |forums|
     forums.resources :interests, :name_prefix => 'forum_'
