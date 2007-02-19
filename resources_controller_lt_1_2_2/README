@@ -1,0 +1,57 @@
+= resources_controller
+
+plugin to facilitate inheritance and DRYness in your resources controllers
+
+Simple Usage (see Ardes::ResourcesController for more)
+
+  class ThingsController < ApplicationController
+    resources_controller_for :things
+  end
+
+Also supports nested resources
+
+  class CommentsController < ApplicationController
+    resources_controller_for :comments, :in => [:forum, :post]
+  end
+  
+Also support polymorphic associations, and arbitrary nesting
+
+  class TagsController < ApplicationController
+    resources_controller_for :tags
+    nested_in :taggable, :polymorphic => true, :load_enclosing => true
+  end
+  
+  # this controller will handle
+  #   /forums/1/tags
+  #   /forums/1/posts/2/tags
+  #   /users/3/tags
+  # etc
+
+=== Contributors
+* Ian White
+* Igor Alexeiuk for work on name_prefix and polymorphic routes
+
+=== Specs and Coverage
+* {SPECDOC}[link:files/SPECDOC.html] lists the specifications
+* {RSpec Report}[link:rspec_report.html] is a report of spec pass/fails
+* {RCov Report}[link:coverage/index.html] is the rcov report
+
+=== Dependencies
+* <tt>RCov</tt>               To install do: <tt>gem install rcov</tt>
+* <tt>RSpec</tt>              To install do: <tt>gem install rspec</tt>
+* <tt>rspec rails plugin</tt> see http://rspec.rubyforge.org/documentation/rails/install.html
+
+=== Testing
+RSpec is used for testing, so the tests are in <tt>spec/</tt> rather than
+<tt>test/</tt> To run the tests you need a test database set up,
+edit <tt>spec/database.yml</tt> to provide the details.
+
+=== Rake tasks
+The following tasks are defined:
+
+* <tt>rspec</tt>      (the default task) run the specs
+* <tt>rcov</tt>       generate a coverage report (in doc/coverage)
+* <tt>rspec_rdoc</tt> generate an rdoc formatted spec doc (in SPECDOC)
+* <tt>rspec_rep</tt>  generate a html report of passing/failing test cases (in doc/rspec_report.html)
+* <tt>rdoc</tt>       generate the docs, (including SPECDOC)
+* <tt>rdoc_all</tt>   generate all documentation including coverage and rspec report
