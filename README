@@ -27,6 +27,13 @@ Also support polymorphic associations, and arbitrary nesting
   #   /users/3/tags
   # etc
 
+=== For Rails <= 1.2.2
+
+If you are using non-edge rails <= 1.2.2 you should also install
+http://svn.ardes.com/rails_plugins/resources_controller_lte_1_2_2
+
+(To tell if you need the patch you can run the specs via rake - if you get failures to do with resource service, then you need the patch)
+
 === Contributors
 * Ian White
 * Igor Alexeiuk for work on name_prefix and polymorphic routes

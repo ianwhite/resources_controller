@@ -1,3 +1,52 @@
+# Routing shortcuts for Addresses (users/2/addresses/1) should map
+# * resources_path to /users/2/addresses
+# * resource_path to /users/2/addresses/1
+# * resource_path(9) to /users/2/addresses/9
+# * edit_resource_path to /users/2/addresses/1;edit
+# * edit_resource_path(9) to /users/2/addresses/9;edit
+# * new_resource_path to /users/2/addresses/new
+# resource_service in AddressesController
+# * should build new address with @user foreign key with new
+# * should find @address with find(@address.id)
+# * should raise RecordNotFound with find(@other_address.id)
+# * should find only addresses belonging to @user with find(:all)
+# Requesting /users/2/addresses
+# * should find the user
+# * should assign the found user for the view
+# * should assign the user_addresses association as the addresses resource_service
+# Requesting /users/2/addresses using GET
+# * should be successful
+# * should render index.rhtml
+# * should find all addresses
+# * should assign the found addresses for the view
+# Requesting /users/2/addresses/1 using GET
+# * should be successful
+# * should render show.rhtml
+# * should find the thing requested
+# * should assign the found thing for the view
+# Requesting /users/2/addresses/new using GET
+# * should be successful
+# * should render new.rhtml
+# * should create an new thing
+# * should not save the new thing
+# * should assign the new thing for the view
+# Requesting /users/2/addresses/1;edit using GET
+# * should be successful
+# * should render edit.rhtml
+# * should find the thing requested
+# * should assign the found Thing for the view
+# Requesting /users/2/addresses using POST
+# * should create a new address
+# * should redirect to the new address
+# Requesting /users/2/addresses/1 using PUT
+# * should find the address requested
+# * should update the found address
+# * should assign the found address for the view
+# * should redirect to the address
+# Requesting /users/2/addresses/1 using DELETE
+# * should find the address requested
+# * should call destroy on the found thing
+# * should redirect to the things list
 # Routing shortcuts for Comments (forums/3/posts/2/comments/1) should map
 # * resources_path to /forums/3/posts/2/comments
 # * resource_path to /forums/3/posts/2/comments/1
@@ -233,6 +282,23 @@
 # * should find the forum
 # * should assign the found forum as :taggable for the view
 # * should assign the forum_tags association as the tags resource_service
+# Routing shortcuts for Tags via User and Address (users/1/addresses/2/tags/3) should map
+# * resources_path to /users/1/addresses/2/tags
+# * resource_path to /users/1/addresses/2/tags/3
+# * resource_path(9) to /users/1/addresses/2/tags/9
+# * edit_resource_path to /users/1/addresses/2/tags/3;edit
+# * edit_resource_path(9) to /users/1/addresses/2/tags/9;edit
+# * new_resource_path to /users/1/addresses/2/tags/new
+# resource_service in TagsController via User and Address
+# * should build new tag with @address fk and type with new
+# * should find @tag with find(@tag.id)
+# * should raise RecordNotFound with find(@other_tag.id)
+# * should find only tags belonging to @address with find(:all)
+# Requesting /users/1/addresses/2/tags using GET
+# * should find the user
+# * should find the address
+# * should assign the found address as :taggable for the view
+# * should assign the address_tags association as the tags resource_service
 # ResourcesController (route_name, singular_route_name and name_prefix)
 # * route_name should be the controller_name by default
 # * singular_route_name should be route_name.singualrize(d)
