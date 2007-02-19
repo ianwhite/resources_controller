@@ -110,7 +110,7 @@ context "Requesting /forums/2/posts (testing the before filters)" do
   specify "should assign the forum_posts association as the posts resource_service" do
     @forum.should_receive(:posts).and_return(@forum_posts)
     do_get
-    @controller.resource_service.should_be @forum_posts
+    @controller.resource_service.service.should_be @forum_posts
   end 
 end
 

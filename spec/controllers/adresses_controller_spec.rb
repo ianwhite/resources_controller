@@ -53,10 +53,10 @@ context "resource_service in AddressesController" do
   controller_name :addresses
   
   setup do
-    @user        = User.create
-    @address         = Address.create :user_id => @user.id
-    @other_user  = User.create
-    @other_address   = Address.create :user_id => @other_user.id
+    @user          = User.create
+    @address       = Address.create :user_id => @user.id
+    @other_user    = User.create
+    @other_address = Address.create :user_id => @other_user.id
     
     get :index, :user_id => @user.id
     @resource_service = controller.send :resource_service
@@ -110,7 +110,7 @@ context "Requesting /users/2/addresses" do
   specify "should assign the user_addresses association as the addresses resource_service" do
     @user.should_receive(:addresses).and_return(@user_addresses)
     do_get
-    @controller.resource_service.should_be @user_addresses
+    @controller.resource_service.service.should_be @user_addresses
   end 
 end
 

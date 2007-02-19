@@ -177,7 +177,9 @@ module Ardes#:nodoc:
       self.class_eval do
         unless included_modules.include?(::Ardes::ResourcesController::InstanceMethods)
           class_inheritable_reader :route_name, :singular_route_name
-          class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_collection_name
+          class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_collection_name, :resource_service_class
+          
+          self.resource_service_class = ResourceService
           
           class<<self
             attr_writer :name_prefix
@@ -347,16 +349,9 @@ module Ardes#:nodoc:
       #  @enclosing_resources ||= enclosing_resource_names.inject([]){|m, name| m << instance_variable_get("@#{name}")}.freeze
       end
       
-      # returns the current resource service.  This is used to find and create resources (see find_resource, find_resources, new_resource)
-      #
-      # (By default) For:
-      # * a resource which is not nested, this will be the resource class
-      # * a nested resource, this will be a collection of the last enclosing resource
+      # returns the current resource service.  This is used to find and create resources (see ResourceService, and find_resource, find_resources, new_resource)
       def resource_service
-        unless @resource_service
-          @resource_service = (enclosing_resources.size == 0) ? resource_class : enclosing_resources.last.send(resource_collection_name || resources_name)
-        end
-        @resource_service
+        @resource_service ||= resource_service_class.new(self)
       end
       
       # sets the current resource service, which is usually a class, or a has_many association
@@ -647,6 +642,31 @@ module Ardes#:nodoc:
       def new_resource_path
         controller.new_resource_path
       end
+    end
+  end
+  
+  # use this class to extend or modify the behaviour of the resource_service
+  class ResourceService
+    attr_reader :controller, :service
+    
+    # When the resource service is created, the default service is either the resource_class (in the case
+    # where therea re no enclosing resources) or the collection on the last enclosing resource (hwne there are enclosing
+    # resources)
+    def initialize(controller)
+      @controller = controller
+      if controller.enclosing_resources.size == 0
+        @service = controller.resource_class
+      else
+        @service = controller.enclosing_resources.last.send(controller.resource_collection_name || controller.resources_name)
+      end
+    end
+    
+    def new(*args)
+      @service.new(*args)
+    end
+      
+    def find(*args)
+      @service.find(*args)
     end
   end
 end

@@ -110,6 +110,6 @@ context "Requesting /forums/1/interests using GET" do
   specify "should assign the forum_interests association as the interests resource_service" do
     @forum.should_receive(:interests).and_return(@forum_interests)
     do_get
-    @controller.resource_service.should_be @forum_interests
+    @controller.resource_service.service.should_be @forum_interests
   end 
 end

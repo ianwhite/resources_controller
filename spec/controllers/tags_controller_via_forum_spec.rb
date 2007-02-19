@@ -110,6 +110,6 @@ context "Requesting /forums/1/tags using GET" do
   specify "should assign the forum_tags association as the tags resource_service" do
     @forum.should_receive(:tags).and_return(@forum_tags)
     do_get
-    @controller.resource_service.should_be @forum_tags
+    @controller.resource_service.service.should_be @forum_tags
   end 
 end

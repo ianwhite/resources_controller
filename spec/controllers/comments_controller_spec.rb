@@ -127,7 +127,7 @@ context "Requesting /forums/3/posts/2/comments (testing the before filters)" do
   specify "should assign the post_comments association as the comments resource_service" do
     @post.should_receive(:comments).and_return(@post_comments)
     do_get
-    @controller.resource_service.should_be @post_comments
+    @controller.resource_service.service.should_be @post_comments
   end
 end
 
