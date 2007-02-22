@@ -507,7 +507,7 @@ module Ardes#:nodoc:
             format.xml  { head :created, :location => resource_url }
           else
             format.html { render :action => "new" }
-            format.xml  { render :xml => resource.errors.to_xml, :status => 422 }
+            format.xml  { render :xml => resource.errors.to_xml, :status => :unprocessable_entity }
           end
         end
       end
@@ -524,7 +524,7 @@ module Ardes#:nodoc:
             format.xml  { head :ok }
           else
             format.html { render :action => "edit" }
-            format.xml  { render :xml => resource.errors.to_xml, :status => 422 }
+            format.xml  { render :xml => resource.errors.to_xml, :status => :unprocessable_entity }
           end
         end
       end
@@ -646,6 +646,20 @@ module Ardes#:nodoc:
   end
   
   # use this class to extend or modify the behaviour of the resource_service
+  #
+  # If using your own ResourceService then you should tell your controller by
+  # setting self.resource_service_class
+  #
+  #   class FoosController < ApplicationController
+  #     resources_controller_for :foos
+  #     self.resource_service_class = FoosResourceService
+  #   end
+  #
+  # Alternatively, if you're doing something really wacky, you can set resource_service
+  # on the controller instance. (to an instance of the class)
+  #
+  #   before_filter {|controller| controller.resource_service = FoosResourceService.new(:with, :my, :wacky, :args)}
+  #
   class ResourceService
     attr_reader :controller, :service
     
