@@ -346,7 +346,11 @@ module Ardes#:nodoc:
       # returns an array of the controller's enclosing (nested in) resources
       def enclosing_resources
         @enclosing_resources ||= []
-      #  @enclosing_resources ||= enclosing_resource_names.inject([]){|m, name| m << instance_variable_get("@#{name}")}.freeze
+      end
+      
+      # return an array of the enclosing resource names (class names tableized)
+      def enclosing_resource_names
+        @enclosing_resource_names ||= enclosing_resources.inject([]) {|m, r| m << r.class.name.tableize }
       end
       
       # returns the current resource service.  This is used to find and create resources (see ResourceService, and find_resource, find_resources, new_resource)
