@@ -1,3 +1,5 @@
+* Fixed small error in flash message of destroy action [Dan Kubb]
+
 * Removing experimental cruft
 
 * CHANGELOG started

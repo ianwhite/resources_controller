@@ -534,7 +534,7 @@ module Ardes#:nodoc:
         self.resource = find_resource
         resource.destroy
         respond_to do |format|
-          flash[:notice] = "#{resource_name} was successfully destroyed."
+          flash[:notice] = "#{resource_name.humanize} was successfully destroyed."
           format.html { redirect_to resources_url }
           format.xml  { head :ok }
         end
