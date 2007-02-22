@@ -348,9 +348,9 @@ module Ardes#:nodoc:
         @enclosing_resources ||= []
       end
       
-      # return an array of the enclosing resource names (class names tableized)
+      # return an array of the enclosing resource names (class names underscored)
       def enclosing_resource_names
-        @enclosing_resource_names ||= enclosing_resources.inject([]) {|m, r| m << r.class.name.tableize }
+        @enclosing_resource_names ||= enclosing_resources.inject([]) {|m, r| m << r.class.name.demodulize.underscore }
       end
       
       # returns the current resource service.  This is used to find and create resources (see ResourceService, and find_resource, find_resources, new_resource)
