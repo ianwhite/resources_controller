@@ -681,5 +681,9 @@ module Ardes#:nodoc:
     def find(*args)
       @service.find(*args)
     end
+    
+    def method_missing(method, *args, &block)
+      @service.send(method, *args, &block)
+    end
   end
 end

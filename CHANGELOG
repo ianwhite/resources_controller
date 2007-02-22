@@ -1,3 +1,6 @@
+* Added method_missing proxy to ResourceService, to enable the resource_service
+  to be used for things other than find or new (for example Pagination) [Dan Kubb]
+
 * Fixed small error in flash message of destroy action [Dan Kubb]
 
 * Removing experimental cruft
