@@ -1,3 +1,6 @@
+* Removed ApplicationController from spec/app.rb to avoid conflicts with en-
+  closing rails application
+
 * Added method_missing proxy to ResourceService, to enable the resource_service
   to be used for things other than find or new (for example Pagination) [Dan Kubb]
 

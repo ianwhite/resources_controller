@@ -87,18 +87,15 @@ end
 # Controllers
 ##############
 
-class ApplicationController < ActionController::Base
-end
-
-class UsersController < ApplicationController
+class UsersController < ActionController::Base
   resources_controller_for :users
 end
 
-class ForumsController < ApplicationController
+class ForumsController < ActionController::Base
   resources_controller_for :forums
 end
 
-class PostsController < ApplicationController
+class PostsController < ActionController::Base
   # example of providing options to resources_controller_for
   resources_controller_for :posts, :class_name => 'Post', :route_name => 'posts', :name_prefix => ''
 end
@@ -108,7 +105,7 @@ class UserPostsController < PostsController
   nested_in :user, :class_name => 'User', :foreign_key => 'user_id', :name_prefix => 'user_'
 end
 
-class AddressesController < ApplicationController
+class AddressesController < ActionController::Base
   resources_controller_for :addresses, :in => :user
 end
 
@@ -119,23 +116,23 @@ class ForumPostsController < PostsController
   end
 end
 
-class CommentsController < ApplicationController
+class CommentsController < ActionController::Base
   resources_controller_for :comments, :in => [:forum, :post]
 end
 
-class HasAComplexNameController < ApplicationController
+class HasAComplexNameController < ActionController::Base
   resources_controller_for :users
 end
 
 class EnclosedByFooHasAComplexNameController < HasAComplexNameController
 end
 
-class InterestsController < ApplicationController
+class InterestsController < ActionController::Base
   resources_controller_for :interests
   nested_in :interested_in, :polymorphic => true # could also use :anonymous => true
 end
 
-class TagsController < ApplicationController
+class TagsController < ActionController::Base
   resources_controller_for :tags
   nested_in :taggable, :polymorphic => true, :load_enclosing => true
 end
