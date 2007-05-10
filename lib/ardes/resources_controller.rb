@@ -663,7 +663,7 @@ module Ardes#:nodoc:
     attr_reader :controller, :service
     
     # When the resource service is created, the default service is either the resource_class (in the case
-    # where therea re no enclosing resources) or the collection on the last enclosing resource (hwne there are enclosing
+    # when there are no enclosing resources) or the collection of the last enclosing resource (when there are enclosing
     # resources)
     def initialize(controller)
       @controller = controller

@@ -276,15 +276,26 @@ describe "Requesting /forums/2/posts using POST" do
     post :create, :post => {:name => 'Post'}, :forum_id => "2"
   end
   
-  it "should create a new post" do
+  it "should make a new post" do
     @forum_posts.should_receive(:new).with({'name' => 'Post'}).and_return(@post)
     do_post
   end
 
-  it "should redirect to the new post" do
+  it "should attempt to save the new post" do
+    @post.should_receive(:save)
+    do_post
+  end
+  
+  it "should redirect to the new post.save == true" do
     do_post
     response.should be_redirect
     response.redirect_url.should == "http://test.host/forums/2/posts/1"
+  end
+  
+  it "should render new when post.save == false" do
+    @post.stub!(:save).and_return(false)
+    do_post
+    response.should render_template(:new)
   end
 end
 

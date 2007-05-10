@@ -1,3 +1,5 @@
+* Added more specs to get coverage to 100%
+
 * Upgraded to rpsec 0.9, improved Rakefile and specs so that spec:plugins will work
 
 * Removed ApplicationController from spec/app.rb to avoid conflicts with en-

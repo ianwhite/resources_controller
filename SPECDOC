@@ -164,8 +164,10 @@ Requesting /forums/2/posts/1/edit using GET
 - should assign the found Thing for the view
 
 Requesting /forums/2/posts using POST
-- should create a new post
-- should redirect to the new post
+- should make a new post
+- should attempt to save the new post
+- should redirect to the new post.save == true
+- should render new when post.save == false
 
 Requesting /forums/2/posts/1 using PUT
 - should find the post requested
@@ -185,6 +187,12 @@ Routing shortcuts for ForumPosts (forums/1) should map
 - edit_resource_path to /forums/2/edit
 - edit_resource_path(9) to /forums/9/edit
 - new_resource_path to /forums/new
+- resources_url to http://test.host/forums
+- resource_url to http://test.host/forums/2
+- resource_url(9) to http://test.host/forums/9
+- edit_resource_url to http://test.host/forums/2/edit
+- edit_resource_url(9) to http://test.host/forums/9/edit
+- new_resource_url to http://test.host/forums/new
 
 resource_service in ForumsController
 - should build new forum with new
@@ -359,6 +367,24 @@ Requesting /users/1/addresses/2/tags using GET
 - should assign the found address as :taggable for the view
 - should assign the address_tags association as the tags resource_service
 
+ActionView with resources_controller Helper
+- should forward #resource_name to controller
+- should forward #resources_name to controller
+- should forward #resource to controller
+- should forward #resources to controller
+- should forward #resource_url(*resource) to controller
+- should forward #edit_resource_url(*resource) to controller
+- should forward #resources_url to controller
+- should forward #new_resource_url to controller
+- should forward #resource_path(*resource) to controller
+- should forward #edit_resource_path(*resource) to controller
+- should forward #resources_path to controller
+- should forward #new_resource_path to controller
+
+A controller's resource_service
+- should pass unknown methods to the resource service of the controller
+- may be explicitly set with #resource_service=
+
 ResourcesController (route_name, singular_route_name and name_prefix)
 - route_name should be the controller_name by default
 - singular_route_name should be route_name.singualrize(d)
@@ -375,6 +401,6 @@ Automatic (route_name, name_prefix) for
 - HasAComplexNameController should be ('has_a_complex_name', '')
 - EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
 
-Finished in 2.23136 seconds
+Finished in 2.140308 seconds
 
-254 examples, 0 failures
+276 examples, 0 failures

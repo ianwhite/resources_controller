@@ -34,6 +34,30 @@ describe "Routing shortcuts for ForumPosts (forums/1) should map" do
   it "new_resource_path to /forums/new" do
     controller.new_resource_path.should == '/forums/new'
   end
+  
+  it "resources_url to http://test.host/forums" do
+    controller.resources_url.should == 'http://test.host/forums'
+  end
+
+  it "resource_url to http://test.host/forums/2" do
+    controller.resource_url.should == 'http://test.host/forums/2'
+  end
+  
+  it "resource_url(9) to http://test.host/forums/9" do
+    controller.resource_url(9).should == 'http://test.host/forums/9'
+  end
+
+  it "edit_resource_url to http://test.host/forums/2/edit" do
+    controller.edit_resource_url.should == 'http://test.host/forums/2/edit'
+  end
+  
+  it "edit_resource_url(9) to http://test.host/forums/9/edit" do
+    controller.edit_resource_url(9).should == 'http://test.host/forums/9/edit'
+  end
+  
+  it "new_resource_url to http://test.host/forums/new" do
+    controller.new_resource_url.should == 'http://test.host/forums/new'
+  end
 end
 
 describe "resource_service in ForumsController" do
