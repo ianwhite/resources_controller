@@ -37,6 +37,7 @@ http://svn.ardes.com/rails_plugins/resources_controller_lte_1_2_2
 === Contributors
 * Ian White
 * Igor Alexeiuk for work on name_prefix and polymorphic routes
+* Dan Kubb
 
 === Specs and Coverage
 * {SPECDOC}[link:files/SPECDOC.html] lists the specifications
@@ -44,21 +45,18 @@ http://svn.ardes.com/rails_plugins/resources_controller_lte_1_2_2
 * {RCov Report}[link:coverage/index.html] is the rcov report
 
 === Dependencies
+
+==== Plugin
+* none
+
+==== Testing
+
 * <tt>RCov</tt>               To install do: <tt>gem install rcov</tt>
 * <tt>RSpec</tt>              To install do: <tt>gem install rspec</tt>
 * <tt>rspec rails plugin</tt> see http://rspec.rubyforge.org/documentation/rails/install.html
 
 === Testing
 RSpec is used for testing, so the tests are in <tt>spec/</tt> rather than
-<tt>test/</tt> To run the tests you need a test database set up,
-edit <tt>spec/database.yml</tt> to provide the details.
+<tt>test/</tt> Do rake --tasks for more details.
 
-=== Rake tasks
-The following tasks are defined:
-
-* <tt>rspec</tt>      (the default task) run the specs
-* <tt>rcov</tt>       generate a coverage report (in doc/coverage)
-* <tt>rspec_rdoc</tt> generate an rdoc formatted spec doc (in SPECDOC)
-* <tt>rspec_rep</tt>  generate a html report of passing/failing test cases (in doc/rspec_report.html)
-* <tt>rdoc</tt>       generate the docs, (including SPECDOC)
-* <tt>rdoc_all</tt>   generate all documentation including coverage and rspec report
+Can be run from RAILS_ROOT with spec:plugins

@@ -489,7 +489,7 @@ module Ardes#:nodoc:
         self.resource = new_resource
       end
 
-      # GET /events/1;edit
+      # GET /events/1/edit
       def edit
         self.resource = find_resource
       end

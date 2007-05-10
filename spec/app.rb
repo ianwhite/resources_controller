@@ -147,7 +147,7 @@ ActionController::Routing::Routes.draw do |map|
     users.resources :interests, :name_prefix => 'user_'
     users.resources :posts, :name_prefix => 'user_', :controller => 'user_posts'
     users.resources :comments, :name_prefix => 'user_', :controller => 'user_comments'
-    users.resources :addresses do |addresses|
+    users.resources :addresses, :name_prefix => nil do |addresses|
       addresses.resources :tags, :name_prefix => 'user_address_'
     end
   end
@@ -156,7 +156,7 @@ ActionController::Routing::Routes.draw do |map|
     forums.resources :tags, :name_prefix => 'forum_'
     forums.resources :posts, :name_prefix => 'forum_', :controller => 'forum_posts' do |posts|
       posts.resources :tags, :name_prefix => 'forum_post_'
-      posts.resources :comments do |comments|
+      posts.resources :comments, :name_prefix => nil do |comments|
         comments.resources :tags, :name_prefix => 'forum_post_comment_'
       end
     end

@@ -1,4 +1,5 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
+require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
 
 module InterestsViaForumSpecHelper
   def setup_mocks
@@ -10,11 +11,11 @@ module InterestsViaForumSpecHelper
   end
 end
 
-context "Routing shortcuts for Interests via Forum (forums/1/interests/2) should map" do
+describe "Routing shortcuts for Interests via Forum (forums/1/interests/2) should map" do
   include InterestsViaForumSpecHelper
   controller_name :interests
   
-  setup do
+  before(:each) do
     setup_mocks
     @interest = mock('Interest')
     @interest.stub!(:to_param).and_return('2')
@@ -23,35 +24,35 @@ context "Routing shortcuts for Interests via Forum (forums/1/interests/2) should
     get :show, :forum_id => "1", :id => "2"
   end
   
-  specify "resources_path to /forums/1/interests" do
+  it "resources_path to /forums/1/interests" do
     controller.resources_path.should == '/forums/1/interests'
   end
 
-  specify "resource_path to /forums/1/interests/2" do
+  it "resource_path to /forums/1/interests/2" do
     controller.resource_path.should == '/forums/1/interests/2'
   end
   
-  specify "resource_path(9) to /forums/1/interests/9" do
+  it "resource_path(9) to /forums/1/interests/9" do
     controller.resource_path(9).should == '/forums/1/interests/9'
   end
 
-  specify "edit_resource_path to /forums/1/interests/2;edit" do
-    controller.edit_resource_path.should == '/forums/1/interests/2;edit'
+  it "edit_resource_path to /forums/1/interests/2/edit" do
+    controller.edit_resource_path.should == '/forums/1/interests/2/edit'
   end
   
-  specify "edit_resource_path(9) to /forums/1/interests/9;edit" do
-    controller.edit_resource_path(9).should == '/forums/1/interests/9;edit'
+  it "edit_resource_path(9) to /forums/1/interests/9/edit" do
+    controller.edit_resource_path(9).should == '/forums/1/interests/9/edit'
   end
   
-  specify "new_resource_path to /forums/1/interests/new" do
+  it "new_resource_path to /forums/1/interests/new" do
     controller.new_resource_path.should == '/forums/1/interests/new'
   end
 end
 
-context "resource_service in InterestsController via Forum" do
+describe "resource_service in InterestsController via Forum" do
   controller_name :interests
   
-  setup do
+  before(:each) do
     @forum          = Forum.create
     @interest       = Interest.create :interested_in_id => @forum.id, :interested_in_type => 'Forum'
     @other_forum    = Forum.create
@@ -61,33 +62,33 @@ context "resource_service in InterestsController via Forum" do
     @resource_service = controller.send :resource_service
   end
   
-  specify "should build new interest with @forum fk and type with new" do
+  it "should build new interest with @forum fk and type with new" do
     resource = @resource_service.new
-    resource.should_be_kind_of Interest
+    resource.should be_kind_of(Interest)
     resource.interested_in_id.should == @forum.id
     resource.interested_in_type.should == 'Forum'
   end
   
-  specify "should find @interest with find(@interest.id)" do
+  it "should find @interest with find(@interest.id)" do
     resource = @resource_service.find(@interest.id)
-    resource.should_be == @interest
+    resource.should == @interest
   end
   
-  specify "should raise RecordNotFound with find(@other_interest.id)" do
-    lambda{ @resource_service.find(@other_interest.id) }.should_raise ActiveRecord::RecordNotFound
+  it "should raise RecordNotFound with find(@other_interest.id)" do
+    lambda{ @resource_service.find(@other_interest.id) }.should raise_error(ActiveRecord::RecordNotFound)
   end
 
-  specify "should find only interests belonging to @forum with find(:all)" do
+  it "should find only interests belonging to @forum with find(:all)" do
     resources = @resource_service.find(:all)
-    resources.should_be == Interest.find(:all, :conditions => "interested_in_id = #{@forum.id} AND interested_in_type = 'Forum'")
+    resources.should be == Interest.find(:all, :conditions => "interested_in_id = #{@forum.id} AND interested_in_type = 'Forum'")
   end
 end
 
-context "Requesting /forums/1/interests using GET" do
+describe "Requesting /forums/1/interests using GET" do
   include InterestsViaForumSpecHelper
   controller_name :interests
 
-  setup do
+  before(:each) do
     setup_mocks
     @interests = mock('Interests')
     @forum_interests.stub!(:find).and_return(@interests)
@@ -97,19 +98,19 @@ context "Requesting /forums/1/interests using GET" do
     get :index, :forum_id => 1
   end
 
-  specify "should find the forum" do
+  it "should find the forum" do
     Forum.should_receive(:find).with('1').and_return(@forum)
     do_get
   end
 
-  specify "should assign the found forum as :interested_in for the view" do
+  it "should assign the found forum as :interested_in for the view" do
     do_get
-    assigns[:interested_in].should_be @forum
+    assigns[:interested_in].should == @forum
   end
 
-  specify "should assign the forum_interests association as the interests resource_service" do
+  it "should assign the forum_interests association as the interests resource_service" do
     @forum.should_receive(:interests).and_return(@forum_interests)
     do_get
-    @controller.resource_service.service.should_be @forum_interests
+    @controller.resource_service.service.should == @forum_interests
   end 
 end

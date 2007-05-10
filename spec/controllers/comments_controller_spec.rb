@@ -1,4 +1,5 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
+require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
 
 module CommentsSpecHelper
   def setup_mocks
@@ -17,11 +18,11 @@ module CommentsSpecHelper
   end
 end
 
-context "Routing shortcuts for Comments (forums/3/posts/2/comments/1) should map" do
+describe "Routing shortcuts for Comments (forums/3/posts/2/comments/1) should map" do
   include CommentsSpecHelper
   controller_name :comments
   
-  setup do
+  before(:each) do
     setup_mocks
     @comment = mock('Comment')
     @comment.stub!(:to_param).and_return("1")
@@ -29,35 +30,35 @@ context "Routing shortcuts for Comments (forums/3/posts/2/comments/1) should map
     get :show, :forum_id => "3", :post_id => "2", :id => "1"
   end
   
-  specify "resources_path to /forums/3/posts/2/comments" do
+  it "resources_path to /forums/3/posts/2/comments" do
     controller.resources_path.should == '/forums/3/posts/2/comments'
   end
 
-  specify "resource_path to /forums/3/posts/2/comments/1" do
+  it "resource_path to /forums/3/posts/2/comments/1" do
     controller.resource_path.should == '/forums/3/posts/2/comments/1'
   end
   
-  specify "resource_path(9) to /forums/3/posts/2/comments/9" do
+  it "resource_path(9) to /forums/3/posts/2/comments/9" do
     controller.resource_path(9).should == '/forums/3/posts/2/comments/9'
   end
 
-  specify "edit_resource_path to /forums/3/posts/2/comments/1;edit" do
-    controller.edit_resource_path.should == '/forums/3/posts/2/comments/1;edit'
+  it "edit_resource_path to /forums/3/posts/2/comments/1/edit" do
+    controller.edit_resource_path.should == '/forums/3/posts/2/comments/1/edit'
   end
   
-  specify "edit_resource_path(9) to /forums/3/posts/2/comments/9;edit" do
-    controller.edit_resource_path(9).should == '/forums/3/posts/2/comments/9;edit'
+  it "edit_resource_path(9) to /forums/3/posts/2/comments/9/edit" do
+    controller.edit_resource_path(9).should == '/forums/3/posts/2/comments/9/edit'
   end
   
-  specify "new_resource_path to /forums/3/posts/2/comments/new" do
+  it "new_resource_path to /forums/3/posts/2/comments/new" do
     controller.new_resource_path.should == '/forums/3/posts/2/comments/new'
   end
 end
 
-context "resource_service in CommentsController" do
+describe "resource_service in CommentsController" do
   controller_name :comments
   
-  setup do
+  before(:each) do
     @forum          = Forum.create
     @post           = Post.create :forum_id => @forum.id
     @comment        = Comment.create :post_id => @post.id
@@ -68,32 +69,32 @@ context "resource_service in CommentsController" do
     @resource_service = controller.send :resource_service
   end
   
-  specify "should build new comment with @post foreign key with new" do
+  it "should build new comment with @post foreign key with new" do
     resource = @resource_service.new
-    resource.should_be_kind_of Comment
+    resource.should be_kind_of(Comment)
     resource.post_id.should == @post.id
   end
   
-  specify "should find @comment with find(@comment.id)" do
+  it "should find @comment with find(@comment.id)" do
     resource = @resource_service.find(@comment.id)
-    resource.should_be == @comment
+    resource.should == @comment
   end
   
-  specify "should raise RecordNotFound with find(@other_post.id)" do
-    lambda{ @resource_service.find(@other_comment.id) }.should_raise ActiveRecord::RecordNotFound
+  it "should raise RecordNotFound with find(@other_post.id)" do
+    lambda{ @resource_service.find(@other_comment.id) }.should raise_error(ActiveRecord::RecordNotFound)
   end
 
-  specify "should find only comments belonging to @post with find(:all)" do
+  it "should find only comments belonging to @post with find(:all)" do
     resources = @resource_service.find(:all)
-    resources.should_be == Comment.find(:all, :conditions => "post_id = #{@post.id}")
+    resources.should be == Comment.find(:all, :conditions => "post_id = #{@post.id}")
   end
 end
 
-context "Requesting /forums/3/posts/2/comments (testing the before filters)" do
+describe "Requesting /forums/3/posts/2/comments (testing the before filters)" do
   include CommentsSpecHelper
   controller_name :comments
   
-  setup do
+  before(:each) do
     setup_mocks
     @comments = mock('Comments')
     @post_comments.stub!(:find).and_return(@comments)
@@ -103,39 +104,39 @@ context "Requesting /forums/3/posts/2/comments (testing the before filters)" do
     get :index, :forum_id => '3', :post_id => '2'
   end
     
-  specify "should find the forum" do
+  it "should find the forum" do
     Forum.should_receive(:find).with('3').and_return(@forum)
     do_get
   end
   
-  specify "should assign the found forum for the view" do
+  it "should assign the found forum for the view" do
     do_get
-    assigns[:forum].should_be @forum
+    assigns[:forum].should == @forum
   end
   
-  specify "should find the post" do
+  it "should find the post" do
     @forum.should_receive(:posts).and_return(@forum_posts)
     @forum_posts.should_receive(:find).with('2').and_return(@post)
     do_get
   end
   
-  specify "should assign the found post for the view" do
+  it "should assign the found post for the view" do
     do_get
-    assigns[:post].should_be @post
+    assigns[:post].should == @post
   end
   
-  specify "should assign the post_comments association as the comments resource_service" do
+  it "should assign the post_comments association as the comments resource_service" do
     @post.should_receive(:comments).and_return(@post_comments)
     do_get
-    @controller.resource_service.service.should_be @post_comments
+    @controller.resource_service.service.should == @post_comments
   end
 end
 
-context "Requesting /forums/3/posts/2/comments using GET" do
+describe "Requesting /forums/3/posts/2/comments using GET" do
   include CommentsSpecHelper
   controller_name :comments
 
-  setup do
+  before(:each) do
     setup_mocks
     @comments = mock('Comments')
     @post_comments.stub!(:find).and_return(@comments)
@@ -145,32 +146,32 @@ context "Requesting /forums/3/posts/2/comments using GET" do
     get :index, :forum_id => '3', :post_id => '2'
   end
   
-  specify "should be successful" do
+  it "should be successful" do
     do_get
-    response.should_be_success
+    response.should be_success
   end
 
-  specify "should render index.rhtml" do
-    controller.should_render :index
+  it "should render index.rhtml" do
     do_get
+    response.should render_template(:index)
   end
   
-  specify "should find comments in post" do
+  it "should find comments in post" do
     @post_comments.should_receive(:find).with(:all).and_return(@comments)
     do_get
   end
   
-  specify "should assign the found comments for the view" do
+  it "should assign the found comments for the view" do
     do_get
-    assigns[:comments].should_be @comments
+    assigns[:comments].should == @comments
   end
 end
 
-context "Requesting /forums/3/posts/3/comments/1 using GET" do
+describe "Requesting /forums/3/posts/3/comments/1 using GET" do
   include CommentsSpecHelper
   controller_name :comments
 
-  setup do
+  before(:each) do
     setup_mocks
     @comment = mock('a post')
     @post_comments.stub!(:find).and_return(@comment)
@@ -180,32 +181,32 @@ context "Requesting /forums/3/posts/3/comments/1 using GET" do
     get :show, :id => "1", :forum_id => '3', :post_id => '2'
   end
 
-  specify "should be successful" do
+  it "should be successful" do
     do_get
-    response.should_be_success
+    response.should be_success
   end
   
-  specify "should render show.rhtml" do
-    controller.should_render :show
+  it "should render show.rhtml" do
     do_get
+    response.should render_template(:show)
   end
   
-  specify "should find the comment requested" do
+  it "should find the comment requested" do
     @post_comments.should_receive(:find).with("1").and_return(@comment)
     do_get
   end
   
-  specify "should assign the found comment for the view" do
+  it "should assign the found comment for the view" do
     do_get
-    assigns[:comment].should_be @comment
+    assigns[:comment].should == @comment
   end
 end
 
-context "Requesting /forums/3/posts/3/comments/new using GET" do
+describe "Requesting /forums/3/posts/3/comments/new using GET" do
   include CommentsSpecHelper
   controller_name :comments
 
-  setup do
+  before(:each) do
     setup_mocks
     @comment = mock('new Comment')
     @post_comments.stub!(:new).and_return(@comment)
@@ -215,37 +216,37 @@ context "Requesting /forums/3/posts/3/comments/new using GET" do
     get :new, :forum_id => '3', :post_id => '2'
   end
 
-  specify "should be successful" do
+  it "should be successful" do
     do_get
-    response.should_be_success
+    response.should be_success
   end
   
-  specify "should render new.rhtml" do
-    controller.should_render :new
+  it "should render new.rhtml" do
     do_get
+    response.should render_template(:new)
   end
   
-  specify "should create a new comment" do
+  it "should create a new comment" do
     @post_comments.should_receive(:new).and_return(@comment)
     do_get
   end
   
-  specify "should not save the new comment" do
+  it "should not save the new comment" do
     @comment.should_not_receive(:save)
     do_get
   end
   
-  specify "should assign the new comment for the view" do
+  it "should assign the new comment for the view" do
     do_get
-    assigns[:post].should_be @post
+    assigns[:post].should == @post
   end
 end
 
-context "Requesting /forums/3/posts/3/comments/1;edit using GET" do
+describe "Requesting /forums/3/posts/3/comments/1/edit using GET" do
   include CommentsSpecHelper
   controller_name :comments
 
-  setup do
+  before(:each) do
     setup_mocks
     @comment = mock('Comment')
     @post_comments.stub!(:find).and_return(@comment)
@@ -255,32 +256,32 @@ context "Requesting /forums/3/posts/3/comments/1;edit using GET" do
     get :edit, :id => "1", :forum_id => '3', :post_id => '2'
   end
 
-  specify "should be successful" do
+  it "should be successful" do
     do_get
-    response.should_be_success
+    response.should be_success
   end
   
-  specify "should render edit.rhtml" do
+  it "should render edit.rhtml" do
     do_get
-    controller.should_render :edit
+    response.should render_template(:edit)
   end
   
-  specify "should find the comment requested" do
+  it "should find the comment requested" do
     @post_comments.should_receive(:find).with("1").and_return(@comment)
     do_get
   end
   
-  specify "should assign the found comment for the view" do
+  it "should assign the found comment for the view" do
     do_get
-    assigns(:comment).should_be @comment
+    assigns(:comment).should == @comment
   end
 end
 
-context "Requesting /forums/3/posts/3/comments using POST" do
+describe "Requesting /forums/3/posts/3/comments using POST" do
   include CommentsSpecHelper
   controller_name :comments
 
-  setup do
+  before(:each) do
     setup_mocks
     @comment = mock('Comment')
     @comment.stub!(:save).and_return(true)
@@ -292,23 +293,23 @@ context "Requesting /forums/3/posts/3/comments using POST" do
     post :create, :comment => {:name => 'Comment'}, :forum_id => '3', :post_id => '2'
   end
   
-  specify "should create a new comment" do
+  it "should create a new comment" do
     @post_comments.should_receive(:new).with({'name' => 'Comment'}).and_return(@comment)
     do_post
   end
 
-  specify "should redirect to the new comment" do
+  it "should redirect to the new comment" do
     do_post
-    response.should_be_redirect
-    response.redirect_url.should_eql "http://test.host/forums/3/posts/2/comments/1"
+    response.should be_redirect
+    response.redirect_url.should == "http://test.host/forums/3/posts/2/comments/1"
   end
 end
 
-context "Requesting /forums/3/posts/3/comments/1 using PUT" do
+describe "Requesting /forums/3/posts/3/comments/1 using PUT" do
   include CommentsSpecHelper
   controller_name :comments
 
-  setup do
+  before(:each) do
     setup_mocks
     @comment = mock('Comment', :null_object => true)
     @comment.stub!(:to_param).and_return("1")
@@ -319,33 +320,33 @@ context "Requesting /forums/3/posts/3/comments/1 using PUT" do
     put :update, :id => "1", :forum_id => '3', :post_id => '2'
   end
   
-  specify "should find the comment requested" do
+  it "should find the comment requested" do
     @post_comments.should_receive(:find).with("1").and_return(@comment)
     do_update
   end
 
-  specify "should update the found comment" do
+  it "should update the found comment" do
     @comment.should_receive(:update_attributes)
     do_update
   end
 
-  specify "should assign the found comment for the view" do
+  it "should assign the found comment for the view" do
     do_update
-    assigns(:comment).should_be @comment
+    assigns(:comment).should == @comment
   end
 
-  specify "should redirect to the comment" do
+  it "should redirect to the comment" do
     do_update
-    response.should_be_redirect
-    response.redirect_url.should_eql "http://test.host/forums/3/posts/2/comments/1"
+    response.should be_redirect
+    response.redirect_url.should == "http://test.host/forums/3/posts/2/comments/1"
   end
 end
 
-context "Requesting /forums/3/posts/3/comments/1 using DELETE" do
+describe "Requesting /forums/3/posts/3/comments/1 using DELETE" do
   include CommentsSpecHelper
   controller_name :comments
 
-  setup do
+  before(:each) do
     setup_mocks
     @comment = mock('Comment', :null_object => true)
     @post_comments.stub!(:find).and_return(@comment)
@@ -355,19 +356,19 @@ context "Requesting /forums/3/posts/3/comments/1 using DELETE" do
     delete :destroy, :id => "1", :forum_id => '3', :post_id => '2'
   end
 
-  specify "should find the comment requested" do
+  it "should find the comment requested" do
     @post_comments.should_receive(:find).with("1").and_return(@comment)
     do_delete
   end
   
-  specify "should call destroy on the found comment" do
+  it "should call destroy on the found comment" do
     @comment.should_receive(:destroy)
     do_delete
   end
   
-  specify "should redirect to the comments list" do
+  it "should redirect to the comments list" do
     do_delete
-    response.should_be_redirect
-    response.redirect_url.should_eql "http://test.host/forums/3/posts/2/comments"
+    response.should be_redirect
+    response.redirect_url.should == "http://test.host/forums/3/posts/2/comments"
   end
 end

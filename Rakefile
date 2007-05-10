@@ -1,47 +1,60 @@
-require 'rubygems'
+# use pluginized rpsec if it exists
+rspec_base = File.expand_path(File.dirname(__FILE__) + '/../rspec/lib')
+$LOAD_PATH.unshift(rspec_base) if File.exist?(rspec_base) and !$LOAD_PATH.include?(rspec_base)
 
-Gem::manage_gems
-
-require 'rake/rdoctask'
 require 'spec/rake/spectask'
+require 'spec/rake/verify_rcov'
+require 'rake/rdoctask'
 
 plugin_name = File.basename(File.dirname(__FILE__))
 
-desc "Default: run the specs for #{plugin_name}"
-task :default => :rspec
+task :default => "spec:rcov:verify"
 
 desc "Run the specs for #{plugin_name}"
-Spec::Rake::SpecTask.new(:rspec) do |t|
+Spec::Rake::SpecTask.new(:spec) do |t|
   t.spec_files = FileList['spec/**/*_spec.rb']
   t.spec_opts  = ["--colour"]
 end
 
-desc "Generate RCov report for #{plugin_name} "
-Spec::Rake::SpecTask.new(:rcov) do |t|
-  t.spec_files  = FileList['spec/**/*_spec.rb']
-  t.rcov        = true
-  t.rcov_dir    = 'doc/coverage'
-  t.rcov_opts   = ['--exclude', 'config\/,spec\/,\/app\/']
+namespace :spec do
+  desc "Generate RCov report for #{plugin_name}"
+  Spec::Rake::SpecTask.new(:rcov) do |t|
+    t.spec_files  = FileList['spec/**/*_spec.rb']
+    t.rcov        = true
+    t.rcov_dir    = 'doc/coverage'
+    t.rcov_opts   = ['--exclude', "spec/,#{File.expand_path(File.join(File.dirname(__FILE__),'../../..'))}"] 
+  end
+
+  namespace :rcov do
+    desc "Verify RCov threshold for #{plugin_name}"
+    RCov::VerifyTask.new(:verify => "spec:rcov") do |t|
+      t.threshold = 100.0
+      t.index_html = File.join(File.dirname(__FILE__), 'doc/coverage/index.html')
+    end
+  end
+  
+  desc "Generate specdoc for #{plugin_name}"
+  Spec::Rake::SpecTask.new(:doc) do |t|
+    t.spec_files  = FileList['spec/**/*_spec.rb']
+    t.spec_opts   = ["--format", "specdoc"]
+    t.out         = 'SPECDOC'
+  end
+
+  namespace :doc do
+    desc "Generate html specdoc for #{plugin_name}"
+    Spec::Rake::SpecTask.new(:html => :rdoc) do |t|
+      t.spec_files    = FileList['spec/**/*_spec.rb']
+      t.spec_opts     = ["--format", "html", "--diff"]
+      t.out           = 'doc/rspec_report.html'
+    end
+  end
 end
 
-desc "Generate RDoc specdoc for #{plugin_name}"
-Spec::Rake::SpecTask.new(:rspec_rdoc) do |t|
-  t.spec_files  = FileList['spec/**/*_spec.rb']
-  t.spec_opts   = ["--format", "rdoc"]
-  t.out         = 'SPECDOC'
-end
+task :rdoc => :doc
+task "SPECDOC" => "spec:doc"
 
-desc "Generate RSpec html report for #{plugin_name}"
-Spec::Rake::SpecTask.new(:rspec_rep) do |t|
-  t.spec_files    = FileList['spec/**/*_spec.rb']
-  t.spec_opts     = ["--format", "html", "--diff"]
-  t.out           = 'doc/rspec_report.html'
-  t.fail_on_error = false
-end
-
-desc "Generate documentation for #{plugin_name}"
-task :rdoc => :rspec_rdoc
-Rake::RDocTask.new(:rdoc) do |t|
+desc "Generate rdoc for #{plugin_name}"
+Rake::RDocTask.new(:doc) do |t|
   t.rdoc_dir = 'doc'
   t.main     = 'README'
   t.title    = "#{plugin_name}"
@@ -50,7 +63,7 @@ Rake::RDocTask.new(:rdoc) do |t|
   t.rdoc_files.include('lib/**/*.rb')
 end
 
-desc "Generate all documentation for the #{plugin_name} plugin."
-task :rdoc_all => :rdoc
-task :rdoc_all => :rspec_rep
-task :rdoc_all => :rcov
+namespace :doc do 
+  desc "Generate all documentation (rdoc, specdoc, specdoc html and rcov) for #{plugin_name}"
+  task :all => ["spec:doc:html", "spec:doc", "spec:rcov", "doc"]
+end
