@@ -1,4 +1,8 @@
 # Testing app setup
+#
+# TODO: modulize the testing app classes for minimal inteference with other plugin specs and app
+#
+# TODO: write more example specs which are to tied to concrete models, for usage purposes
 
 ##################
 # Database schema
@@ -162,7 +166,6 @@ ActionController::Routing::Routes.draw do |map|
     end
   end
   
-  # Install the default route as the lowest priority.
   map.connect ':controller/:action/:id.:format'
   map.connect ':controller/:action/:id'
 end
