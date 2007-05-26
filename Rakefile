@@ -8,7 +8,9 @@ require 'rake/rdoctask'
 
 plugin_name = File.basename(File.dirname(__FILE__))
 
-task :default => "spec:rcov:verify"
+task :default => :cruise
+
+task :cruise => "spec:rcov:verify"
 
 desc "Run the specs for #{plugin_name}"
 Spec::Rake::SpecTask.new(:spec) do |t|
@@ -22,7 +24,7 @@ namespace :spec do
     t.spec_files  = FileList['spec/**/*_spec.rb']
     t.rcov        = true
     t.rcov_dir    = 'doc/coverage'
-    t.rcov_opts   = ['--exclude', "spec/,#{File.expand_path(File.join(File.dirname(__FILE__),'../../..'))}"] 
+    t.rcov_opts   = ['--text-report', '--exclude', "spec/,#{File.expand_path(File.join(File.dirname(__FILE__),'../../..'))}"] 
   end
 
   namespace :rcov do
