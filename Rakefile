@@ -25,6 +25,7 @@ namespace :spec do
     t.rcov        = true
     t.rcov_dir    = 'doc/coverage'
     t.rcov_opts   = ['--text-report', '--exclude', "spec/,#{File.expand_path(File.join(File.dirname(__FILE__),'../../..'))}"] 
+    t.spec_opts   = ["--f", "specdoc"]
   end
 
   namespace :rcov do
