@@ -295,6 +295,10 @@ module Ardes#:nodoc:
       before_filter {|controller| controller.send :load_enclosing_resource, name, options, &block }
     end
     
+    def gday
+      :mate
+    end
+    
     module InstanceMethods
       def self.included(base)
         base.send :hide_action, *instance_methods
