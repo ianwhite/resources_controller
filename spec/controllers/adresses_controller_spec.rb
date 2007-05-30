@@ -115,6 +115,28 @@ describe "Requesting /users/2/addresses" do
   end 
 end
 
+
+describe "Requesting /users/foo/addresses (testing non-integer ids)" do
+  include AddressesSpecHelper
+  controller_name :addresses
+  
+  before do
+    setup_mocks
+    @user.stub!(:to_param).and_return("foo")
+    @addresses = mock('Addresses')
+    @user_addresses.stub!(:find).and_return(@addresses)
+  end
+  
+  def do_get
+    get :index, :user_id => 'foo'
+  end
+  
+  it "should try and find user with id == 'foo'" do
+    User.should_receive(:find).with('foo').and_return(@user)
+    do_get
+  end
+end
+
 describe "Requesting /users/2/addresses using GET" do
   include AddressesSpecHelper
   controller_name :addresses

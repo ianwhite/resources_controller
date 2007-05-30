@@ -380,10 +380,10 @@ module Ardes#:nodoc:
         resource_service.new params[resource_name]
       end
 
-      # returns [resources_name, resource_id] sections from the request
-      # @TODO - test regexp
+      # returns an array containing [resources_name, resource_id] sections from the enclosing request
       def resources_request
-        @resources_request ||= request.env['REQUEST_URI'].scan(%r{/(\w+)/(\d*)})
+        #@resources_request ||= request.path.scan(%r{/(\w+)/(\d*)})
+        @resources_request ||= request.path.scan(%r{/(\w+)/([\w\-]*)})
       end
 
     private
