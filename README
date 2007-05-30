@@ -44,19 +44,8 @@ http://svn.ardes.com/rails_plugins/resources_controller_lte_1_2_2
 * {RSpec Report}[link:rspec_report.html] is a report of spec pass/fails
 * {RCov Report}[link:coverage/index.html] is the rcov report
 
-=== Dependencies
-
-==== Plugin
-* none
-
-==== Testing
-
-* <tt>RCov</tt>               To install do: <tt>gem install rcov</tt>
-* <tt>RSpec</tt>              To install do: <tt>gem install rspec</tt>
-* <tt>rspec rails plugin</tt> see http://rspec.rubyforge.org/documentation/rails/install.html
-
 === Testing
+
 RSpec is used for testing, so the tests are in <tt>spec/</tt> rather than
 <tt>test/</tt> Do rake --tasks for more details.
 
-Can be run from RAILS_ROOT with spec:plugins
