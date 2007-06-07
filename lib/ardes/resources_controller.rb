@@ -300,7 +300,7 @@ module Ardes#:nodoc:
         base.send :hide_action, *instance_methods
         
         # the following accessors are set up to use the class attribute as default
-        # and alos to allow setting on the instance, without affecting the class attribute
+        # and also to allow setting on the instance, without affecting the class attribute
         base.class_eval do
           attr_writer :name_prefix
           
@@ -320,6 +320,30 @@ module Ardes#:nodoc:
           def name_prefix
             @name_prefix ||= self.class.name_prefix
           end
+          
+        protected
+          # we define the find|new_resource(s) methods only if they're not already defined
+          # this allows abstract controllers to define the resource service methods
+          unless instance_methods.include?('find_resources')
+            # finds the collection of resources
+            def find_resources
+              resource_service.find :all
+            end
+          end
+
+          unless instance_methods.include?('find_resource')
+            # finds the resource, using the passed id
+            def find_resource(id = params[:id])
+              resource_service.find id
+            end
+          end
+
+          unless instance_methods.include?('new_resource')
+            # makes a new resource, optionally using the passed hash
+            def new_resource(attributes = params[resource_name])
+              resource_service.new attributes
+            end
+          end     
         end
       end
       
@@ -365,21 +389,6 @@ module Ardes#:nodoc:
       end
       
     protected
-      # finds the collection of resources
-      def find_resources
-        resource_service.find :all
-      end
-  
-      # finds the resource, using the passed id
-      def find_resource
-        resource_service.find params[:id]
-      end
-      
-      # makes a new resource, optionally using the passed hash
-      def new_resource
-        resource_service.new params[resource_name]
-      end
-
       # returns an array containing [resources_name, resource_id] sections from the enclosing request
       def resources_request
         #@resources_request ||= request.path.scan(%r{/(\w+)/(\d*)})

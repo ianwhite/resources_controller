@@ -18,6 +18,9 @@ Requesting /users/2/addresses
 - should assign the found user for the view
 - should assign the user_addresses association as the addresses resource_service
 
+Requesting /users/foo/addresses (testing non-integer ids)
+- should try and find user with id == 'foo'
+
 Requesting /users/2/addresses using GET
 - should be successful
 - should render index.rhtml
@@ -141,7 +144,7 @@ Requesting /forums/2/posts (testing the before filters)
 Requesting /forums/2/posts using GET
 - should be successful
 - should render index.rhtml
-- should find all posts
+- should find all posts, in reverse order (because of AbstractPostsController)
 - should assign the found posts for the view
 
 Requesting /forums/2/posts/1 using GET
@@ -385,6 +388,12 @@ A controller's resource_service
 - should pass unknown methods to the resource service of the controller
 - may be explicitly set with #resource_service=
 
+ResourcesController#resources_request
+- should be [] for /users
+- should be [[users, id]] for /users/id
+- should be [[users, id]] for /users/id/foos
+- should be [[users, id], [foos, id]] for /users/id/foos/id
+
 ResourcesController (route_name, singular_route_name and name_prefix)
 - route_name should be the controller_name by default
 - singular_route_name should be route_name.singualrize(d)
@@ -401,6 +410,6 @@ Automatic (route_name, name_prefix) for
 - HasAComplexNameController should be ('has_a_complex_name', '')
 - EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
 
-Finished in 1.545698 seconds
+Finished in 1.648335 seconds
 
-276 examples, 0 failures
+281 examples, 0 failures

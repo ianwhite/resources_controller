@@ -139,8 +139,8 @@ describe "Requesting /forums/2/posts using GET" do
     response.should render_template(:index)
   end
   
-  it "should find all posts" do
-    @forum_posts.should_receive(:find).with(:all).and_return(@posts)
+  it "should find all posts, in reverse order (because of AbstractPostsController)" do
+    @forum_posts.should_receive(:find).with(:all, :order => 'id DESC').and_return(@posts)
     do_get
   end
   

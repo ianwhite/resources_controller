@@ -90,7 +90,6 @@ end
 ##############
 # Controllers
 ##############
-
 class UsersController < ActionController::Base
   resources_controller_for :users
 end
@@ -99,7 +98,14 @@ class ForumsController < ActionController::Base
   resources_controller_for :forums
 end
 
-class PostsController < ActionController::Base
+class PostsAbstractController < ActionController::Base
+  # redefine find_resources
+  def find_resources
+    resource_service.find :all, :order => 'id DESC'
+  end
+end
+
+class PostsController < PostsAbstractController
   # example of providing options to resources_controller_for
   resources_controller_for :posts, :class_name => 'Post', :route_name => 'posts', :name_prefix => ''
 end
