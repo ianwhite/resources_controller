@@ -48,6 +48,22 @@ describe "Routing shortcuts for ForumPosts (forums/2/posts/1) should map" do
   it "new_resource_path to /forums/2/posts/new" do
     controller.new_resource_path.should == '/forums/2/posts/new'
   end
+  
+  it "resource_tags_path to /forums/2/posts/1/tags" do
+    controller.resource_tags_path.should == "/forums/2/posts/1/tags"
+  end
+
+  it "resource_tags_path(9) to /forums/2/posts/9/tags" do
+    controller.resource_tags_path(9).should == "/forums/2/posts/9/tags" 
+  end
+  
+  it "resource_tag_path(5) to /forums/2/posts/1/tags/5" do
+    controller.resource_tag_path(5).should == "/forums/2/posts/1/tags/5"
+  end
+  
+  it "resource_tag_path(9,5) to /forums/2/posts/9/tags/5" do
+    controller.resource_tag_path(9,5).should == "/forums/2/posts/9/tags/5"
+  end
 end
 
 describe "resource_service in ForumPostsController" do

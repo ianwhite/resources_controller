@@ -68,6 +68,10 @@ Routing shortcuts for Comments (forums/3/posts/2/comments/1) should map
 - edit_resource_path to /forums/3/posts/2/comments/1/edit
 - edit_resource_path(9) to /forums/3/posts/2/comments/9/edit
 - new_resource_path to /forums/3/posts/2/comments/new
+- resource_tags_path to /forums/3/posts/2/comments/1/tags
+- resource_tags_path(9) to /forums/3/posts/2/comments/9/tags
+- resource_tag_path(5) to /forums/3/posts/2/comments/1/tags/5
+- resource_tag_path(9,5) to /forums/3/posts/2/comments/9/tags/5
 
 resource_service in CommentsController
 - should build new comment with @post foreign key with new
@@ -129,6 +133,10 @@ Routing shortcuts for ForumPosts (forums/2/posts/1) should map
 - edit_resource_path to /forums/2/posts/1/edit
 - edit_resource_path(9) to /forums/2/posts/9/edit
 - new_resource_path to /forums/2/posts/new
+- resource_tags_path to /forums/2/posts/1/tags
+- resource_tags_path(9) to /forums/2/posts/9/tags
+- resource_tag_path(5) to /forums/2/posts/1/tags/5
+- resource_tag_path(9,5) to /forums/2/posts/9/tags/5
 
 resource_service in ForumPostsController
 - should build new post with @forum foreign key with new
@@ -196,6 +204,11 @@ Routing shortcuts for ForumPosts (forums/1) should map
 - edit_resource_url to http://test.host/forums/2/edit
 - edit_resource_url(9) to http://test.host/forums/9/edit
 - new_resource_url to http://test.host/forums/new
+- resource_interests_path to /forums/2/interests
+- resource_interests_path(9) to /forums/9/interests
+- resource_interest_path(5) to /forums/2/interests/5
+- resource_interest_path(9,5) to /forums/9/interests/5
+- resource_users_path should raise NoMethodError
 
 resource_service in ForumsController
 - should build new forum with new
@@ -383,6 +396,16 @@ ActionView with resources_controller Helper
 - should forward #edit_resource_path(*resource) to controller
 - should forward #resources_path to controller
 - should forward #new_resource_path to controller
+- should forward #resource_tags_path to controller
+- should forward #resource_tags_path(resource_id) to controller
+- should forward #resource_tag_path(tag_id) to controller
+- should forward #resource_tag_path(resource_id,tag_id) to controller
+- should forward #resource_tags_url to controller
+- should forward #resource_tags_url(resource_id) to controller
+- should forward #resource_tag_url(tag_id) to controller
+- should forward #resource_tag_url(resource_id,tag_id) to controller
+- should not forward a badly formed method to the controller
+- should not respond to badly formed method
 
 A controller's resource_service
 - should pass unknown methods to the resource service of the controller
@@ -410,6 +433,6 @@ Automatic (route_name, name_prefix) for
 - HasAComplexNameController should be ('has_a_complex_name', '')
 - EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
 
-Finished in 1.648335 seconds
+Finished in 1.815066 seconds
 
-281 examples, 0 failures
+304 examples, 0 failures

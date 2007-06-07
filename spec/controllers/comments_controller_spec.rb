@@ -53,6 +53,22 @@ describe "Routing shortcuts for Comments (forums/3/posts/2/comments/1) should ma
   it "new_resource_path to /forums/3/posts/2/comments/new" do
     controller.new_resource_path.should == '/forums/3/posts/2/comments/new'
   end
+  
+  it "resource_tags_path to /forums/3/posts/2/comments/1/tags" do
+    controller.resource_tags_path.should == "/forums/3/posts/2/comments/1/tags"
+  end
+
+  it "resource_tags_path(9) to /forums/3/posts/2/comments/9/tags" do
+    controller.resource_tags_path(9).should == "/forums/3/posts/2/comments/9/tags" 
+  end
+  
+  it "resource_tag_path(5) to /forums/3/posts/2/comments/1/tags/5" do
+    controller.resource_tag_path(5).should == "/forums/3/posts/2/comments/1/tags/5"
+  end
+  
+  it "resource_tag_path(9,5) to /forums/3/posts/2/comments/9/tags/5" do
+    controller.resource_tag_path(9,5).should == "/forums/3/posts/2/comments/9/tags/5"
+  end
 end
 
 describe "resource_service in CommentsController" do

@@ -1,3 +1,7 @@
+* Now handles enclosing named paths.  You can reference named routes that are
+  'below' (or enclosed by) the current resource by appending resource_ to that
+  named route. [thanks Chris Hapgood for the initial idea]
+
 * (find|new)_resource(s) methods are now defined by resources_controller_for only
   if they do not already exist
 

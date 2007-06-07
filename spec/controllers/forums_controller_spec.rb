@@ -58,7 +58,28 @@ describe "Routing shortcuts for ForumPosts (forums/1) should map" do
   it "new_resource_url to http://test.host/forums/new" do
     controller.new_resource_url.should == 'http://test.host/forums/new'
   end
+  
+  it "resource_interests_path to /forums/2/interests" do
+    controller.resource_interests_path.should == "/forums/2/interests"
+  end
+
+  it "resource_interests_path(9) to /forums/9/interests" do
+    controller.resource_interests_path(9).should == "/forums/9/interests"
+  end
+  
+  it "resource_interest_path(5) to /forums/2/interests/5" do
+    controller.resource_interest_path(5).should == "/forums/2/interests/5"
+  end
+  
+  it "resource_interest_path(9,5) to /forums/9/interests/5" do
+    controller.resource_interest_path(9,5).should == "/forums/9/interests/5"
+  end
+  
+  it "resource_users_path should raise NoMethodError" do
+    lambda{ controller.resource_users_path }.should raise_error(NoMethodError)
+  end
 end
+
 
 describe "resource_service in ForumsController" do
   controller_name :forums

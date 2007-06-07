@@ -60,7 +60,7 @@ describe "Automatic (route_name, name_prefix) for" do
   end
 
   it "CommentsController should be ('comments', '')" do
-    route_name_and_name_prefix_for(CommentsController).should == ['comments', '']
+    route_name_and_name_prefix_for(CommentsController).should == ['comments', 'forum_post_']
   end
   
   it "TagsController should be ('tags', '')" do

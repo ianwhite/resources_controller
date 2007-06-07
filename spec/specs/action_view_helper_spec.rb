@@ -1,13 +1,17 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
 require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
 
+class ViewWithResourcesControllerHelper < ActionView::Base
+  include Ardes::ResourcesController::Helper
+end
+
 describe "ActionView with resources_controller Helper" do
   
   before do
-    @view = mock('View')
-    @view.extend Ardes::ResourcesController::Helper
+    @view = ViewWithResourcesControllerHelper.new
     @controller = mock('Controller')
-    @view.stub!(:controller).and_return(@controller)
+    @controller.stub!(:url_helper?).and_return(true)
+    @view.controller = @controller
   end
   
   def self.it_should_forward_to_controller(msg, *args)
@@ -29,4 +33,26 @@ describe "ActionView with resources_controller Helper" do
   it_should_forward_to_controller :edit_resource_path, '*resource'
   it_should_forward_to_controller :resources_path
   it_should_forward_to_controller :new_resource_path
+  
+  
+  # enclosed url helpers
+  it_should_forward_to_controller :resource_tags_path
+  it_should_forward_to_controller :resource_tags_path, 'resource_id'
+  it_should_forward_to_controller :resource_tag_path, 'tag_id'
+  it_should_forward_to_controller :resource_tag_path, 'resource_id', 'tag_id'
+  it_should_forward_to_controller :resource_tags_url
+  it_should_forward_to_controller :resource_tags_url, 'resource_id'
+  it_should_forward_to_controller :resource_tag_url, 'tag_id'
+  it_should_forward_to_controller :resource_tag_url, 'resource_id', 'tag_id'
+
+  it 'should not forward a badly formed method to the controller' do
+    @controller.stub!(:url_helper?).and_return(false)
+    @controller.should_not_receive(:badly_formed)
+    lambda {@view.badly_formed}.should raise_error
+  end
+  
+  it 'should not respond to badly formed method' do
+    @controller.stub!(:url_helper?).and_return(false)
+    @view.should_not respond_to :badly_formed
+  end
 end

@@ -127,7 +127,7 @@ class ForumPostsController < PostsController
 end
 
 class CommentsController < ActionController::Base
-  resources_controller_for :comments, :in => [:forum, :post]
+  resources_controller_for :comments, :in => [:forum, :post], :name_prefix => 'forum_post_'
 end
 
 class HasAComplexNameController < ActionController::Base
@@ -166,7 +166,7 @@ ActionController::Routing::Routes.draw do |map|
     forums.resources :tags, :name_prefix => 'forum_'
     forums.resources :posts, :name_prefix => 'forum_', :controller => 'forum_posts' do |posts|
       posts.resources :tags, :name_prefix => 'forum_post_'
-      posts.resources :comments, :name_prefix => nil do |comments|
+      posts.resources :comments, :name_prefix => 'forum_post_' do |comments|
         comments.resources :tags, :name_prefix => 'forum_post_comment_'
       end
     end
