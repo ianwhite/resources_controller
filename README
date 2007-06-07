@@ -1,3 +1,5 @@
+{Ardes plugins}[http://plugins.ardes.com] > {Documentation}[http://plugins.ardes.com/doc] > resources_controller
+
 = resources_controller
 
 plugin to facilitate inheritance and DRYness in your resources controllers
