@@ -53,6 +53,6 @@ describe "ActionView with resources_controller Helper" do
   
   it 'should not respond to badly formed method' do
     @controller.stub!(:url_helper?).and_return(false)
-    @view.should_not respond_to :badly_formed
+    @view.should_not respond_to(:badly_formed)
   end
 end
