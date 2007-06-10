@@ -61,7 +61,7 @@ Rake::RDocTask.new(:doc) do |t|
   t.main     = 'README'
   t.title    = "#{plugin_name}"
   t.options  = ['--line-numbers', '--inline-source']
-  t.rdoc_files.include('README', 'SPECDOC', 'MIT-LICENSE')
+  t.rdoc_files.include('README', 'SPECDOC', 'MIT-LICENSE', 'CHANGELOG')
   t.rdoc_files.include('lib/**/*.rb')
 end
 
