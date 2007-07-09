@@ -567,7 +567,7 @@ module Ardes#:nodoc:
       end
       
       def edit_resource_url(resource = self.resource)
-        send("#{name_prefix}edit_#{singular_route_name}_url", *(enclosing_resources + [resource]))
+        send("edit_#{name_prefix}#{singular_route_name}_url", *(enclosing_resources + [resource]))
       end
       
       def resources_url
@@ -575,7 +575,7 @@ module Ardes#:nodoc:
       end
       
       def new_resource_url
-        send("#{name_prefix}new_#{singular_route_name}_url", *enclosing_resources)
+        send("new_#{name_prefix}#{singular_route_name}_url", *enclosing_resources)
       end
       
       def resource_path(resource = self.resource)
@@ -583,7 +583,7 @@ module Ardes#:nodoc:
       end
       
       def edit_resource_path(resource = self.resource)
-        send("#{name_prefix}edit_#{singular_route_name}_path", *(enclosing_resources + [resource]))
+        send("edit_#{name_prefix}#{singular_route_name}_path", *(enclosing_resources + [resource]))
       end
       
       def resources_path
@@ -591,7 +591,7 @@ module Ardes#:nodoc:
       end
       
       def new_resource_path
-        send("#{name_prefix}new_#{singular_route_name}_path", *enclosing_resources)
+        send("new_#{name_prefix}#{singular_route_name}_path", *enclosing_resources)
       end 
       
       def method_missing_with_url_helpers(method, *args, &block)
