@@ -25,12 +25,15 @@ describe "ActionView with resources_controller Helper" do
   it_should_forward_to_controller :resources_name
   it_should_forward_to_controller :resource
   it_should_forward_to_controller :resources
-  it_should_forward_to_controller :resource_url, '*resource'
-  it_should_forward_to_controller :edit_resource_url, '*resource'
+  it_should_forward_to_controller :resources
+  it_should_forward_to_controller :resource_url, 'resource'
+  it_should_forward_to_controller :resource_url, 'resource', :foo => 'bar'
+  it_should_forward_to_controller :edit_resource_url, 'resource'
   it_should_forward_to_controller :resources_url
+  it_should_forward_to_controller :resources_url, :foo => 'bar'
   it_should_forward_to_controller :new_resource_url
-  it_should_forward_to_controller :resource_path, '*resource'
-  it_should_forward_to_controller :edit_resource_path, '*resource'
+  it_should_forward_to_controller :resource_path, 'resource'
+  it_should_forward_to_controller :edit_resource_path, 'resource'
   it_should_forward_to_controller :resources_path
   it_should_forward_to_controller :new_resource_path
   
@@ -38,8 +41,10 @@ describe "ActionView with resources_controller Helper" do
   # enclosed url helpers
   it_should_forward_to_controller :resource_tags_path
   it_should_forward_to_controller :resource_tags_path, 'resource_id'
+  it_should_forward_to_controller :resource_tags_path, 'resource_id', :foo => 'bar'
   it_should_forward_to_controller :resource_tag_path, 'tag_id'
   it_should_forward_to_controller :resource_tag_path, 'resource_id', 'tag_id'
+  it_should_forward_to_controller :resource_tag_path, 'resource_id', 'tag_id', :foo => 'bar'
   it_should_forward_to_controller :resource_tags_url
   it_should_forward_to_controller :resource_tags_url, 'resource_id'
   it_should_forward_to_controller :resource_tag_url, 'tag_id'

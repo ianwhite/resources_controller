@@ -1,7 +1,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
 require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
 
-describe "Routing shortcuts for ForumPosts (forums/1) should map" do
+describe "Routing shortcuts for Forums should map" do
   controller_name :forums
   
   before(:each) do
@@ -15,12 +15,24 @@ describe "Routing shortcuts for ForumPosts (forums/1) should map" do
     controller.resources_path.should == '/forums'
   end
 
+  it "resources_path(:foo => 'bar') to /forums?foo=bar" do
+    controller.resources_path(:foo => 'bar').should == '/forums?foo=bar'
+  end
+
   it "resource_path to /forums/2" do
     controller.resource_path.should == '/forums/2'
+  end
+
+  it "resource_path(:foo => 'bar') to /forums/2?foo=bar" do
+    controller.resource_path(:foo => 'bar').should == '/forums/2?foo=bar'
   end
   
   it "resource_path(9) to /forums/9" do
     controller.resource_path(9).should == '/forums/9'
+  end
+
+  it "resource_path(9, :foo => 'bar') to /forums/2?foo=bar" do
+    controller.resource_path(9, :foo => 'bar').should == '/forums/9?foo=bar'
   end
 
   it "edit_resource_path to /forums/2/edit" do
@@ -58,15 +70,23 @@ describe "Routing shortcuts for ForumPosts (forums/1) should map" do
   it "new_resource_url to http://test.host/forums/new" do
     controller.new_resource_url.should == 'http://test.host/forums/new'
   end
-  
+ 
   it "resource_interests_path to /forums/2/interests" do
     controller.resource_interests_path.should == "/forums/2/interests"
   end
-
+  
+  it "resource_interests_path(:foo => 'bar') to /forums/2/interests?foo=bar" do
+    controller.resource_interests_path(:foo => 'bar').should == '/forums/2/interests?foo=bar'
+  end
+  
   it "resource_interests_path(9) to /forums/9/interests" do
     controller.resource_interests_path(9).should == "/forums/9/interests"
   end
   
+  it "resource_interests_path(9, :foo => 'bar') to /forums/9/interests?foo=bar" do
+    controller.resource_interests_path(9, :foo => 'bar').should == "/forums/9/interests?foo=bar"
+  end
+
   it "resource_interest_path(5) to /forums/2/interests/5" do
     controller.resource_interest_path(5).should == "/forums/2/interests/5"
   end
@@ -75,11 +95,26 @@ describe "Routing shortcuts for ForumPosts (forums/1) should map" do
     controller.resource_interest_path(9,5).should == "/forums/9/interests/5"
   end
   
+  it "resource_interest_path(9,5, :foo => 'bar') to /forums/9/interests/5?foo=bar" do
+    controller.resource_interest_path(9, 5, :foo => 'bar').should == "/forums/9/interests/5?foo=bar"
+  end
+
+  it 'new_resource_interest_path(9) to /forums/9/interests/new' do
+    controller.new_resource_interest_path(9).should == "/forums/9/interests/new"
+  end
+  
+  it 'edit_resource_interest_path(5) to /forums/2/interests/5/edit' do
+    controller.edit_resource_interest_path(5).should == "/forums/2/interests/5/edit"
+  end
+  
+  it 'edit_resource_interest_path(9,5) to /forums/9/interests/5/edit' do
+    controller.edit_resource_interest_path(9,5).should == "/forums/9/interests/5/edit"
+  end
+  
   it "resource_users_path should raise NoMethodError" do
     lambda{ controller.resource_users_path }.should raise_error(NoMethodError)
   end
 end
-
 
 describe "resource_service in ForumsController" do
   controller_name :forums

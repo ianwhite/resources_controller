@@ -41,6 +41,8 @@ http://svn.ardes.com/rails_plugins/resources_controller_lte_1_2_2
 * Igor Alexeiuk for work on name_prefix and polymorphic routes
 * Dan Kubb
 
+See the {CHANGLELOG}[link:files/CHANGELOG.html] for recent changes
+
 === Specs and Coverage
 * {SPECDOC}[link:files/SPECDOC.html] lists the specifications
 * {RSpec Report}[link:rspec_report.html] is a report of spec pass/fails

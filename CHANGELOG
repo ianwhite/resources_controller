@@ -1,3 +1,12 @@
+* Enclosed named paths use the new edge rails conventions for named routes.
+
+  So to get the path to edit a child tag resource (where resource is 'forum:1')
+    edit_resource_tag_path(@tag) # => '/forums/1/tags/2/edit'
+
+* Handles options passed to named routes
+  
+    resource_path(:sort_by => 'article') # => '/forums/2?sort_by=article'
+
 * Now handles enclosing named paths.  You can reference named routes that are
   'below' (or enclosed by) the current resource by appending resource_ to that
   named route. [thanks Chris Hapgood for the initial idea]

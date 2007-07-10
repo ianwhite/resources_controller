@@ -38,16 +38,14 @@ namespace :spec do
   desc "Generate specdoc for #{plugin_name}"
   Spec::Rake::SpecTask.new(:doc) do |t|
     t.spec_files  = FileList['spec/**/*_spec.rb']
-    t.spec_opts   = ["--format", "specdoc"]
-    t.out         = 'SPECDOC'
-  end
+    t.spec_opts   = ["--format", "specdoc:SPECDOC"]
+   end
 
   namespace :doc do
     desc "Generate html specdoc for #{plugin_name}"
     Spec::Rake::SpecTask.new(:html => :rdoc) do |t|
       t.spec_files    = FileList['spec/**/*_spec.rb']
-      t.spec_opts     = ["--format", "html", "--diff"]
-      t.out           = 'doc/rspec_report.html'
+      t.spec_opts     = ["--format", "html:doc/rspec_report.html", "--diff"]
     end
   end
 end

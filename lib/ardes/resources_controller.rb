@@ -562,40 +562,40 @@ module Ardes#:nodoc:
         end
       end
       
-      def resource_url(resource = self.resource)
-        send("#{name_prefix}#{singular_route_name}_url", *(enclosing_resources + [resource]))
+      def resource_url(*args)
+        send("#{name_prefix}#{singular_route_name}_url", *enclosing_resources + extract_resource_and_options!(args))
       end
-      
-      def edit_resource_url(resource = self.resource)
-        send("edit_#{name_prefix}#{singular_route_name}_url", *(enclosing_resources + [resource]))
+
+      def edit_resource_url(*args)
+        send("edit_#{name_prefix}#{singular_route_name}_url", *enclosing_resources + extract_resource_and_options!(args))
       end
-      
-      def resources_url
-        send("#{name_prefix}#{route_name}_url", *enclosing_resources)
+
+      def resources_url(*args)
+        send("#{name_prefix}#{route_name}_url", *enclosing_resources + args)
       end
-      
-      def new_resource_url
-        send("new_#{name_prefix}#{singular_route_name}_url", *enclosing_resources)
+
+      def new_resource_url(*args)
+        send("new_#{name_prefix}#{singular_route_name}_url", *enclosing_resources + args)
       end
-      
-      def resource_path(resource = self.resource)
-        send("#{name_prefix}#{singular_route_name}_path", *(enclosing_resources + [resource]))
+
+      def resource_path(*args)
+        send("#{name_prefix}#{singular_route_name}_path", *enclosing_resources + extract_resource_and_options!(args))
       end
-      
-      def edit_resource_path(resource = self.resource)
-        send("edit_#{name_prefix}#{singular_route_name}_path", *(enclosing_resources + [resource]))
+
+      def edit_resource_path(*args)
+        send("edit_#{name_prefix}#{singular_route_name}_path", *enclosing_resources + extract_resource_and_options!(args))
       end
-      
-      def resources_path
-        send("#{name_prefix}#{route_name}_path", *enclosing_resources)
+
+      def resources_path(*args)
+        send("#{name_prefix}#{route_name}_path", *enclosing_resources + args)
       end
-      
-      def new_resource_path
-        send("new_#{name_prefix}#{singular_route_name}_path", *enclosing_resources)
-      end 
-      
+
+      def new_resource_path(*args)
+        send("new_#{name_prefix}#{singular_route_name}_path", *enclosing_resources + args)
+      end
+          
       def method_missing_with_url_helpers(method, *args, &block)
-        if route = resource_route_name_from_method(method)
+        if route = resource_route_from_method(method)
           return resource_url_helper_from_route(route, method, *args, &block)
         end
         method_missing_without_url_helpers(method, *args, &block)
@@ -606,7 +606,7 @@ module Ardes#:nodoc:
       end
       
       def url_helper?(method)
-        !!resource_route_name_from_method(method)
+        !!resource_route_from_method(method)
       end
     
     protected
@@ -615,24 +615,36 @@ module Ardes#:nodoc:
       # sent
       def resource_url_helper_from_route(route, method, *args, &block) 
         required_keys = route.significant_keys.reject{|k| [:controller, :action].include?(k)}
+        options = args.last.is_a?(Hash) ? args.pop : {}
         if enclosing_resources.size + args.size < required_keys.size
           route_args = enclosing_resources + [resource] + args
         else
           route_args = enclosing_resources + args
         end
-        send(method.to_s.sub(/^resource/, "#{name_prefix}#{singular_route_name}"), *route_args, &block)
+        route_args << options if options.size > 0
+        method = method.to_s.sub(/(^edit_|^new_|^)resource_/) { "#{$1}#{name_prefix}#{singular_route_name}_" }
+        send(method, *route_args, &block)
       end
       
-      # passed something like resource_<named_route>_(url|path), will return the route correpsonding to
+      # passed something like (edit_|new_)resource_<named_route>_(url|path), will return the route correpsonding to
       # the expanded resource.
       # returns false if the method doesn't match the correct siganture
       # return nil if the route cannot be found
       # return the route otherwise
-      def resource_route_name_from_method(method)
-        if method.to_s =~ /^resource_.*_(path|url)$/
-          route_name = method.to_s.sub(/_(path|url)$/,'').sub(/^resource/, "#{name_prefix}#{singular_route_name}").to_sym
-          return ActionController::Routing::Routes.named_routes.get(route_name)
+      def resource_route_from_method(method)
+        if method.to_s =~ /(^edit_|^new_|^)resource_.*_(path|url)$/
+          route_name = method.to_s.sub(/_(path|url)$/,'')
+          route_name = route_name.sub(/(^edit_|^new_|^)resource_/) { "#{$1}#{name_prefix}#{singular_route_name}_" }
+          return ActionController::Routing::Routes.named_routes.get(route_name.to_sym)
         end
+      end
+      
+      # return [resource] or [resource, options] from args array
+      # self.resource is used if args[0] doesn't contain anything
+      def extract_resource_and_options!(args)
+        options  = args.last.is_a?(Hash) ? args.pop : false
+        resource = args[0] || self.resource
+        options ? [resource, options] : [resource]
       end
     end
     
@@ -661,11 +673,13 @@ module Ardes#:nodoc:
     # taggable views.  In a view shared amongst taggables you can write
     #
     #  <%= link_to 'tags', resource_tags_path %>
+    #  <%= link_to 'edit tag', edit_resource_tag_path(@tag) %>
     # 
     # or:
     #  <% for taggable in resources %>
     #    <%= link_to 'tags', resource_tags_path(taggable) %>
     #
+    # See UrlHelpers for more detail
     module Helper
       def self.included(base)
         base.class_eval do
@@ -690,36 +704,36 @@ module Ardes#:nodoc:
         controller.resources
       end
       
-      def resource_url(*resource)
-        controller.resource_url(*resource)
+      def resource_url(*args)
+        controller.resource_url(*args) 
       end
-      
-      def edit_resource_url(*resource)
-        controller.edit_resource_url(*resource)
+
+      def edit_resource_url(*args)
+        controller.edit_resource_url(*args)
       end
-      
-      def resources_url
-        controller.resources_url
+
+      def resources_url(*args)
+        controller.resources_url(*args)
       end
-      
-      def new_resource_url
-        controller.new_resource_url
+
+      def new_resource_url(*args)
+        controller.new_resource_url(*args)
       end
-      
-      def resource_path(*resource)
-        controller.resource_path(*resource)
+
+      def resource_path(*args)
+        controller.resource_path(*args)
       end
-      
-      def edit_resource_path(*resource)
-        controller.edit_resource_path(*resource)
+
+      def edit_resource_path(*args)
+        controller.edit_resource_path(*args)
       end
-      
-      def resources_path
-        controller.resources_path
+
+      def resources_path(*args)
+        controller.resources_path(*args)
       end
-      
-      def new_resource_path
-        controller.new_resource_path
+
+      def new_resource_path(*args)
+        controller.new_resource_path(*args)
       end
 
       def method_missing_with_url_helpers(method, *args, &block)
@@ -778,3 +792,56 @@ module Ardes#:nodoc:
     end
   end
 end
+
+# TODO: waiting for http://dev.rubyonrails.org/ticket/8930 to be accepted.  Remove this when it is
+module ActionController#:nodoc:
+  module Routing#:nodoc:
+    class RouteSet#:nodoc:
+      class NamedRouteCollection#:nodoc:
+      private
+        def define_url_helper(route, name, kind, options)
+          selector = url_helper_name(name, kind)
+  
+          # The segment keys used for positional paramters
+          segment_keys = route.segments.collect do |segment|
+            segment.key if segment.respond_to? :key
+          end.compact
+          hash_access_method = hash_access_name(name, kind)
+  
+          @module.send :module_eval, <<-end_eval # We use module_eval to avoid leaks
+            def #{selector}(*args)
+              opts = if args.empty? || Hash === args.first
+                args.first || {}
+              else
+                # allow ordered parameters to be associated with corresponding
+                # dynamic segments, so you can do
+                #
+                #   foo_url(bar, baz, bang)
+                #
+                # instead of
+                #
+                #   foo_url(:bar => bar, :baz => baz, :bang => bang)
+                #
+                # Also allow options hash, so you can do
+                #
+                #   foo_url(bar, baz, bang, :sort_by => 'baz')
+                #
+                options = args.last.is_a?(Hash) ? args.pop : {}
+                args = args.zip(#{segment_keys.inspect}).inject({}) do |h, (v, k)|
+                  h[k] = v
+                  h
+                end
+                options.merge(args)
+              end
+      
+              url_for(#{hash_access_method}(opts))
+            end
+          end_eval
+          @module.send(:protected, selector)
+          helpers << selector
+        end
+      end
+    end
+  end
+end
+
