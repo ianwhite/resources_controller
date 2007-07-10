@@ -421,6 +421,12 @@ ActionView with resources_controller Helper
 - should not forward a badly formed method to the controller
 - should not respond to badly formed method
 
+Helper#form_for_resource (when resource is new record)
+- should call form_for with create form options
+
+Helper#form_for_resource (when resource is existing record)
+- should call form_for with update form options
+
 A controller's resource_service
 - should pass unknown methods to the resource service of the controller
 - may be explicitly set with #resource_service=
@@ -447,6 +453,6 @@ Automatic (route_name, name_prefix) for
 - HasAComplexNameController should be ('has_a_complex_name', '')
 - EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
 
-Finished in 2.317846 seconds
+Finished in 2.315742 seconds
 
-318 examples, 0 failures
+320 examples, 0 failures

@@ -1,3 +1,5 @@
+* Added Helper#form_for_resource for easy form generation, see rdoc for details
+
 * Enclosed named paths use the new edge rails conventions for named routes.
 
   So to get the path to edit a child tag resource (where resource is 'forum:1')

@@ -61,3 +61,41 @@ describe "ActionView with resources_controller Helper" do
     @view.should_not respond_to(:badly_formed)
   end
 end
+
+describe "Helper#form_for_resource (when resource is new record)" do
+  before do
+    @view = ViewWithResourcesControllerHelper.new
+    @controller = mock('Controller')
+    @resource = mock('Forum')
+    @resource = mock('Forum', :null_object => true)
+    @resource.stub!(:new_record?).and_return(true)
+    @controller.stub!(:resource).and_return(@resource)
+    @controller.stub!(:resource_name).and_return('forum')
+    @controller.stub!(:resources_path).and_return('/forums')
+    @view.controller = @controller
+  end
+  
+  it 'should call form_for with create form options' do
+    @view.should_receive(:form_for).with('forum', @resource, {:html => {:method => :post}, :url => '/forums'})
+    @view.form_for_resource{}
+  end
+end
+
+describe "Helper#form_for_resource (when resource is existing record)" do
+  before do
+    @view = ViewWithResourcesControllerHelper.new
+    @controller = mock('Controller')
+    @resource = mock('Forum', :null_object => true)
+    @resource.stub!(:new_record?).and_return(false)
+    @resource.stub!(:to_param).and_return("1")
+    @controller.stub!(:resource).and_return(@resource)
+    @controller.stub!(:resource_name).and_return('forum')
+    @controller.stub!(:resource_path).and_return('/forums/1')
+    @view.controller = @controller
+  end
+  
+  it 'should call form_for with update form options' do
+    @view.should_receive(:form_for).with('forum', @resource, {:html => {:method => :put}, :url => '/forums/1'})
+    @view.form_for_resource{}
+  end
+end

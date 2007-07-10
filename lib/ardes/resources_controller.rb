@@ -688,6 +688,35 @@ module Ardes#:nodoc:
         end
       end
 
+      # Calls form_for with the apropriate action and method for the resource
+      #
+      # resource.new_record? is used to decide between a create or update action
+      #
+      # You can optionally pass a resource object, default is to use self.resource
+      #
+      # === Example
+      # 
+      #   <% form_for_resource do |f| %>
+      #     <%= f.text_field :name %>
+      #     <%= f.submit resource.new_record? ? 'Create' : 'Update'
+      #   <% end %>
+      #
+      #   <% for attachment in resources %>
+      #     <% form_for_resource attachment, :html => {:multipart => true} %>
+      #       <%= f.file_field :uploaded_data %>
+      #       <%= f.submit 'Update' %>
+      #     <% end %>
+      #   <% end %>
+      #
+      def form_for_resource(*args, &block)
+        options = args.last.is_a?(Hash) ? args.pop : {}
+        resource = args[0] || self.resource
+        options[:html]        ||= {}
+        options[:html][:method] = resource.new_record? ? :post : :put
+        options[:url]           = resource.new_record? ? resources_path : resource_path
+        form_for(resource_name, resource, options, &block)
+      end
+      
       def resource_name
         controller.resource_name
       end
