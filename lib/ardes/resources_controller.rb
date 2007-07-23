@@ -724,10 +724,19 @@ module Ardes#:nodoc:
       def form_for_resource(*args, &block)
         options = args.last.is_a?(Hash) ? args.pop : {}
         resource = args[0] || self.resource
-        options[:html]        ||= {}
-        options[:html][:method] = resource.new_record? ? :post : :put
-        options[:url]           = resource.new_record? ? resources_path : resource_path
+        options[:html]          ||= {}
+        options[:html][:method] ||= resource.new_record? ? :post : :put
+        options[:url]           ||= resource.new_record? ? resources_path : resource_path
         form_for(resource_name, resource, options, &block)
+      end
+      
+      def remote_form_for_resource(*args, &block)
+        options = args.last.is_a?(Hash) ? args.pop : {}
+        resource = args[0] || self.resource
+        options[:html]          ||= {}
+        options[:html][:method] ||= resource.new_record? ? :post : :put
+        options[:url]           ||= resource.new_record? ? resources_path : resource_path
+        remote_form_for(resource_name, resource, options, &block)
       end
       
       def resource_name

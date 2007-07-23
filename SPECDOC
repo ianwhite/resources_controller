@@ -459,6 +459,9 @@ Helper#form_for_resource (when resource is new record)
 Helper#form_for_resource (when resource is existing record)
 - should call form_for with update form options
 
+Helper#remote_form_for_resource (when resource is existing record)
+- should call remote_form_for with update form options
+
 A controller's resource_service
 - should pass unknown methods to the resource service of the controller
 - may be explicitly set with #resource_service=
@@ -485,6 +488,6 @@ Automatic (route_name, name_prefix) for
 - HasAComplexNameController should be ('has_a_complex_name', '')
 - EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
 
-Finished in 2.682698 seconds
+Finished in 2.499683 seconds
 
-342 examples, 0 failures
+343 examples, 0 failures

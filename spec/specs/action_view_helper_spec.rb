@@ -99,3 +99,22 @@ describe "Helper#form_for_resource (when resource is existing record)" do
     @view.form_for_resource{}
   end
 end
+
+describe "Helper#remote_form_for_resource (when resource is existing record)" do
+  before do
+    @view = ViewWithResourcesControllerHelper.new
+    @controller = mock('Controller')
+    @resource = mock('Forum', :null_object => true)
+    @resource.stub!(:new_record?).and_return(false)
+    @resource.stub!(:to_param).and_return("1")
+    @controller.stub!(:resource).and_return(@resource)
+    @controller.stub!(:resource_name).and_return('forum')
+    @controller.stub!(:resource_path).and_return('/forums/1')
+    @view.controller = @controller
+  end
+  
+  it 'should call remote_form_for with update form options' do
+    @view.should_receive(:remote_form_for).with('forum', @resource, {:html => {:method => :put}, :url => '/forums/1'})
+    @view.remote_form_for_resource{}
+  end
+end
