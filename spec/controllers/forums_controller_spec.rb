@@ -422,6 +422,11 @@ describe "Requesting /forums using POST" do
     do_post
   end
 
+  it "should set the flash notice" do
+    do_post
+    flash[:notice].should == "Forum was successfully created."
+  end
+
   it "should redirect to the new forum" do
     do_post
     response.should be_redirect
@@ -448,6 +453,11 @@ describe "Requesting /forums using XHR POST" do
     do_post
   end
 
+  it "should not set the flash notice" do
+    do_post
+    flash[:notice].should == nil
+  end
+
   it "should render create.rjs" do
     do_post
     response.should render_template('create')
@@ -470,6 +480,11 @@ describe "Requesting /forums/1 using PUT" do
   it "should find the forum requested" do
     Forum.should_receive(:find).with("1").and_return(@mock_forum)
     do_update
+  end
+
+  it "should set the flash notice" do
+    do_update
+    flash[:notice].should == "Forum was successfully updated."
   end
 
   it "should update the found forum" do
@@ -514,6 +529,11 @@ describe "Requesting /forums/1 using XHR PUT" do
     assigns(:forum).should == @mock_forum
   end
 
+  it "should not set the flash notice" do
+    do_update
+    flash[:notice].should == nil
+  end
+
   it "should assign the found forum for the view" do
     do_update
     assigns(:forum).should == @mock_forum
@@ -547,6 +567,11 @@ describe "Requesting /forums/1 using DELETE" do
     do_delete
   end
   
+  it "should set the flash notice" do
+    do_delete
+    flash[:notice].should == 'Forum was successfully destroyed.'
+  end
+  
   it "should redirect to the forums list" do
     do_delete
     response.should be_redirect
@@ -569,6 +594,11 @@ describe "Requesting /forums/1 using XHR DELETE" do
   it "should find the forum requested" do
     Forum.should_receive(:find).with("1").and_return(@mock_forum)
     do_delete
+  end
+  
+  it "should not set the flash notice" do
+    do_delete
+    flash[:notice].should == nil
   end
   
   it "should call destroy on the found forum" do

@@ -1,3 +1,5 @@
+* Added flash tests [frederikfix at eml dot cc]
+
 * Added rjs actions [frederikfix at eml dot cc]
 
 * Added Ardes::ResourcesController::Spec::ViewHelper for easy view testing

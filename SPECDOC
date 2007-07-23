@@ -272,14 +272,17 @@ Requesting /forums/1/edit using GET
 
 Requesting /forums using POST
 - should create a new forum
+- should set the flash notice
 - should redirect to the new forum
 
 Requesting /forums using XHR POST
 - should create a new forum
+- should not set the flash notice
 - should render create.rjs
 
 Requesting /forums/1 using PUT
 - should find the forum requested
+- should set the flash notice
 - should update the found forum
 - should assign the found forum for the view
 - should redirect to the forum
@@ -287,16 +290,19 @@ Requesting /forums/1 using PUT
 Requesting /forums/1 using XHR PUT
 - should find the forum requested
 - should update the found forum
+- should not set the flash notice
 - should assign the found forum for the view
 - should render update.rjs
 
 Requesting /forums/1 using DELETE
 - should find the forum requested
 - should call destroy on the found forum
+- should set the flash notice
 - should redirect to the forums list
 
 Requesting /forums/1 using XHR DELETE
 - should find the forum requested
+- should not set the flash notice
 - should call destroy on the found forum
 - should render destroy.rjs
 
@@ -479,6 +485,6 @@ Automatic (route_name, name_prefix) for
 - HasAComplexNameController should be ('has_a_complex_name', '')
 - EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
 
-Finished in 2.5088 seconds
+Finished in 2.682698 seconds
 
-336 examples, 0 failures
+342 examples, 0 failures
