@@ -235,6 +235,11 @@ Requesting /forums.xml using GET
 - should find all forums
 - should render the found forums as xml
 
+Requesting /forums using XHR GET
+- should be successful
+- should find all forums
+- should render index.rjs
+
 Requesting /forums/1 using GET
 - should be successful
 - should render show.rhtml
@@ -245,6 +250,12 @@ Requesting /forums/1.xml using GET
 - should be successful
 - should find the forum requested
 - should render the found forum as xml
+
+Requesting /forums/1 using XHR GET
+- should be successful
+- should render show.rjs
+- should find the forum requested
+- should assign the found forum for the view
 
 Requesting /forums/new using GET
 - should be successful
@@ -263,16 +274,31 @@ Requesting /forums using POST
 - should create a new forum
 - should redirect to the new forum
 
+Requesting /forums using XHR POST
+- should create a new forum
+- should render create.rjs
+
 Requesting /forums/1 using PUT
 - should find the forum requested
 - should update the found forum
 - should assign the found forum for the view
 - should redirect to the forum
 
+Requesting /forums/1 using XHR PUT
+- should find the forum requested
+- should update the found forum
+- should assign the found forum for the view
+- should render update.rjs
+
 Requesting /forums/1 using DELETE
 - should find the forum requested
 - should call destroy on the found forum
 - should redirect to the forums list
+
+Requesting /forums/1 using XHR DELETE
+- should find the forum requested
+- should call destroy on the found forum
+- should render destroy.rjs
 
 Routing shortcuts for Interests via Forum (forums/1/interests/2) should map
 - resources_path to /forums/1/interests
@@ -453,6 +479,6 @@ Automatic (route_name, name_prefix) for
 - HasAComplexNameController should be ('has_a_complex_name', '')
 - EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
 
-Finished in 2.316163 seconds
+Finished in 2.5088 seconds
 
-320 examples, 0 failures
+336 examples, 0 failures

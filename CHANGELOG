@@ -1,3 +1,5 @@
+* Added rjs actions [frederikfix at eml dot cc]
+
 * Added Ardes::ResourcesController::Spec::ViewHelper for easy view testing
 
 * Added Helper#form_for_resource for easy form generation, see rdoc for details

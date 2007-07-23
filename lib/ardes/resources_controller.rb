@@ -478,6 +478,7 @@ module Ardes#:nodoc:
     
         respond_to do |format|
           format.html # index.rhtml
+          format.js
           format.xml  { render :xml => resources.to_xml }
         end
       end
@@ -489,6 +490,7 @@ module Ardes#:nodoc:
 
         respond_to do |format|
           format.html # show.rhtml
+          format.js
           format.xml  { render :xml => resource.to_xml }
         end
       end
@@ -510,11 +512,15 @@ module Ardes#:nodoc:
 
         respond_to do |format|
           if resource.save
-            flash[:notice] = "#{resource_name.humanize} was successfully created."
-            format.html { redirect_to resource_url }
+            format.html do
+              flash[:notice] = "#{resource_name.humanize} was successfully created."
+              redirect_to resource_url
+            end
+            format.js
             format.xml  { head :created, :location => resource_url }
           else
             format.html { render :action => "new" }
+            format.js
             format.xml  { render :xml => resource.errors.to_xml, :status => :unprocessable_entity }
           end
         end
@@ -527,11 +533,15 @@ module Ardes#:nodoc:
   
         respond_to do |format|
           if resource.update_attributes(params[resource_name])
-            flash[:notice] = "#{resource_name.humanize} was successfully updated."
-            format.html { redirect_to resource_url }
+            format.html do
+              flash[:notice] = "#{resource_name.humanize} was successfully updated."
+              redirect_to resource_url
+            end
+            format.js
             format.xml  { head :ok }
           else
             format.html { render :action => "edit" }
+            format.js
             format.xml  { render :xml => resource.errors.to_xml, :status => :unprocessable_entity }
           end
         end
@@ -543,8 +553,11 @@ module Ardes#:nodoc:
         self.resource = find_resource
         resource.destroy
         respond_to do |format|
-          flash[:notice] = "#{resource_name.humanize} was successfully destroyed."
-          format.html { redirect_to resources_url }
+          format.html do
+            flash[:notice] = "#{resource_name.humanize} was successfully destroyed."
+            redirect_to resources_url
+          end
+          format.js
           format.xml  { head :ok }
         end
       end

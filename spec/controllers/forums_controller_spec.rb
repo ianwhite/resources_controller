@@ -206,6 +206,35 @@ describe "Requesting /forums.xml using GET" do
   end
 end
 
+describe "Requesting /forums using XHR GET" do
+  controller_name :forums
+
+  before(:each) do
+    @mock_forums = mock('forums')
+    Forum.stub!(:find).and_return(@mock_forums)
+  end
+  
+  def do_get
+    @request.env["HTTP_ACCEPT"] = "text/javascript"
+    xhr :get, :index
+  end
+  
+  it "should be successful" do
+    do_get
+    response.should be_success
+  end
+
+  it "should find all forums" do
+    Forum.should_receive(:find).with(:all).and_return(@mock_forums)
+    do_get
+  end
+  
+  it "should render index.rjs" do
+    do_get
+    response.should render_template('index')
+  end
+end
+
 describe "Requesting /forums/1 using GET" do
   controller_name :forums
 
@@ -267,6 +296,39 @@ describe "Requesting /forums/1.xml using GET" do
     @mock_forum.should_receive(:to_xml).and_return("XML")
     do_get
     response.body.should eql("XML")
+  end
+end
+
+describe "Requesting /forums/1 using XHR GET" do
+  controller_name :forums
+
+  before(:each) do
+    @mock_forum = mock('Forum')
+    Forum.stub!(:find).and_return(@mock_forum)
+  end
+  
+  def do_get
+    xhr :get, :show, :id => "1"
+  end
+
+  it "should be successful" do
+    do_get
+    response.should be_success
+  end
+  
+  it "should render show.rjs" do
+    do_get
+    response.should render_template('show')
+  end
+  
+  it "should find the forum requested" do
+    Forum.should_receive(:find).with("1").and_return(@mock_forum)
+    do_get
+  end
+  
+  it "should assign the found forum for the view" do
+    do_get
+    assigns[:forum].should == @mock_forum
   end
 end
 
@@ -367,6 +429,31 @@ describe "Requesting /forums using POST" do
   end
 end
 
+describe "Requesting /forums using XHR POST" do
+  controller_name :forums
+
+  before(:each) do
+    @mock_forum = mock('Forum')
+    @mock_forum.stub!(:save).and_return(true)
+    @mock_forum.stub!(:to_param).and_return("1")
+    Forum.stub!(:new).and_return(@mock_forum)
+  end
+  
+  def do_post
+    xhr :post, :create, :forum => {:name => 'Forum'}
+  end
+  
+  it "should create a new forum" do
+    Forum.should_receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
+    do_post
+  end
+
+  it "should render create.rjs" do
+    do_post
+    response.should render_template('create')
+  end
+end
+
 describe "Requesting /forums/1 using PUT" do
   controller_name :forums
 
@@ -403,6 +490,41 @@ describe "Requesting /forums/1 using PUT" do
   end
 end
 
+describe "Requesting /forums/1 using XHR PUT" do
+  controller_name :forums
+
+  before(:each) do
+    @mock_forum = mock('Forum', :null_object => true)
+    @mock_forum.stub!(:to_param).and_return("1")
+    Forum.stub!(:find).and_return(@mock_forum)
+  end
+  
+  def do_update
+    xhr :put, :update, :id => "1"
+  end
+  
+  it "should find the forum requested" do
+    Forum.should_receive(:find).with("1").and_return(@mock_forum)
+    do_update
+  end
+
+  it "should update the found forum" do
+    @mock_forum.should_receive(:update_attributes)
+    do_update
+    assigns(:forum).should == @mock_forum
+  end
+
+  it "should assign the found forum for the view" do
+    do_update
+    assigns(:forum).should == @mock_forum
+  end
+
+  it "should render update.rjs" do
+    do_update
+    response.should render_template('update')
+  end
+end
+
 describe "Requesting /forums/1 using DELETE" do
   controller_name :forums
 
@@ -429,5 +551,33 @@ describe "Requesting /forums/1 using DELETE" do
     do_delete
     response.should be_redirect
     response.redirect_url.should == "http://test.host/forums"
+  end
+end
+
+describe "Requesting /forums/1 using XHR DELETE" do
+  controller_name :forums
+
+  before(:each) do
+    @mock_forum = mock('Forum', :null_object => true)
+    Forum.stub!(:find).and_return(@mock_forum)
+  end
+  
+  def do_delete
+    xhr :delete, :destroy, :id => "1"
+  end
+
+  it "should find the forum requested" do
+    Forum.should_receive(:find).with("1").and_return(@mock_forum)
+    do_delete
+  end
+  
+  it "should call destroy on the found forum" do
+    @mock_forum.should_receive(:destroy)
+    do_delete
+  end
+  
+  it "should render destroy.rjs" do
+    do_delete
+    response.should render_template('destroy')
   end
 end
