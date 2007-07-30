@@ -23,6 +23,12 @@ describe "ActionView with resources_controller Helper" do
   it_should_forward_to_controller :resources_name
   it_should_forward_to_controller :resource
   it_should_forward_to_controller :resources
+  
+  it 'should not forward unknown url helper to controller' do
+    @controller.stub!(:resource_url_helper_method?).and_return(false)
+    @controller.should_not_receive(:resource_foo_path)
+    lambda { @view.send(:resource_foo_path) }.should raise_error(NoMethodError)
+  end
 end
 
 describe "Helper#form_for_resource (when resource is new record)" do
@@ -34,7 +40,8 @@ describe "Helper#form_for_resource (when resource is new record)" do
     @resource.stub!(:new_record?).and_return(true)
     @controller.stub!(:resource).and_return(@resource)
     @controller.stub!(:resource_name).and_return('forum')
-    @view.stub!(:resources_path).and_return('/forums')
+    @controller.stub!(:resources_path).and_return('/forums')
+    @controller.stub!(:resource_url_helper_method?).and_return(true)
     @view.controller = @controller
   end
   
@@ -53,7 +60,8 @@ describe "Helper#form_for_resource (when resource is existing record)" do
     @resource.stub!(:to_param).and_return("1")
     @controller.stub!(:resource).and_return(@resource)
     @controller.stub!(:resource_name).and_return('forum')
-    @view.stub!(:resource_path).and_return('/forums/1')
+    @controller.stub!(:resource_path).and_return('/forums/1')
+    @controller.stub!(:resource_url_helper_method?).and_return(true)
     @view.controller = @controller
   end
   
@@ -72,7 +80,8 @@ describe "Helper#remote_form_for_resource (when resource is existing record)" do
     @resource.stub!(:to_param).and_return("1")
     @controller.stub!(:resource).and_return(@resource)
     @controller.stub!(:resource_name).and_return('forum')
-    @view.stub!(:resource_path).and_return('/forums/1')
+    @controller.stub!(:resource_path).and_return('/forums/1')
+    @controller.stub!(:resource_url_helper_method?).and_return(true)
     @view.controller = @controller
   end
   

@@ -616,7 +616,6 @@ module Ardes#:nodoc:
         respond_to_without_url_helper?(method) || resource_url_helper_method?(method)
       end
       
-    private
       # return true if the passed method (e.g. 'resources_path') corresponds to a defined
       # named route helper method
       def resource_url_helper_method?(resource_method)
@@ -626,6 +625,7 @@ module Ardes#:nodoc:
         end
       end
       
+    private
       # passed something like (^|.*_)resource(s)_.*(url|path)$, will 
       # return the [route, route_method]  for the expanded resource
       def route_and_method_from_resource_method(method)
@@ -685,6 +685,13 @@ module Ardes#:nodoc:
     #
     # See UrlHelpers for more detail
     module Helper
+      def self.included(base)
+        base.class_eval do
+          alias_method_chain :method_missing, :url_helper
+          alias_method_chain :respond_to?, :url_helper
+        end
+      end
+      
       # Calls form_for with the apropriate action and method for the resource
       #
       # resource.new_record? is used to decide between a create or update action
@@ -737,6 +744,20 @@ module Ardes#:nodoc:
       
       def resources
         controller.resources
+      end
+      
+      # delegate url helper method creation to the controller
+      def method_missing_with_url_helper(method, *args, &block)
+        if controller.resource_url_helper_method?(method) 
+          controller.send(method, *args)
+        else
+          method_missing_without_url_helper(method, *args, &block)
+        end
+      end
+
+      # delegate url help method creation to the controller
+      def respond_to_with_url_helper?(method)
+        respond_to_without_url_helper?(method) || controller.resource_url_helper_method?(method)
       end
     end
   end

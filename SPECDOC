@@ -431,6 +431,7 @@ ActionView with resources_controller Helper
 - should forward #resources_name to controller
 - should forward #resource to controller
 - should forward #resources to controller
+- should not forward unknown url helper to controller
 
 Helper#form_for_resource (when resource is new record)
 - should call form_for with create form options
@@ -467,6 +468,6 @@ Automatic (route_name, name_prefix) for
 - HasAComplexNameController should be ('has_a_complex_name', '')
 - EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
 
-Finished in 2.588591 seconds
+Finished in 2.685501 seconds
 
-322 examples, 0 failures
+323 examples, 0 failures
