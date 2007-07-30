@@ -217,7 +217,9 @@ Routing shortcuts for Forums should map
 - new_resource_interest_path(9) to /forums/9/interests/new
 - edit_resource_interest_path(5) to /forums/2/interests/5/edit
 - edit_resource_interest_path(9,5) to /forums/9/interests/5/edit
+- respond_to?(:edit_resource_interest_path) should == true
 - resource_users_path should raise NoMethodError
+- respond_to?(:resource_users_path) should == false
 
 resource_service in ForumsController
 - should build new forum with new
@@ -429,29 +431,6 @@ ActionView with resources_controller Helper
 - should forward #resources_name to controller
 - should forward #resource to controller
 - should forward #resources to controller
-- should forward #resources to controller
-- should forward #resource_url(resource) to controller
-- should forward #resource_url(resource,foobar) to controller
-- should forward #edit_resource_url(resource) to controller
-- should forward #resources_url to controller
-- should forward #resources_url(foobar) to controller
-- should forward #new_resource_url to controller
-- should forward #resource_path(resource) to controller
-- should forward #edit_resource_path(resource) to controller
-- should forward #resources_path to controller
-- should forward #new_resource_path to controller
-- should forward #resource_tags_path to controller
-- should forward #resource_tags_path(resource_id) to controller
-- should forward #resource_tags_path(resource_id,foobar) to controller
-- should forward #resource_tag_path(tag_id) to controller
-- should forward #resource_tag_path(resource_id,tag_id) to controller
-- should forward #resource_tag_path(resource_id,tag_id,foobar) to controller
-- should forward #resource_tags_url to controller
-- should forward #resource_tags_url(resource_id) to controller
-- should forward #resource_tag_url(tag_id) to controller
-- should forward #resource_tag_url(resource_id,tag_id) to controller
-- should not forward a badly formed method to the controller
-- should not respond to badly formed method
 
 Helper#form_for_resource (when resource is new record)
 - should call form_for with create form options
@@ -488,6 +467,6 @@ Automatic (route_name, name_prefix) for
 - HasAComplexNameController should be ('has_a_complex_name', '')
 - EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
 
-Finished in 2.499683 seconds
+Finished in 2.588591 seconds
 
-343 examples, 0 failures
+322 examples, 0 failures

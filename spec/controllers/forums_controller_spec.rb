@@ -111,8 +111,16 @@ describe "Routing shortcuts for Forums should map" do
     controller.edit_resource_interest_path(9,5).should == "/forums/9/interests/5/edit"
   end
   
+  it "respond_to?(:edit_resource_interest_path) should == true" do
+    controller.should respond_to(:edit_resource_interest_path)
+  end
+
   it "resource_users_path should raise NoMethodError" do
     lambda{ controller.resource_users_path }.should raise_error(NoMethodError)
+  end
+  
+  it "respond_to?(:resource_users_path) should == false" do
+    controller.should_not respond_to(:resource_users_path)
   end
 end
 

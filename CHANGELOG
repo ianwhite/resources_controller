@@ -1,3 +1,9 @@
+* Named path support is much improved.  All named routes for the current resource can be
+  called by substituting 'resource'.  E.g. the following methods in your controller or
+  view will work: :formatted_resource_path, :preview_resource_path (if :preview is in :member),
+  :resource_tags_path, etc, etc.
+  This helps with decoupling the model name from the controller and view.
+
 * Added flash tests [frederikfix at eml dot cc]
 
 * Added rjs actions [frederikfix at eml dot cc]
