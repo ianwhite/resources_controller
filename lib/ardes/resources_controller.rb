@@ -201,7 +201,6 @@ module Ardes#:nodoc:
         end
       end
 
-      include_resource_url_helper      
       include options[:actions_include] if options[:actions_include]
 
       self.resources_name           = resources_name.to_s
@@ -282,7 +281,6 @@ module Ardes#:nodoc:
     #  end
     #
     def nested_in(*names, &block)
-      include_resource_url_helper
       options = names.last.is_a?(Hash) ? names.pop : {}
       raise ArgumentError "when giving more than one nesting, you may not specify options or a block" if names.length > 1 and (block_given? or options.length > 0)
       names.each {|name| add_enclosing(name, options, &block)}
@@ -295,13 +293,6 @@ module Ardes#:nodoc:
       
       before_filter {|controller| controller.send :load_enclosing_resources} if options[:load_enclosing]
       before_filter {|controller| controller.send :load_enclosing_resource, name, options, &block }
-    end
-    
-    def include_resource_url_helper
-      unless included_modules.include?(resource_url_helper)
-        include resource_url_helper
-        helper resource_url_helper
-      end
     end
     
     module InstanceMethods
@@ -579,7 +570,7 @@ module Ardes#:nodoc:
     #
     # If the route specified requires a member argument and you don't provide it, the current resource is used.
     #
-    # In general you may subsitute 'resource' for the current (polymorphic) object. e.g.
+    # In general you may subsitute 'resource' for the current (maybe polymorphic) resource. e.g.
     #
     #    (in attachable/attachments where attachable is a Post)
     #
@@ -588,25 +579,24 @@ module Ardes#:nodoc:
     #    resource_tags_path                    # => post_attachments_tags_paths(<current post>, <current attachment>)
     #    resource_tags_path(foo)               # => post_attachments_tags_paths(<current post>, foo)
     #
-    # These methods are defined as they are used.  The methods are added to a module named <controller_name>ResourceUrlHelpers.
-    # This module is also used as an ActionView Helper so you get these methods in your views as well.
+    # These methods are defined as they are used.  The ActionView Helper module delegates to the current controller to access these
+    # methods
     module UrlHelper
       def self.included(base)
         base.class_eval do
-          class<<self
-            def resource_url_helper
-              @resource_url_helper ||= send(:module_eval, "module ::#{controller_name.classify}ResourceUrlHelper; self; end")
-            end
-          end
           alias_method_chain :method_missing, :url_helper
           alias_method_chain :respond_to?, :url_helper
         end
       end
       
       def method_missing_with_url_helper(method, *args, &block)
+        # TODO: test that methods are only defined once
         if resource_url_helper_method?(method) 
           define_resource_url_helper_method(method)
-          self.method(method).call(*args) # need to get the method object this time, as it's not in scope yet
+          send(method, *args)
+        elsif resource_url_helper_method_for_name_prefix?(method)
+          define_resource_url_helper_method_for_name_prefix(method)
+          send(method, *args)
         else
           method_missing_without_url_helper(method, *args, &block)
         end
@@ -620,7 +610,7 @@ module Ardes#:nodoc:
       # named route helper method
       def resource_url_helper_method?(resource_method)
         if resource_method.to_s =~ /_(path|url)$/ && resource_method.to_s =~ /(^|^.*_)resource(s)?_/
-          route, route_method = *route_and_method_from_resource_method(resource_method)
+          route, route_method = *route_and_method_from_resource_method_and_name_prefix(resource_method, name_prefix)
           respond_to_without_url_helper?(route_method)
         end
       end
@@ -628,27 +618,39 @@ module Ardes#:nodoc:
     private
       # passed something like (^|.*_)resource(s)_.*(url|path)$, will 
       # return the [route, route_method]  for the expanded resource
-      def route_and_method_from_resource_method(method)
+      def route_and_method_from_resource_method_and_name_prefix(method, name_prefix)
         route_method = method.to_s.sub(/resource(s)?/) { $1 ? "#{name_prefix}#{route_name}" : "#{name_prefix}#{singular_route_name}" }
         return [ActionController::Routing::Routes.named_routes.get(route_method.sub(/_(path|url)$/,'').to_sym), route_method]
       end
             
       # defines a method that calls the appropriate named route method, with appropraite args.
-      # The method is defined on <ControllerName>ResourceUrlHelper, which is included in the controller
-      # and view
-      #
-      # TODO: define further methods based on name_prefix - which changes because of load_enclosing
-      def define_resource_url_helper_method(resource_method) 
-        self.class.resource_url_helper.send :module_eval, <<-end_eval
-          def #{resource_method}(*args)
-            options = args.last.is_a?(Hash) ? args.pop : {}
-            route, route_method = *route_and_method_from_resource_method('#{resource_method}')
-            required_keys = route.significant_keys.reject{|k| [:controller, :action].include?(k)}
-            args = [resource] + args if enclosing_resources.size + args.size < required_keys.size
-            args = args + [options] if options.size > 0
-            send route_method, *enclosing_resources + args
+      def define_resource_url_helper_method(method)
+        self.class.send :module_eval, <<-end_eval
+          def #{method}(*args)
+            send "#{method}_for_\#{name_prefix}", *args
           end
         end_eval
+      end
+      
+      def resource_url_helper_method_for_name_prefix?(method)
+        method.to_s =~ /_for_.*$/ && resource_url_helper_method?(method.to_s.sub(/_for_.*$/,''))
+      end
+      
+      def define_resource_url_helper_method_for_name_prefix(method)
+        resource_method = method.to_s.sub(/_for_.*$/,'')
+        name_prefix = method.to_s.sub(/^.*_for_/,'')
+        route, route_method = *route_and_method_from_resource_method_and_name_prefix(resource_method, name_prefix)
+        required_args = route.significant_keys.reject{|k| [:controller, :action].include?(k)}.size
+        
+        self.class.send :module_eval, <<-end_eval
+          def #{method}(*args)
+            options = args.last.is_a?(Hash) ? args.pop : {}
+            #{"args = [resource] + args if enclosing_resources.size + args.size < #{required_args}" if required_args > 0}
+            args = args + [options] if options.size > 0
+            send :#{route_method}, *enclosing_resources + args
+          end
+        end_eval
+        self.class.send :private, method
       end
     end
     
@@ -746,9 +748,11 @@ module Ardes#:nodoc:
         controller.resources
       end
       
-      # delegate url helper method creation to the controller
+      # delegate url helper method to the controller
       def method_missing_with_url_helper(method, *args, &block)
+        # TODO: test that methods are only defined once
         if controller.resource_url_helper_method?(method) 
+          self.class.send :module_eval, "def #{method}(*args); controller.#{method}(*args); end"
           controller.send(method, *args)
         else
           method_missing_without_url_helper(method, *args, &block)
