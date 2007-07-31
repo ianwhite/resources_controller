@@ -46,8 +46,7 @@ module Ardes#:nodoc:
         def make_resources_controller!(controller = @controller)
           controller.metaclass.class_eval do
             include Ardes::ResourcesController::UrlHelper
-            include resource_url_helper
-
+            
             attr_accessor :route_name, :name_prefix, :resource_name, :resources_name, :enclosing_resources
             attr_reader :resource_class
 
@@ -85,7 +84,6 @@ module Ardes#:nodoc:
 
           controller.template.metaclass.class_eval do
             include Ardes::ResourcesController::Helper
-            include resource_url_helper
           end
         end
       end
