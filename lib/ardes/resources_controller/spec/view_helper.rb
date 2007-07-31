@@ -1,5 +1,5 @@
 module Ardes#:nodoc:
-  module ResourcesController#:nodoc:
+  module ResourcesController
     module Spec#:nodoc:
       # Easy view testing for resources_controller views
       #
