@@ -591,7 +591,7 @@ module Ardes#:nodoc:
       
       def method_missing_with_url_helper(method, *args, &block)
         # TODO: test that methods are only defined once
-        if resource_url_helper_method?(method) 
+        if resource_url_helper_method?(method, raise_error = true) 
           define_resource_url_helper_method(method)
           send(method, *args)
         elsif resource_url_helper_method_for_name_prefix?(method)
@@ -608,10 +608,15 @@ module Ardes#:nodoc:
       
       # return true if the passed method (e.g. 'resources_path') corresponds to a defined
       # named route helper method
-      def resource_url_helper_method?(resource_method)
+      def resource_url_helper_method?(resource_method, raise_error = false)
         if resource_method.to_s =~ /_(path|url)$/ && resource_method.to_s =~ /(^|^.*_)resource(s)?_/
           route, route_method = *route_and_method_from_resource_method_and_name_prefix(resource_method, name_prefix)
-          respond_to_without_url_helper?(route_method)
+          respond_to_without_url_helper?(route_method) || (raise_error && raise(NoMethodError, <<-end_str
+Tried to map :#{resource_method} to :#{route_method}, which doesn't exist.
+You may need to explicictly set route_name and name_prefix in reosurces_controller_for.
+Currently route_name is '#{route_name}' and name_prefix is '#{name_prefix}'
+          end_str
+          ))
         end
       end
       

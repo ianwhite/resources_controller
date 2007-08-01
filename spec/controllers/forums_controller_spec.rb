@@ -115,8 +115,17 @@ describe "Routing shortcuts for Forums should map" do
     controller.should respond_to(:edit_resource_interest_path)
   end
 
-  it "resource_users_path should raise NoMethodError" do
-    lambda{ controller.resource_users_path }.should raise_error(NoMethodError)
+  it "resource_users_path should raise informative NoMethodError" do
+    lambda{ controller.resource_users_path }.should raise_error(NoMethodError, <<-end_str
+Tried to map :resource_users_path to :forum_users_path, which doesn't exist.
+You may need to explicictly set route_name and name_prefix in reosurces_controller_for.
+Currently route_name is 'forums' and name_prefix is ''
+    end_str
+    )
+  end
+  
+  it "any_old_missing_method should raise NoMethodError" do
+    lambda{ controller.any_old_missing_method }.should raise_error(NoMethodError)
   end
   
   it "respond_to?(:resource_users_path) should == false" do

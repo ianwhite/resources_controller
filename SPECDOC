@@ -468,6 +468,6 @@ Automatic (route_name, name_prefix) for
 - HasAComplexNameController should be ('has_a_complex_name', '')
 - EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
 
-Finished in 2.685501 seconds
+Finished in 2.679775 seconds
 
 323 examples, 0 failures
