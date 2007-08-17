@@ -1,3 +1,7 @@
+* Removed Ardes::ResourcesController::Spec::ViewHelper as it's best to not have a dependency
+  like this in your specs.  Just stub out the resource methods that are needed by that view,
+  or use the default assigns. 
+
 * Named path support is much improved.  All named routes for the current resource can be
   called by substituting 'resource'.  E.g. the following methods in your controller or
   view will work: :formatted_resource_path, :preview_resource_path (if :preview is in :member),
