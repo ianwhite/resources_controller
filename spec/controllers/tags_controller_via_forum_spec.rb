@@ -47,6 +47,10 @@ describe "Routing shortcuts for Tags via Forum (forums/1/tags/2) should map" do
   it "new_resource_path to /forums/1/tags/new" do
     controller.new_resource_path.should == '/forums/1/tags/new'
   end
+  
+  it "enclosing_resource_path to /forums/1" do
+    controller.enclosing_resource_path.should == "/forums/1"
+  end
 end
 
 describe "resource_service in TagsController via Forum" do

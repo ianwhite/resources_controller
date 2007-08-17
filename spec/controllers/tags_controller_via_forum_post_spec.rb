@@ -53,6 +53,10 @@ describe "Routing shortcuts for Tags via Forum and Post (forums/1/posts/2/tags/3
   it "new_resource_path to /forums/1/posts/2/tags/new" do
     controller.new_resource_path.should == '/forums/1/posts/2/tags/new'
   end
+  
+  it "enclosing_resource_path to /forums/1/posts/2" do
+    controller.enclosing_resource_path.should == "/forums/1/posts/2"
+  end
 end
 
 describe "resource_service in TagsController via Forum and Post" do

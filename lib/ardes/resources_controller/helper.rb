@@ -93,10 +93,13 @@ module Ardes#:nodoc:
       def resources
         controller.resources
       end
+      
+      def enclosing_resource
+        controller.enclosing_resource
+      end
 
       # delegate url helper method to the controller
       def method_missing_with_url_helper(method, *args, &block)
-        # TODO: test that methods are only defined once
         if controller.resource_url_helper_method?(method) 
           self.class.send :module_eval, "def #{method}(*args); controller.#{method}(*args); end"
           controller.send(method, *args)

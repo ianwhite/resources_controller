@@ -161,6 +161,13 @@ end
 class TagsController < ActionController::Base
   resources_controller_for :tags
   nested_in :taggable, :polymorphic => true, :load_enclosing => true
+  
+  # here's an example of why it's best to stick to conventions.  The named routes for address
+  # don't fit with the enclosing resources - so detect this when we've got an address
+  before_filter do |controller|
+    controller.name_prefix = 'address_' if controller.enclosing_resource.is_a?(Address)
+    true
+  end
 end
 
 
@@ -173,8 +180,8 @@ ActionController::Routing::Routes.draw do |map|
     users.resources :interests, :name_prefix => 'user_'
     users.resources :posts, :name_prefix => 'user_', :controller => 'user_posts'
     users.resources :comments, :name_prefix => 'user_', :controller => 'user_comments'
-    users.resources :addresses, :name_prefix => nil do |addresses|
-      addresses.resources :tags, :name_prefix => 'user_address_'
+    users.resources :addresses, :name_prefix => nil do |address|
+      address.resources :tags, :name_prefix => 'address_'
     end
   end
   map.resources :forums do |forums|

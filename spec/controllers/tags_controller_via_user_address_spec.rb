@@ -3,13 +3,13 @@ require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
 
 module TagsViaUserAddressSpecHelper
   def setup_mocks
-    @user = mock('User')
+    @user = mock_model(User)
     User.stub!(:find).and_return(@user)
     @user.stub!(:to_param).and_return('1')
     @user_addresses = mock('user_addresses assoc')
     @user.stub!(:addresses).and_return(@user_addresses)
     
-    @address = mock('Address')
+    @address = mock_model(Address)
     @user_addresses.stub!(:find).and_return(@address)
     @address.stub!(:to_param).and_return('2')
     @address_tags = mock('address_tags assoc')
@@ -23,7 +23,7 @@ describe "Routing shortcuts for Tags via User and Address (users/1/addresses/2/t
   
   before(:each) do
     setup_mocks
-    @tag = mock('Tag')
+    @tag = mock_model(Tag)
     @tag.stub!(:to_param).and_return('3')
     @address_tags.stub!(:find).and_return(@tag)
     
@@ -52,6 +52,10 @@ describe "Routing shortcuts for Tags via User and Address (users/1/addresses/2/t
   
   it "new_resource_path to /users/1/addresses/2/tags/new" do
     controller.new_resource_path.should == '/users/1/addresses/2/tags/new'
+  end
+  
+  it "enclosing_resource_path to /users/1/addresses/2" do
+    controller.enclosing_resource_path.should == "/users/1/addresses/2"
   end
 end
 

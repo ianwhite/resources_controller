@@ -374,6 +374,11 @@ module Ardes#:nodoc:
         @enclosing_resources ||= []
       end
       
+      # returns the immediately enclosing resource
+      def enclosing_resource
+        @enclosing_resource ||= enclosing_resources.last
+      end
+      
       # returns the current resource service.  This is used to find and create resources.  This will
       # be either an ActiveRecord, or an association proxy
       def resource_service
@@ -490,28 +495,6 @@ module ActionController#:nodoc:
           helpers << selector
         end
       end
-    end
-  end
-end
-
-# Decorate Routing to store the recognized route in the request, so the controller can
-# introspect on how it was invoked.
-module ActionController
-  class AbstractRequest
-    attr_accessor :recognized_route
-  end
-  
-  module Routing
-    class RouteSet
-      # OPTIMIZE: or wait till something like this goes in to rails core
-      # the following will recognize routes twice, once to get the params, and another to get the
-      # route.  I'm doing it like this so as to not touch the internals of RouteSet
-      def recognize_with_remember_route(request)
-        returning recognize_without_remember_route(request) do
-          request.recognized_route = routes.find {|route| route.recognize(request.path, extract_request_environment(request))}
-        end
-      end
-      alias_method_chain :recognize, :remember_route
     end
   end
 end

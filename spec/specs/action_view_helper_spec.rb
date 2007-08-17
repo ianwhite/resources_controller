@@ -23,6 +23,7 @@ describe "ActionView with resources_controller Helper" do
   it_should_forward_to_controller :resources_name
   it_should_forward_to_controller :resource
   it_should_forward_to_controller :resources
+  it_should_forward_to_controller :enclosing_resource
   
   it 'should not forward unknown url helper to controller' do
     @controller.stub!(:resource_url_helper_method?).and_return(false)

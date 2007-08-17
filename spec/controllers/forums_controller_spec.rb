@@ -125,6 +125,10 @@ Currently route_name is 'forums' and name_prefix is ''
     )
   end
   
+  it "enclosing_resource_path should raise informative NoMethodError" do
+    lambda{ controller.enclosing_resource_path }.should raise_error(NoMethodError, "Tried to map :enclosing_resource_path but there is no enclosing_resource for this controller")
+  end
+  
   it "any_old_missing_method should raise NoMethodError" do
     lambda{ controller.any_old_missing_method }.should raise_error(NoMethodError)
   end

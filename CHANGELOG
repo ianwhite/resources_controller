@@ -1,3 +1,9 @@
+* You can now call methods such as enclosing_resource_path, enclosing_resources_path, etc 
+  in your controller and view and the correct url helper will be called.  These url_helpers are defined
+  as they are needed, so it's pretty fast.
+  
+* Removing routing decoration for now
+
 * Enclosing resources are now all loaded by one method :load_enclosing which is a prepend_before_filter.
   This means that you can access the enclosing resources in all before_filters, even when a subclass adds
   more nestings.

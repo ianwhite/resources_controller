@@ -137,6 +137,13 @@ Routing shortcuts for ForumPosts (forums/2/posts/1) should map
 - resource_tags_path(9) to /forums/2/posts/9/tags
 - resource_tag_path(5) to /forums/2/posts/1/tags/5
 - resource_tag_path(9,5) to /forums/2/posts/9/tags/5
+- enclosing_resource_path to /forums/2
+- enclosing_resource_path(9) to /forums/9
+- enclosing_resources_path to /forums
+- new_enclosing_resource_path to /forums/new
+- enclosing_resource_tags_path to /forums/2/tags
+- enclosing_resource_tag_path(9) to /forums/2/tags/9
+- enclosing_resource_tag_path(8,9) to /forums/8/tags/9
 
 resource_service in ForumPostsController
 - should build new post with @forum foreign key with new
@@ -222,6 +229,7 @@ Routing shortcuts for Forums should map
 - edit_resource_interest_path(9,5) to /forums/9/interests/5/edit
 - respond_to?(:edit_resource_interest_path) should == true
 - resource_users_path should raise informative NoMethodError
+- enclosing_resource_path should raise informative NoMethodError
 - any_old_missing_method should raise NoMethodError
 - respond_to?(:resource_users_path) should == false
 
@@ -357,6 +365,7 @@ Routing shortcuts for Tags via Forum, Post and Comment (forums/1/posts/2/comment
 - edit_resource_path to /forums/1/posts/2/comments/3/tags/4/edit
 - edit_resource_path(9) to /forums/1/posts/2/comments/3/tags/9/edit
 - new_resource_path to /forums/1/posts/2/comments/3/tags/new
+- enclosing_resource_path to /forums/1/posts/2/comments/3
 
 resource_service in TagsController via Forum, Post and Comment
 - should build new tag with @comment fk and type with new
@@ -378,6 +387,7 @@ Routing shortcuts for Tags via Forum and Post (forums/1/posts/2/tags/3) should m
 - edit_resource_path to /forums/1/posts/2/tags/3/edit
 - edit_resource_path(9) to /forums/1/posts/2/tags/9/edit
 - new_resource_path to /forums/1/posts/2/tags/new
+- enclosing_resource_path to /forums/1/posts/2
 
 resource_service in TagsController via Forum and Post
 - should build new tag with @post fk and type with new
@@ -398,6 +408,7 @@ Routing shortcuts for Tags via Forum (forums/1/tags/2) should map
 - edit_resource_path to /forums/1/tags/2/edit
 - edit_resource_path(9) to /forums/1/tags/9/edit
 - new_resource_path to /forums/1/tags/new
+- enclosing_resource_path to /forums/1
 
 resource_service in TagsController via Forum
 - should build new tag with @forum fk and type with new
@@ -417,6 +428,7 @@ Routing shortcuts for Tags via User and Address (users/1/addresses/2/tags/3) sho
 - edit_resource_path to /users/1/addresses/2/tags/3/edit
 - edit_resource_path(9) to /users/1/addresses/2/tags/9/edit
 - new_resource_path to /users/1/addresses/2/tags/new
+- enclosing_resource_path to /users/1/addresses/2
 
 resource_service in TagsController via User and Address
 - should build new tag with @address fk and type with new
@@ -435,6 +447,7 @@ ActionView with resources_controller Helper
 - should forward #resources_name to controller
 - should forward #resource to controller
 - should forward #resources to controller
+- should forward #enclosing_resource to controller
 - should not forward unknown url helper to controller
 
 Helper#form_for_resource (when resource is new record)
@@ -447,7 +460,6 @@ Helper#remote_form_for_resource (when resource is existing record)
 - should call remote_form_for with update form options
 
 A controller's resource_service
-- should pass unknown methods to the resource service of the controller
 - may be explicitly set with #resource_service=
 
 ResourcesController#resources_request
@@ -472,6 +484,6 @@ Automatic (route_name, name_prefix) for
 - HasAComplexNameController should be ('has_a_complex_name', '')
 - EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
 
-Finished in 2.541796 seconds
+Finished in 2.576967 seconds
 
-325 examples, 0 failures
+337 examples, 0 failures
