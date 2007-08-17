@@ -99,6 +99,10 @@ class ForumsController < ActionController::Base
 end
 
 class PostsAbstractController < ActionController::Base
+  attr_accessor :filter_trace
+  
+  before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :abstract}
+  
   # redefine find_resources
   def find_resources
     resource_service.find :all, :order => 'id DESC'
@@ -106,11 +110,21 @@ class PostsAbstractController < ActionController::Base
 end
 
 class PostsController < PostsAbstractController
+  before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :posts}
+  
   # example of providing options to resources_controller_for
   resources_controller_for :posts, :class_name => 'Post', :route_name => 'posts', :name_prefix => ''
+  
+  def load_enclosing_with_trace(*args)
+    self.filter_trace ||= []; self.filter_trace << :load_enclosing
+    load_enclosing_without_trace(*args)
+  end
+  alias_method_chain :load_enclosing, :trace
 end
 
 class UserPostsController < PostsController
+  before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :user_posts}
+  
   # example of providing options to nested in
   nested_in :user, :class_name => 'User', :foreign_key => 'user_id', :name_prefix => 'user_'
 end
@@ -120,6 +134,8 @@ class AddressesController < ActionController::Base
 end
 
 class ForumPostsController < PostsController
+  before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :forum_posts}
+
   # example of providing a custom finder for the nesting resource
   nested_in :forum do
     Forum.find(params[:forum_id])

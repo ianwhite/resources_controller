@@ -144,6 +144,9 @@ resource_service in ForumPostsController
 - should raise RecordNotFound with find(@other_post.id)
 - should find only posts belonging to @forum with find(:all)
 
+ForumPostsController order of before_filters
+- should == [:load_enclosing, :abstract, :posts, :forum_posts]
+
 Requesting /forums/2/posts (testing the before filters)
 - should find the forum
 - should assign the found forum for the view
@@ -469,6 +472,6 @@ Automatic (route_name, name_prefix) for
 - HasAComplexNameController should be ('has_a_complex_name', '')
 - EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
 
-Finished in 2.473041 seconds
+Finished in 2.541796 seconds
 
-324 examples, 0 failures
+325 examples, 0 failures

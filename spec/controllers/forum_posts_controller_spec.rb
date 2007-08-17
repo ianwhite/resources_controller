@@ -100,6 +100,15 @@ describe "resource_service in ForumPostsController" do
   end
 end
 
+describe ForumPostsController, ' order of before_filters' do
+  before do
+    @forum        = Forum.create
+    get :index, :forum_id => @forum.id
+  end
+  
+  it { @controller.filter_trace.should == [:load_enclosing, :abstract, :posts, :forum_posts] }
+end
+
 describe "Requesting /forums/2/posts (testing the before filters)" do
   include ForumPostsSpecHelper
   controller_name :forum_posts

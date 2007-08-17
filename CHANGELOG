@@ -1,3 +1,19 @@
+* Enclosing resources are now all loaded by one method :load_enclosing which is a prepend_before_filter.
+  This means that you can access the enclosing resources in all before_filters, even when a subclass adds
+  more nestings.
+  
+  Example:
+  
+    class PostsController < ApplicationController
+      resources_controller_for :posts
+    end
+    
+    class UserPostsController < PostsController
+      nested_in :user
+      
+      before_filter {|c| raise 'boom' if @user.name == 'Santa'}
+    end
+  
 * Removed ResourceService proxy class.  This was mainly used for BC with rails <= 1.2.2.  If you're
   using this, then freeze to r377 of resources_controller.  The resource_service is now either an
   ActiveRecord or association proxy.

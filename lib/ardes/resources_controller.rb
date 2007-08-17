@@ -177,7 +177,9 @@ module Ardes#:nodoc:
       self.class_eval do
         unless included_modules.include?(::Ardes::ResourcesController::InstanceMethods)
           class_inheritable_reader :route_name, :singular_route_name
-          class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_collection_name
+          class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_collection_name, :enclosing_loaders
+          
+          self.enclosing_loaders = []
           
           class<<self
             attr_writer :name_prefix
@@ -196,6 +198,8 @@ module Ardes#:nodoc:
           include UrlHelper
           include Actions if options[:actions_include].nil? || options[:actions_include] == true
           helper Helper
+          
+          prepend_before_filter :load_enclosing
         end
       end
 
@@ -289,8 +293,8 @@ module Ardes#:nodoc:
       options.assert_valid_keys(:polymorphic, :anonymous, :load_enclosing, :class_name, :collection_name, :foreign_key, :name_prefix)
       options[:anonymous] = options[:anonymous] || options[:polymorphic]
       
-      before_filter {|controller| controller.send :load_enclosing_resources} if options[:load_enclosing]
-      before_filter {|controller| controller.send :load_enclosing_resource, name, options, &block }
+      enclosing_loaders << :load_enclosing_resources if options[:load_enclosing]
+      enclosing_loaders << [:load_enclosing_resource, [name, options], block]
     end
     
     module InstanceMethods
@@ -394,6 +398,10 @@ module Ardes#:nodoc:
       end
 
     private
+      def load_enclosing
+        enclosing_loaders.each {|method| method.is_a?(Symbol) ? send(method) : send(method[0], *method[1], &method[2]) }
+      end
+      
       # load any remaining enclosing resources that nest the current nested_in
       def load_enclosing_resources
         raise RuntimeError, "you can only specify nested_in :load_enclosing => true once" if @_load_enclosing_resources
