@@ -135,6 +135,6 @@ describe "Requesting /forums/1/posts/2/tags using GET" do
   it "should assign the comment_tags association as the tags resource_service" do
     @comment.should_receive(:tags).and_return(@comment_tags)
     do_get
-    @controller.resource_service.service.should == @comment_tags
+    @controller.resource_service.should == @comment_tags
   end 
 end

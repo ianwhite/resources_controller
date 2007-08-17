@@ -123,6 +123,6 @@ describe "Requesting /forums/1/posts/2/tags using GET" do
   it "should assign the post_tags association as the tags resource_service" do
     @post.should_receive(:tags).and_return(@post_tags)
     do_get
-    @controller.resource_service.service.should == @post_tags
+    @controller.resource_service.should == @post_tags
   end 
 end

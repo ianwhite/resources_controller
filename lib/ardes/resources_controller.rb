@@ -177,9 +177,7 @@ module Ardes#:nodoc:
       self.class_eval do
         unless included_modules.include?(::Ardes::ResourcesController::InstanceMethods)
           class_inheritable_reader :route_name, :singular_route_name
-          class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_collection_name, :resource_service_class
-          
-          self.resource_service_class = ResourceService
+          class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_collection_name
           
           class<<self
             attr_writer :name_prefix
@@ -372,12 +370,13 @@ module Ardes#:nodoc:
         @enclosing_resources ||= []
       end
       
-      # returns the current resource service.  This is used to find and create resources (see ResourceService, and find_resource, find_resources, new_resource)
+      # returns the current resource service.  This is used to find and create resources.  This will
+      # be either an ActiveRecord, or an association proxy
       def resource_service
-        @resource_service ||= resource_service_class.new(self)
+        @resource_service ||= enclosing_resources.size == 0 ? resource_class : enclosing_resources.last.send(resource_collection_name || resources_name)
       end
       
-      # sets the current resource service, which is usually a class, or a has_many association
+      # sets the current resource service, which is usually an ActiveRecord class, or an association proxy
       #
       # If you wish to provide a customised resource service you need to make sure the object responds
       # appropriately to:
@@ -770,49 +769,6 @@ Currently route_name is '#{route_name}' and name_prefix is '#{name_prefix}'
       end
     end
   end
-  
-  # use this class to extend or modify the behaviour of the resource_service
-  #
-  # If using your own ResourceService then you should tell your controller by
-  # setting self.resource_service_class
-  #
-  #   class FoosController < ApplicationController
-  #     resources_controller_for :foos
-  #     self.resource_service_class = FoosResourceService
-  #   end
-  #
-  # Alternatively, if you're doing something really wacky, you can set resource_service
-  # on the controller instance. (to an instance of the class)
-  #
-  #   before_filter {|controller| controller.resource_service = FoosResourceService.new(:with, :my, :wacky, :args)}
-  #
-  class ResourceService
-    attr_reader :controller, :service
-    
-    # When the resource service is created, the default service is either the resource_class (in the case
-    # when there are no enclosing resources) or the collection of the last enclosing resource (when there are enclosing
-    # resources)
-    def initialize(controller)
-      @controller = controller
-      if controller.enclosing_resources.size == 0
-        @service = controller.resource_class
-      else
-        @service = controller.enclosing_resources.last.send(controller.resource_collection_name || controller.resources_name)
-      end
-    end
-    
-    def new(*args)
-      @service.new(*args)
-    end
-      
-    def find(*args)
-      @service.find(*args)
-    end
-    
-    def method_missing(method, *args, &block)
-      @service.send(method, *args, &block)
-    end
-  end
 end
 
 # TODO: waiting for http://dev.rubyonrails.org/ticket/8930 to be accepted.  Remove this when it is
@@ -867,3 +823,24 @@ module ActionController#:nodoc:
   end
 end
 
+# Decorate Routing to store the recognized route in the request, so the controller can
+# introspect on how it was invoked.
+module ActionController
+  class AbstractRequest
+    attr_accessor :recognized_route
+  end
+  
+  module Routing
+    class RouteSet
+      # OPTIMIZE: or wait till something like this goes in to rails core
+      # the following will recognize routes twice, once to get the params, and another to get the
+      # route.  I'm doing it like this so as to not touch the internals of RouteSet
+      def recognize_with_remember_route(request)
+        returning recognize_without_remember_route(request) do
+          request.recognized_route = routes.find {|route| route.recognize(request.path, extract_request_environment(request))}
+        end
+      end
+      alias_method_chain :recognize, :remember_route
+    end
+  end
+end

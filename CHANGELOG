@@ -1,3 +1,10 @@
+* Removed ResourceService proxy class.  This was mainly used for BC with rails <= 1.2.2.  If you're
+  using this, then freeze to r377 of resources_controller.  The resource_service is now either an
+  ActiveRecord or association proxy.
+  
+* Added route decoration to access the recognized route in the controller (for future parsing of
+  singular resources, and better polymorphic support)
+
 * Removed Ardes::ResourcesController::Spec::ViewHelper as it's best to not have a dependency
   like this in your specs.  Just stub out the resource methods that are needed by that view,
   or use the default assigns. 

@@ -218,7 +218,8 @@ Routing shortcuts for Forums should map
 - edit_resource_interest_path(5) to /forums/2/interests/5/edit
 - edit_resource_interest_path(9,5) to /forums/9/interests/5/edit
 - respond_to?(:edit_resource_interest_path) should == true
-- resource_users_path should raise NoMethodError
+- resource_users_path should raise informative NoMethodError
+- any_old_missing_method should raise NoMethodError
 - respond_to?(:resource_users_path) should == false
 
 resource_service in ForumsController
@@ -468,6 +469,6 @@ Automatic (route_name, name_prefix) for
 - HasAComplexNameController should be ('has_a_complex_name', '')
 - EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
 
-Finished in 2.679775 seconds
+Finished in 2.459969 seconds
 
-323 examples, 0 failures
+324 examples, 0 failures

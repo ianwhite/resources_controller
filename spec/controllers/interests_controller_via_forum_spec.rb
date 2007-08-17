@@ -111,6 +111,6 @@ describe "Requesting /forums/1/interests using GET" do
   it "should assign the forum_interests association as the interests resource_service" do
     @forum.should_receive(:interests).and_return(@forum_interests)
     do_get
-    @controller.resource_service.service.should == @forum_interests
+    @controller.resource_service.should == @forum_interests
   end 
 end

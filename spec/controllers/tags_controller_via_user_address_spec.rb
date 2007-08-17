@@ -123,6 +123,6 @@ describe "Requesting /users/1/addresses/2/tags using GET" do
   it "should assign the address_tags association as the tags resource_service" do
     @address.should_receive(:tags).and_return(@address_tags)
     do_get
-    @controller.resource_service.service.should == @address_tags
+    @controller.resource_service.should == @address_tags
   end 
 end

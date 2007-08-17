@@ -34,6 +34,9 @@ Also support polymorphic associations, and arbitrary nesting
 If you are using non-edge rails <= 1.2.2 you should also install
 http://svn.ardes.com/rails_plugins/resources_controller_lte_1_2_2
 
+And you should install resources_controller r377 (later revisions do not support the
+<= 1.2.2 plugin)
+
 (To tell if you need the patch you can run the specs via rake - if you get failures to do with resource service, then you need the patch)
 
 === Contributors

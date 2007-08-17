@@ -111,7 +111,7 @@ describe "Requesting /users/2/addresses" do
   it "should assign the user_addresses association as the addresses resource_service" do
     @user.should_receive(:addresses).and_return(@user_addresses)
     do_get
-    @controller.resource_service.service.should == @user_addresses
+    @controller.resource_service.should == @user_addresses
   end 
 end
 
