@@ -1,8 +1,43 @@
 # Testing app setup
-#
-# TODO: modulize the testing app classes for minimal inteference with other plugin specs and app
-#
-# TODO: write more example specs which are to tied to concrete models, for usage purposes
+
+##########
+# Routing
+##########
+
+ActionController::Routing::Routes.draw do |map|
+  map.resource :my_home do |my_home|
+    my_home.resources :posts
+    my_home.resource :info do |info|
+      info.resources :tags
+    end
+  end
+  
+  map.resources :users do |users|
+    users.resources :interests
+    users.resources :posts, :controller => 'user_posts'
+    users.resources :comments, :controller => 'user_comments'
+    users.resources :addresses, :name_prefix => nil do |address|
+      address.resources :tags
+    end
+  end
+  map.resources :forums do |forums|
+    forums.resource :owner do |owner|
+      owner.resources :posts
+    end
+    forums.resources :interests
+    forums.resources :tags
+    forums.resources :posts, :controller => 'forum_posts' do |posts|
+      posts.resources :tags
+      posts.resources :comments do |comments|
+        comments.resources :tags
+      end
+    end
+  end
+  
+  map.connect ':controller/:action/:id.:format'
+  map.connect ':controller/:action/:id'
+end
+
 
 ##################
 # Database schema
@@ -164,47 +199,10 @@ class TagsController < ActionController::Base
   
   # here's an example of why it's best to stick to conventions.  The named routes for address
   # don't fit with the enclosing resources - so detect this when we've got an address
+  #
+  # see the routes below for what is being tested here - (:name_prefix => nil)
   before_filter do |controller|
     controller.name_prefix = 'address_' if controller.enclosing_resource.is_a?(Address)
     true
   end
-end
-
-
-##########
-# Routing
-##########
-
-ActionController::Routing::Routes.draw do |map|
-  map.resource :my_home do |my_home|
-    my_home.resources :posts
-    my_home.resource :info do |info|
-      info.resources :tags
-    end
-  end
-  
-  map.resources :users do |users|
-    users.resources :interests
-    users.resources :posts, :controller => 'user_posts'
-    users.resources :comments, :controller => 'user_comments'
-    users.resources :addresses, :name_prefix => nil do |address|
-      address.resources :tags
-    end
-  end
-  map.resources :forums do |forums|
-    forums.resource :owner do |owner|
-      owner.resources :posts
-    end
-    forums.resources :interests
-    forums.resources :tags
-    forums.resources :posts, :controller => 'forum_posts' do |posts|
-      posts.resources :tags
-      posts.resources :comments do |comments|
-        comments.resources :tags
-      end
-    end
-  end
-  
-  map.connect ':controller/:action/:id.:format'
-  map.connect ':controller/:action/:id'
 end
