@@ -184,23 +184,23 @@ ActionController::Routing::Routes.draw do |map|
   end
   
   map.resources :users do |users|
-    users.resources :interests, :name_prefix => 'user_'
-    users.resources :posts, :name_prefix => 'user_', :controller => 'user_posts'
-    users.resources :comments, :name_prefix => 'user_', :controller => 'user_comments'
+    users.resources :interests
+    users.resources :posts, :controller => 'user_posts'
+    users.resources :comments, :controller => 'user_comments'
     users.resources :addresses, :name_prefix => nil do |address|
-      address.resources :tags, :name_prefix => 'address_'
+      address.resources :tags
     end
   end
   map.resources :forums do |forums|
     forums.resource :owner do |owner|
       owner.resources :posts
     end
-    forums.resources :interests, :name_prefix => 'forum_'
-    forums.resources :tags, :name_prefix => 'forum_'
-    forums.resources :posts, :name_prefix => 'forum_', :controller => 'forum_posts' do |posts|
-      posts.resources :tags, :name_prefix => 'forum_post_'
-      posts.resources :comments, :name_prefix => 'forum_post_' do |comments|
-        comments.resources :tags, :name_prefix => 'forum_post_comment_'
+    forums.resources :interests
+    forums.resources :tags
+    forums.resources :posts, :controller => 'forum_posts' do |posts|
+      posts.resources :tags
+      posts.resources :comments do |comments|
+        comments.resources :tags
       end
     end
   end
