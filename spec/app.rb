@@ -176,6 +176,13 @@ end
 ##########
 
 ActionController::Routing::Routes.draw do |map|
+  map.resource :my_home do |my_home|
+    my_home.resources :posts
+    my_home.resource :info do |info|
+      info.resources :tags
+    end
+  end
+  
   map.resources :users do |users|
     users.resources :interests, :name_prefix => 'user_'
     users.resources :posts, :name_prefix => 'user_', :controller => 'user_posts'
@@ -185,6 +192,9 @@ ActionController::Routing::Routes.draw do |map|
     end
   end
   map.resources :forums do |forums|
+    forums.resource :owner do |owner|
+      owner.resources :posts
+    end
     forums.resources :interests, :name_prefix => 'forum_'
     forums.resources :tags, :name_prefix => 'forum_'
     forums.resources :posts, :name_prefix => 'forum_', :controller => 'forum_posts' do |posts|

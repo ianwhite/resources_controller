@@ -1,3 +1,11 @@
+* resources_request has changed format - it now returns an array like this
+  [ {:name => "forums", :name_prefix => "forum_", :key => :forum_id, :id => "1"}, {:name => "posts"}]
+  Singular resources are detected properly (see spec/specs/resources_controller_spec for some tests).
+  This paves the way for singular_resource support, and better 'many routes/one controller' support
+  
+  Decided that Patching Routing was a bad idea, so route is re-recognized using the request path.  This
+  only happens for controllers with :load_enclosing => true
+
 * You can now call methods such as enclosing_resource_path, enclosing_resources_path, etc 
   in your controller and view and the correct url helper will be called.  These url_helpers are defined
   as they are needed, so it's pretty fast.

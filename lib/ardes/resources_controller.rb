@@ -396,13 +396,34 @@ module Ardes#:nodoc:
         @resource_service = service
       end
       
-    protected
-      # returns an array containing [resources_name, resource_id] sections from the enclosing request
-      def resources_request
-        @resources_request ||= request.path.scan(%r{/(\w+)/([\w\-]*)})
-      end
-
     private
+      # TODO: drill down by keys as well
+      def recognized_route
+        routes =  ::ActionController::Routing::Routes.routes_by_controller[controller_name][action_name].values.flatten
+        @recognized_route ||= routes.find do |route|
+          route.recognize(request.path, ::ActionController::Routing::Routes.extract_request_environment(request))
+        end
+      end
+      
+      # returns an array containing hashes {:name => resource name, :key => params key, :value => params value, :name_prefix => 'prefix segment'}
+      def resources_request
+        @resources_request ||= recognized_route.segments.inject([]) do |request, segment|
+          unless segment.is_optional or segment.is_a?(::ActionController::Routing::DividerSegment)
+            if segment.is_a?(::ActionController::Routing::StaticSegment)
+              if request.size > 0
+                request.last[:name_prefix] = (request.last[:key] ? request.last[:name].singularize : request.last[:name]) + '_'
+              end
+              request << {:name => segment.value}
+            elsif segment.is_a?(::ActionController::Routing::DynamicSegment)
+              request.last.merge!(:key => segment.key, :id => params[segment.key])
+            end
+          end
+          request
+        end
+        #puts @resources_request.inspect
+        #@resources_request        
+      end
+      
       def load_enclosing
         enclosing_loaders.each {|method| method.is_a?(Symbol) ? send(method) : send(method[0], *method[1], &method[2]) }
       end
@@ -413,11 +434,11 @@ module Ardes#:nodoc:
         @_load_enclosing_resources = true
         
         # ignore the last request pair if it is the resources_name
-        enclosing_request = (resources_request.last.first == resources_name) ? resources_request.slice(0..-2) : resources_request
+        enclosing_request = (resources_request.last[:name] == resources_name) ? resources_request.slice(0..-2) : resources_request
         
         # load the rest of the enclosing resources, except the last (which is loaded by the nested_in
-        enclosing_request.slice(enclosing_resources.size..-2).each do |(name, _)|
-          load_enclosing_resource(name, :anonymous => true)
+        enclosing_request.slice(enclosing_resources.size..-2).each do |request|
+          load_enclosing_resource(request[:name], :anonymous => true)
         end
       end
     
@@ -429,14 +450,16 @@ module Ardes#:nodoc:
       end
     
       def update_name_prefix(name_prefix)
-        name_prefix ||= "#{resources_request[enclosing_resources.size].first.singularize}_"
+        name_prefix ||= resources_request[enclosing_resources.size][:name_prefix]
         self.name_prefix = "#{self.name_prefix}#{name_prefix}"
       end
     
       # This is the default method for finding an enclosing resource, if a block is not given to nested_in
+      #
+      # TODO: add singular resource finding here
       def find_enclosing_resource(name, options)
         if options[:anonymous]
-          source_name, id = *resources_request[enclosing_resources.size]
+          source_name, id = resources_request[enclosing_resources.size][:name], resources_request[enclosing_resources.size][:id]
         else
           source_name, id = options[:class_name] || options[:collection_name] || name, params[options[:foreign_key] || name.foreign_key]
         end

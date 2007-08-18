@@ -462,11 +462,17 @@ Helper#remote_form_for_resource (when resource is existing record)
 A controller's resource_service
 - may be explicitly set with #resource_service=
 
-ResourcesController#resources_request
-- should be [] for /users
-- should be [[users, id]] for /users/id
-- should be [[users, id]] for /users/id/foos
-- should be [[users, id], [foos, id]] for /users/id/foos/id
+ResourcesController#resources_request for recognized_route
+- :users should be [{:name => "users"}]
+- :user should be [{:name => "users", :id => "1", :key => :id}]
+- :user_interests should be [{:name => "users", :id => "1", :key => :user_id, :name_prefix => "user_"}, {:name => "interests"}]
+- :user_interest should be [{:name => "users", :id => "1", :key => :user_id, :name_prefix => "user_"}, {:name => "interests", :key => :id, :id => "2"}]
+- :forum_post_tag should be [{:name => "forums", :id => "1", :key => :forum_id, :name_prefix => "forum_"}, {:name => "posts", :key => :post_id, :id => "2", :name_prefix => "post_"}, {:name => "tags", :id => "3", :key => :id}]
+- :my_home should be [{:name => "my_home"}]
+- :my_home_info should be [{:name => "my_home", :name_prefix => "my_home_"}, {:name => "info"}]
+- :my_home_info_tags should be [{:name => "my_home", :name_prefix => "my_home_"}, {:name => "info", :name_prefix => "info_"}, {:name => "tags"}]
+- :my_home_post should be [{:name => "my_home", :name_prefix => "my_home_"}, {:name => "posts", :key => :id, :id => "1"}]
+- :forum_owner_post should be [{:name => "forums", :name_prefix => "forum_", :id => "1", :key => :forum_id}, {:name => "owner", :name_prefix => "owner_"}, {:name ="posts", :id => "2", :key => :id}]
 
 ResourcesController (route_name, singular_route_name and name_prefix)
 - route_name should be the controller_name by default
@@ -484,6 +490,6 @@ Automatic (route_name, name_prefix) for
 - HasAComplexNameController should be ('has_a_complex_name', '')
 - EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
 
-Finished in 2.576967 seconds
+Finished in 2.697172 seconds
 
-337 examples, 0 failures
+343 examples, 0 failures
