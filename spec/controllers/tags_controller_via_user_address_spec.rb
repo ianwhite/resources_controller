@@ -119,9 +119,9 @@ describe "Requesting /users/1/addresses/2/tags using GET" do
     do_get
   end
 
-  it "should assign the found address as :taggable for the view" do
+  it "should assign the found address for the view" do
     do_get
-    assigns[:taggable].should == @address
+    assigns[:address].should == @address
   end
 
   it "should assign the address_tags association as the tags resource_service" do

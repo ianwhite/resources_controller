@@ -19,7 +19,7 @@ module Ardes#:nodoc:
     #    resource_tags_path(foo)               # => post_attachments_tags_paths(<current post>, foo)
     #
     #    enclosing_resource_path               # => post_path(<current post>)
-    #    enclosing_resources_path              # => posts_path
+    #    route_resources_path              # => posts_path
     #    enclosing_resource_tags_path          # => post_tags_path(<current post>)
     #    enclosing_resource_path(2)            # => post_path(2)
     #
@@ -90,7 +90,7 @@ Currently route_name is '#{route_name}' and name_prefix is '#{name_prefix}'
       # passed something like (^|.*_)resource(s)_.*(url|path)$, will 
       # return the [route, route_method]  for the expanded resource
       def route_and_method_from_resource_method_and_name_prefix(method, name_prefix)
-        route_method = method.to_s.sub(/resource(s)?/) { $1 ? "#{name_prefix}#{route_name}" : "#{name_prefix}#{singular_route_name}" }
+        route_method = method.to_s.sub(/resource(s)?/) { $1 ? "#{name_prefix}#{route_name.pluralize}" : "#{name_prefix}#{route_name}" }
         return [ActionController::Routing::Routes.named_routes.get(route_method.sub(/_(path|url)$/,'').to_sym), route_method]
       end
       
@@ -117,7 +117,7 @@ Currently route_name is '#{route_name}' and name_prefix is '#{name_prefix}'
           self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
             def #{method}(*args)
               options = args.last.is_a?(Hash) ? args.pop : {}
-              args = args.size < #{required_args} ? enclosing_resources + args : enclosing_resources - [enclosing_resource] + args
+              args = args.size < #{required_args} ? route_resources + args : route_resources - [enclosing_resource] + args
               args = args + [options] if options.size > 0
               send :#{route_method}, *args
             end
@@ -130,9 +130,9 @@ Currently route_name is '#{route_name}' and name_prefix is '#{name_prefix}'
           self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
             def #{method}(*args)
               options = args.last.is_a?(Hash) ? args.pop : {}
-              #{"args = [resource] + args if enclosing_resources.size + args.size < #{required_args}" if required_args > 0}
+              #{"args = [resource] + args if route_resources.size + args.size < #{required_args}" if required_args > 0}
               args = args + [options] if options.size > 0
-              send :#{route_method}, *enclosing_resources + args
+              send :#{route_method}, *(route_resources + args)
             end
           end_eval
         end

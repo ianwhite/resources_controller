@@ -102,7 +102,7 @@ describe "resource_service in TagsController via Forum, Post and Comment" do
   end
 end
 
-describe "Requesting /forums/1/posts/2/tags using GET" do
+describe "Requesting /forums/1/posts/2/comment/3/tags using GET" do
   include TagsViaForumPostCommentSpecHelper
   controller_name :tags
 
@@ -131,9 +131,11 @@ describe "Requesting /forums/1/posts/2/tags using GET" do
     do_get
   end
 
-  it "should assign the found comment as :taggable for the view" do
+  it "should assign the found forum, post, and comment for the view" do
     do_get
-    assigns[:taggable].should == @comment
+    assigns[:forum].should == @forum
+    assigns[:post].should == @post
+    assigns[:comment].should == @comment
   end
 
   it "should assign the comment_tags association as the tags resource_service" do

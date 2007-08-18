@@ -119,9 +119,9 @@ describe "Requesting /forums/1/posts/2/tags using GET" do
     do_get
   end
 
-  it "should assign the found post as :taggable for the view" do
+  it "should assign the found post for the view" do
     do_get
-    assigns[:taggable].should == @post
+    assigns[:post].should == @post
   end
 
   it "should assign the post_tags association as the tags resource_service" do

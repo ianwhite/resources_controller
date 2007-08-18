@@ -1,4 +1,12 @@
 
+Routing shortcuts for Account should map
+- resource_path to /account
+- resource_info_tags_path to /account/info/tags
+
+AccountController#resource_service
+- .new should call :new on User
+- .find should call :find_singleton lambda
+
 Routing shortcuts for Addresses (users/2/addresses/1) should map
 - resources_path to /users/2/addresses
 - resource_path to /users/2/addresses/1
@@ -358,6 +366,64 @@ Requesting /users/1/interests using GET
 - should assign the found user as :interested_in for the view
 - should assign the user_interests association as the interests resource_service
 
+Routing shortcuts for ForumOwner should map
+- resource_path to /forums/2/owner
+- resource_path(:foo => 'bar') to /forums/2/owner?foo=bar
+- edit_resource_path to /forums/2/owner/edit
+- new_resource_path to /forums/2/owner/new
+- resource_posts_path to /forums/2/owner/posts
+- resource_posts_path(:foo => 'bar') to /forums/2/owner/posts?foo=bar
+- resource_post_path(5) to /forums/2/owner/posts/5
+- enclosing_resource_path to /forums/2
+
+OwnerController#resource_service
+- .new should call :build_owner on @forum
+- .find should call :owner on @forum
+
+Requesting /forums/2/owner using GET
+- should be successful
+- should render show.rhtml
+- should find the forum requested
+- should assign the found forum for the view
+- should find the owner from forum.owner
+- should assign the found owner for the view
+
+Requesting /forums/2/owner/new using GET
+- should be successful
+- should render new.rhtml
+- should build a new owner
+
+Requesting /forums/2/owner/edit using GET
+- should be successful
+- should render edit.rhtml
+- should find the owner from forum.owner
+
+Requesting /forums/2/owner using POST
+- should build a new owner
+- should set the flash notice
+- should redirect to the new owner
+
+Requesting /forums/2/owner using PUT
+- should find the owner from forum.owner
+- should set the flash notice
+- should update the owner
+- should redirect to the owner
+
+Requesting /forums/2/owner using DELETE
+- should find the owner from forum.owner
+- should call destroy on the owner
+- should set the flash notice
+- should redirect to forums/2
+
+Routing shortcuts for Tags via account info (/account/info/) should map
+- resources_path to /account/info/tags
+- resource_path to /account/info/tags/2
+- resource_path(9) to /account/info/tags/9
+- edit_resource_path to /account/info/tags/2/edit
+- edit_resource_path(9) to /account/info/tags/9/edit
+- new_resource_path to /account/info/tags/new
+- enclosing_resource_path to /account/info
+
 Routing shortcuts for Tags via Forum, Post and Comment (forums/1/posts/2/comments/3tags/4) should map
 - resources_path to /forums/1/posts/2/comments/3/tags
 - resource_path to /forums/1/posts/2/comments/3/tags/4
@@ -373,11 +439,11 @@ resource_service in TagsController via Forum, Post and Comment
 - should raise RecordNotFound with find(@other_tag.id)
 - should find only tags belonging to @post with find(:all)
 
-Requesting /forums/1/posts/2/tags using GET
+Requesting /forums/1/posts/2/comment/3/tags using GET
 - should find the forum
 - should find the post
 - should find the comment
-- should assign the found comment as :taggable for the view
+- should assign the found forum, post, and comment for the view
 - should assign the comment_tags association as the tags resource_service
 
 Routing shortcuts for Tags via Forum and Post (forums/1/posts/2/tags/3) should map
@@ -398,7 +464,7 @@ resource_service in TagsController via Forum and Post
 Requesting /forums/1/posts/2/tags using GET
 - should find the forum
 - should find the post
-- should assign the found post as :taggable for the view
+- should assign the found post for the view
 - should assign the post_tags association as the tags resource_service
 
 Routing shortcuts for Tags via Forum (forums/1/tags/2) should map
@@ -418,7 +484,7 @@ resource_service in TagsController via Forum
 
 Requesting /forums/1/tags using GET
 - should find the forum
-- should assign the found forum as :taggable for the view
+- should assign the found forum for the view
 - should assign the forum_tags association as the tags resource_service
 
 Routing shortcuts for Tags via User and Address (users/1/addresses/2/tags/3) should map
@@ -439,7 +505,7 @@ resource_service in TagsController via User and Address
 Requesting /users/1/addresses/2/tags using GET
 - should find the user
 - should find the address
-- should assign the found address as :taggable for the view
+- should assign the found address for the view
 - should assign the address_tags association as the tags resource_service
 
 ActionView with resources_controller Helper
@@ -464,32 +530,16 @@ A controller's resource_service
 
 ResourcesController#resources_request for recognized_route
 - :users should be [{:name => "users"}]
-- :user should be [{:name => "users", :id => "1", :key => :id}]
-- :user_interests should be [{:name => "users", :id => "1", :key => :user_id, :name_prefix => "user_"}, {:name => "interests"}]
-- :user_interest should be [{:name => "users", :id => "1", :key => :user_id, :name_prefix => "user_"}, {:name => "interests", :key => :id, :id => "2"}]
-- :forum_post_tag should be [{:name => "forums", :id => "1", :key => :forum_id, :name_prefix => "forum_"}, {:name => "posts", :key => :post_id, :id => "2", :name_prefix => "post_"}, {:name => "tags", :id => "3", :key => :id}]
-- :my_home should be [{:name => "my_home"}]
-- :my_home_info should be [{:name => "my_home", :name_prefix => "my_home_"}, {:name => "info"}]
-- :my_home_info_tags should be [{:name => "my_home", :name_prefix => "my_home_"}, {:name => "info", :name_prefix => "info_"}, {:name => "tags"}]
-- :my_home_post should be [{:name => "my_home", :name_prefix => "my_home_"}, {:name => "posts", :key => :id, :id => "1"}]
-- :forum_owner_post should be [{:name => "forums", :name_prefix => "forum_", :id => "1", :key => :forum_id}, {:name => "owner", :name_prefix => "owner_"}, {:name ="posts", :id => "2", :key => :id}]
+- :user should be [{:name => "users", :key => :id}]
+- :user_interests should be [{:name => "users", :key => :user_id, :name_prefix => "user_"}, {:name => "interests"}]
+- :user_interest should be [{:name => "users", :key => :user_id, :name_prefix => "user_"}, {:name => "interests", :key => :id, :id => "2"}]
+- :forum_post_tag should be [{:name => "forums", :key => :forum_id, :name_prefix => "forum_"}, {:name => "posts", :key => :post_id, :name_prefix => "post_"}, {:name => "tags", :key => :id}]
+- :account should be [{:name => "account"}]
+- :account_info should be [{:name => "account", :name_prefix => "account_"}, {:name => "info"}]
+- :account_info_tags should be [{:name => "account", :name_prefix => "account_"}, {:name => "info", :name_prefix => "info_"}, {:name => "tags"}]
+- :account_post should be [{:name => "account", :name_prefix => "account_"}, {:name => "posts", :key => :id}]
+- :forum_owner_post should be [{:name => "forums", :name_prefix => "forum_", :key => :forum_id}, {:name => "owner", :name_prefix => "owner_"}, {:name ="posts", :key => :id}]
 
-ResourcesController (route_name, singular_route_name and name_prefix)
-- route_name should be the controller_name by default
-- singular_route_name should be route_name.singualrize(d)
-- should inherit route_name and singular_route_name from parent, unless explicitly set
-- should allow overriding on instance, and not affect class route_name, singular_route_name, or name_prefix
+Finished in 3.221921 seconds
 
-Automatic (route_name, name_prefix) for
-- ForumsController should be ('forums', '')
-- PostsController should be ('posts', '')
-- ForumPostsController should be ('posts', 'forum_')
-- UserPostsController should be ('posts', 'user_')
-- CommentsController should be ('comments', '')
-- TagsController should be ('tags', '')
-- HasAComplexNameController should be ('has_a_complex_name', '')
-- EnclosedByFooHasAComplexNameController should be ('has_a_complex_name', 'enclosed_by_foo_')
-
-Finished in 2.697172 seconds
-
-343 examples, 0 failures
+375 examples, 0 failures

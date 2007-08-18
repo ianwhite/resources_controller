@@ -120,8 +120,8 @@ describe "Routing shortcuts for Forums should map" do
 Tried to map :resource_users_path to :forum_users_path, which doesn't exist.
 You may not have defined the route in config/routes.rb. Or, you may need to
 explicictly set route_name and name_prefix in resources_controller_for.
-Currently route_name is 'forums' and name_prefix is ''
-    end_str
+Currently route_name is 'forum' and name_prefix is ''
+end_str
     )
   end
   

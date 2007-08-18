@@ -1,3 +1,38 @@
+* resources_controller now supports singleton resources!  and much better :load_enclosing support
+  Booya! =>
+    class TagsController < ApplicationController
+      resources_controller_for :tags, :load_enclosing => true
+    end
+    
+    this will service all these routes (loading the resources into assigns for the view)
+    
+      /tags
+      /forums/2/tags
+      /images/1/tags
+      /home/tags          <= singular resource
+      /users/1/image/tags <= nested singular resource 
+  
+    Also
+    
+    class BlogController < ApplicationController
+      resources_controller_for :blog, :singleton => true, :load_enclosing => true
+    end
+    
+    class PostController < ApplicationController
+      resources_controller_for :post, :load_enclosing => true
+    end
+    
+    for /campaigns/1/blog
+        /users/2/blog
+        /campaigns/1/blog/posts
+        /users/2/blog/posts
+        /blogs/2/posts
+        
+        etc...
+  
+  TODO: rewrite docs - for now check out the spec suite.
+  TODO: refactor code - I did it BDD stylee, so there's lots of specs but also a lot of code that 'is the simplest thing that makes the specs pass'
+
 * resources_request has changed format - it now returns an array like this
   [ {:name => "forums", :name_prefix => "forum_", :key => :forum_id, :id => "1"}, {:name => "posts"}]
   Singular resources are detected properly (see spec/specs/resources_controller_spec for some tests).
