@@ -415,6 +415,23 @@ Requesting /forums/2/owner using DELETE
 - should set the flash notice
 - should redirect to forums/2
 
+Routing shortcuts for Tags should map
+- resources_path to /tags
+- resource_path to /tags/2
+- resource_path(9) to /tags/9
+- edit_resource_path to /tags/2/edit
+- edit_resource_path(9) to /tags/9/edit
+- new_resource_path to /forums/1/tags/new
+- enclosing_resource_path should raise error
+
+resource_service in TagsController
+- .new should call new on Tag
+- .find should call find on Tag
+
+Requesting /tags using GET
+- should find the tags
+- should assign the tags for the view
+
 Routing shortcuts for Tags via account info (/account/info/) should map
 - resources_path to /account/info/tags
 - resource_path to /account/info/tags/2
@@ -423,6 +440,18 @@ Routing shortcuts for Tags via account info (/account/info/) should map
 - edit_resource_path(9) to /account/info/tags/9/edit
 - new_resource_path to /account/info/tags/new
 - enclosing_resource_path to /account/info
+
+resource_service in TagsController via Account Info
+- should build new tag with @info fk and type with new
+- should find @tag with find(@tag.id)
+- should raise RecordNotFound with find(@other_tag.id)
+- should find only tags belonging to @info with find(:all)
+
+Requesting /forums/1/tags using GET
+- should find the account as current_user
+- should get info from current_user
+- should get tags assoc from info
+- should get tags from tags assoc
 
 Routing shortcuts for Tags via Forum, Post and Comment (forums/1/posts/2/comments/3tags/4) should map
 - resources_path to /forums/1/posts/2/comments/3/tags
@@ -540,6 +569,6 @@ ResourcesController#resources_request for recognized_route
 - :account_post should be [{:name => "account", :name_prefix => "account_"}, {:name => "posts", :key => :id}]
 - :forum_owner_post should be [{:name => "forums", :name_prefix => "forum_", :key => :forum_id}, {:name => "owner", :name_prefix => "owner_"}, {:name ="posts", :key => :id}]
 
-Finished in 3.221921 seconds
+Finished in 3.271525 seconds
 
-375 examples, 0 failures
+394 examples, 0 failures

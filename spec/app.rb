@@ -36,6 +36,8 @@ ActionController::Routing::Routes.draw do |map|
     end
   end
   
+  map.resources :tags
+  
   map.connect ':controller/:action/:id.:format'
   map.connect ':controller/:action/:id'
 end
@@ -140,25 +142,30 @@ end
 # Controllers
 ##############
 
+module AccountResource
+  def self.extended(base)
+    base.class_eval do
+      # we add this so that controllers know how to find the singleton :account if it appears
+      # in the enclosing resources
+      map_enclosing_resource :account, :singleton => true do
+        User.find(@current_user.id)
+      end
+    end
+  end
+end
+
 class AccountController < ActionController::Base
   resources_controller_for :account, :class_name => 'User', :singleton => lambda { @current_user }  
 end
 
 class InfoController < ActionController::Base
-  resources_controller_for :info, :singleton => true
-  nested_in :account do
-    @current_user
-  end
+  extend AccountResource
+  resources_controller_for :info, :singleton => true, :load_enclosing => true
 end
 
 class TagsController < ActionController::Base
+  extend AccountResource
   resources_controller_for :tags, :load_enclosing => true
-  
-  # we add this so that tags controller knows how to find the singleton :account if it appears
-  # in the enclosing resources
-  map_enclosing_resource :account, :singleton => true do
-    User.find(@current_user.id)
-  end
 end
 
 class UsersController < ActionController::Base

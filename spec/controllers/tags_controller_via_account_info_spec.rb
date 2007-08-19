@@ -58,68 +58,76 @@ describe "Routing shortcuts for Tags via account info (/account/info/) should ma
   end
 end
 
-#describe "resource_service in TagsController via Forum" do
-#  controller_name :tags
-#  
-#  before(:each) do
-#    @forum       = Forum.create
-#    @tag         = Tag.create :taggable_id => @forum.id, :taggable_type => 'Forum'
-#    @other_forum = Forum.create
-#    @other_tag   = Tag.create :taggable_id => @other_forum.id, :taggable_type => 'Forum'
-#    
-#    get :index, :forum_id => @forum.id
-#    @resource_service = controller.send :resource_service
-#  end
-#  
-#  it "should build new tag with @forum fk and type with new" do
-#    resource = @resource_service.new
-#    resource.should be_kind_of(Tag)
-#    resource.taggable_id.should == @forum.id
-#    resource.taggable_type.should == 'Forum'
-#  end
-#  
-#  it "should find @tag with find(@tag.id)" do
-#    resource = @resource_service.find(@tag.id)
-#    resource.should == @tag
-#  end
-#  
-#  it "should raise RecordNotFound with find(@other_tag.id)" do
-#    lambda{ @resource_service.find(@other_tag.id) }.should raise_error(ActiveRecord::RecordNotFound)
-#  end
-#
-#  it "should find only tags belonging to @forum with find(:all)" do
-#    resources = @resource_service.find(:all)
-#    resources.should be == Tag.find(:all, :conditions => "taggable_id = #{@forum.id} AND taggable_type = 'Forum'")
-#  end
-#end
-#
-#describe "Requesting /forums/1/tags using GET" do
-#  include TagsViaForumSpecHelper
-#  controller_name :tags
-#
-#  before(:each) do
-#    setup_mocks
-#    @tags = mock('Tags')
-#    @forum_tags.stub!(:find).and_return(@tags)
-#  end
-#  
-#  def do_get
-#    get :index, :forum_id => 1
-#  end
-#
-#  it "should find the forum" do
-#    Forum.should_receive(:find).with('1').and_return(@forum)
-#    do_get
-#  end
-#
-#  it "should assign the found forum as :taggable for the view" do
-#    do_get
-#    assigns[:taggable].should == @forum
-#  end
-#
-#  it "should assign the forum_tags association as the tags resource_service" do
-#    @forum.should_receive(:tags).and_return(@forum_tags)
-#    do_get
-#    @controller.resource_service.should == @forum_tags
-#  end 
-#end
+describe "resource_service in TagsController via Account Info" do
+  include TagsViaAccountInfoHelper
+  controller_name :tags
+  
+  before(:each) do
+    @info = Info.create
+    @account = User.create :info => @info
+    @info.tags << (@tag = Tag.create)
+    @other_tag = Tag.create
+    
+    @controller.instance_variable_set('@current_user', @account)
+    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:account_info_tags])
+    get :index
+    @resource_service = controller.send :resource_service
+  end
+  
+  it "should build new tag with @info fk and type with new" do
+    resource = @resource_service.new
+    resource.should be_kind_of(Tag)
+    resource.taggable_id.should == @info.id
+    resource.taggable_type.should == 'Info'
+  end
+  
+  it "should find @tag with find(@tag.id)" do
+    resource = @resource_service.find(@tag.id)
+    resource.should == @tag
+  end
+  
+  it "should raise RecordNotFound with find(@other_tag.id)" do
+    lambda{ @resource_service.find(@other_tag.id) }.should raise_error(ActiveRecord::RecordNotFound)
+  end
+
+  it "should find only tags belonging to @info with find(:all)" do
+    resources = @resource_service.find(:all)
+    resources.should be == Tag.find(:all, :conditions => "taggable_id = #{@info.id} AND taggable_type = 'Info'")
+  end
+end
+
+describe "Requesting /forums/1/tags using GET" do
+  include TagsViaAccountInfoHelper
+  controller_name :tags
+
+  before(:each) do
+    setup_mocks
+    @tags = mock('Tags')
+    @info_tags.stub!(:find).and_return(@tags)
+  end
+  
+  def do_get
+    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:account_info_tags])
+    get :index
+  end
+
+  it "should find the account as current_user" do
+    do_get
+    assigns['account'].should == @current_user
+  end
+
+  it "should get info from current_user" do
+    @current_user.should_receive(:info).and_return(@info)
+    do_get
+  end
+
+  it "should get tags assoc from info" do
+    @info.should_receive(:tags).and_return(@info_tags)
+    do_get
+  end
+
+  it "should get tags from tags assoc" do
+    @info_tags.should_receive(:find).with(:all).and_return(@tags)
+    do_get
+  end
+end

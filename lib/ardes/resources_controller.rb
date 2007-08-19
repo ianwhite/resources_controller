@@ -217,10 +217,9 @@ module Ardes#:nodoc:
       self.class_eval do
         unless included_modules.include?(::Ardes::ResourcesController::InstanceMethods)
           class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_source,
-            :resource_service_class, :enclosing_loaders, :name_prefix, :route_name, :find_singleton, :enclosing_resource_map
+            :resource_service_class, :enclosing_loaders, :name_prefix, :route_name, :find_singleton
           
           self.enclosing_loaders = []
-          self.enclosing_resource_map = {}
           
           include InstanceMethods
           include UrlHelper
@@ -359,6 +358,10 @@ module Ardes#:nodoc:
       
       add_load_enclosing if options[:load_enclosing]
       enclosing_loaders << [:load_enclosing_resource, [name, options], block]
+    end
+    
+    def enclosing_resource_map
+      read_inheritable_attribute('_enclosing_resource_map') || write_inheritable_attribute('_enclosing_resource_map', {})
     end
     
     module InstanceMethods
@@ -508,9 +511,10 @@ module Ardes#:nodoc:
     
       def load_enclosing_resource(name, options = {}, &block)
         name = options[:singleton] ? name.to_s : name.to_s.singularize
-        if enclosing_resource_map[name]
-          options = enclosing_resource_map[name].first.merge(:anonymous => true)
-          block = enclosing_resource_map[name].last
+        map = self.class.send(:enclosing_resource_map)
+        if map[name]
+          options = map[name].first.merge(:anonymous => true)
+          block = map[name].last
         end
         enclosing_resource = block ? instance_eval(&block) : find_enclosing_resource(name, options)
         update_name_prefix(options[:name_prefix]) if options[:anonymous] && options[:name_prefix] != false
