@@ -3,8 +3,7 @@ module Ardes#:nodoc:
   # an ActiveResource compliant controller for your your RESTful models.
   # 
   # The intention is not to create an auto-scaffold, although it can be used for that.
-  # The intention is to DRY up some of the repetitive code associated with controllers
-  # and to facilitate inheritance.
+  # The intention is to DRY up some of the repetitive code associated with controllers.
   # 
   # === Simple Usage
   # Here's a simple example of how it works with a Forums has many Posts model:
@@ -16,6 +15,15 @@ module Ardes#:nodoc:
   #   class PostsController < ApplicationController
   #     resources_controller_for :posts, :in => :forum
   #   end
+  #
+  #  class AccountController < ApplicationController
+  #    resources_controller_for :account, :singleton => true, :class_name => 'User'
+  #  protected
+  #    def find_resource
+  #      User.find(@current_user.id)
+  #    end
+  #  end
+  # 
   # 
   # === Inheritance
   # But you can also use it to facilitate inheritance.  Let's say you have a Posts, User's Posts, and Forum's Posts controller,
@@ -217,7 +225,7 @@ module Ardes#:nodoc:
       self.class_eval do
         unless included_modules.include?(::Ardes::ResourcesController::InstanceMethods)
           class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_source,
-            :resource_service_class, :enclosing_loaders, :name_prefix, :route_name, :find_singleton
+            :resource_service_class, :enclosing_loaders, :name_prefix, :route_name, :find_singleton, :singleton
           
           self.enclosing_loaders = []
           
@@ -236,12 +244,14 @@ module Ardes#:nodoc:
       self.resource_source = options[:source] || options[:collection_name]
       
       if options[:singleton]
+        self.singleton = true
         self.find_singleton = options[:singleton] if options[:singleton].is_a?(Proc)
         self.resources_name, self.resource_name = name.to_s.pluralize, name.to_s
         self.resource_service_class = SingletonResourceServiceProxy
         self.resource_source ||= self.resource_name
         self.route_name = (options[:route_name] || name).to_s
       else
+        self.singleton = false
         self.resources_name, self.resource_name = name.to_s, name.to_s.singularize
         self.resource_source ||= self.resources_name
         self.route_name = (options[:route_name] || name).to_s.singularize
@@ -474,20 +484,36 @@ module Ardes#:nodoc:
       end
       
       # returns an array containing hashes like {:name => resource name, :key => params key, :value => params value, :name_prefix => 'prefix segment'}
+      # corresponding to the enclosing resources.
       def resources_request
-        @resources_request ||= recognized_route.segments.inject([]) do |request, segment|
-          unless segment.is_optional or segment.is_a?(::ActionController::Routing::DividerSegment)
-            if segment.is_a?(::ActionController::Routing::StaticSegment)
-              if last = request.last
-                last[:name_prefix] = (last[:key] ? last[:name].singularize : last[:name]) + '_'
+        unless @resources_request
+          enclosing_request = enclosing_route_segments.inject([]) do |request, segment|
+            unless segment.is_optional or segment.is_a?(::ActionController::Routing::DividerSegment)
+              if segment.is_a?(::ActionController::Routing::StaticSegment)
+                request << {:name => segment.value}
+              elsif segment.is_a?(::ActionController::Routing::DynamicSegment)
+                request.last.merge!(:key => segment.key)
               end
-              request << {:name => segment.value}
-            elsif segment.is_a?(::ActionController::Routing::DynamicSegment)
-              request.last.merge!(:key => segment.key)
             end
+            request
           end
-          request
+          enclosing_request.each do |request|
+            request[:name_prefix] = (request[:key] ? request[:name].singularize : request[:name]) + '_'
+          end
+          @resources_request = enclosing_request
         end
+        @resources_request
+      end
+      
+      # pop off segments up to and including the current resource.  This will also remove any static action segments 
+      def enclosing_route_segments
+        segments = recognized_route.segments.dup
+        route_name = singleton ? self.route_name : self.route_name.pluralize
+        while segments.size > 0
+          segment = segments.pop
+          return segments if segment.is_a?(::ActionController::Routing::StaticSegment) and segment.value == route_name
+        end
+        raise "Could not recognize '#{route_name}' in '#{recognized_route}'" if segments.size == 0
       end
       
       def load_resources
@@ -499,8 +525,6 @@ module Ardes#:nodoc:
       # load any remaining enclosing resources that nest the current nested_in
       def load_enclosing_resources(load_all = false)
         enclosing_request = resources_request.dup
-        # ignore the last request item if it is the resource
-        enclosing_request.pop if [resources_name, resource_name].include?(enclosing_request.last[:name])
         # ignore the lat request item if it's going to be loaded by a nested_in
         enclosing_request.pop unless load_all 
 

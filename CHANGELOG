@@ -1,3 +1,5 @@
+* Fixed some problems with internals of RC when :load_enclosing => true
+
 * resources_controller now supports singleton resources!  and much better :load_enclosing support
   Booya! =>
     class TagsController < ApplicationController

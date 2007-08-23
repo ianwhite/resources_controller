@@ -516,6 +516,16 @@ Requesting /forums/1/tags using GET
 - should assign the found forum for the view
 - should assign the forum_tags association as the tags resource_service
 
+Requesting /forums/1/tags/new using GET
+- should find the forum
+- should assign the found forum for the view
+- should assign the forum_tags association as the tags resource_service
+- should render new template
+- should create a new tag with params
+- should not save the new category
+- should assign the new tag for the view
+- should send :resource= to controller with @tag
+
 Routing shortcuts for Tags via User and Address (users/1/addresses/2/tags/3) should map
 - resources_path to /users/1/addresses/2/tags
 - resource_path to /users/1/addresses/2/tags/3
@@ -557,18 +567,17 @@ Helper#remote_form_for_resource (when resource is existing record)
 A controller's resource_service
 - may be explicitly set with #resource_service=
 
-ResourcesController#resources_request for recognized_route
-- :users should be [{:name => "users"}]
-- :user should be [{:name => "users", :key => :id}]
-- :user_interests should be [{:name => "users", :key => :user_id, :name_prefix => "user_"}, {:name => "interests"}]
-- :user_interest should be [{:name => "users", :key => :user_id, :name_prefix => "user_"}, {:name => "interests", :key => :id, :id => "2"}]
-- :forum_post_tag should be [{:name => "forums", :key => :forum_id, :name_prefix => "forum_"}, {:name => "posts", :key => :post_id, :name_prefix => "post_"}, {:name => "tags", :key => :id}]
-- :account should be [{:name => "account"}]
-- :account_info should be [{:name => "account", :name_prefix => "account_"}, {:name => "info"}]
-- :account_info_tags should be [{:name => "account", :name_prefix => "account_"}, {:name => "info", :name_prefix => "info_"}, {:name => "tags"}]
-- :account_post should be [{:name => "account", :name_prefix => "account_"}, {:name => "posts", :key => :id}]
-- :forum_owner_post should be [{:name => "forums", :name_prefix => "forum_", :key => :forum_id}, {:name => "owner", :name_prefix => "owner_"}, {:name ="posts", :key => :id}]
+ResourcesController#resources_request (route_name:tag, :singleton:false)
+- :tags should be []
+- :new_tag should be []
+- :edit_tag should be []
+- :tag should be []
+- :forum_tags should be [{:name => "forums", :name_prefix => "forum_", :key => :forum_id}]
+- :forum_tag should be [{:name => "forums", :name_prefix => "forum_", :key => :forum_id}]
+- :user_addresses_tags should be [{:name => "users", :key => :user_id, :name_prefix => "user_"}, {:name => "addresses", :name_prefix => "address_", :key => :address_id}]
+- :account_info_tags should be [{:name => "account", :name_prefix => "account_"}, {:name => "info", :name_prefix => "info_"}]
+- :new_account_info_tag should be [{:name => "account", :name_prefix => "account_"}, {:name => "info", :name_prefix => "info_"}]
 
-Finished in 3.271525 seconds
+Finished in 3.641579 seconds
 
-394 examples, 0 failures
+401 examples, 0 failures

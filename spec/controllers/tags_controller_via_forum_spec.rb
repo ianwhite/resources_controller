@@ -126,11 +126,11 @@ describe "Requesting /forums/1/tags/new using GET" do
   before(:each) do
     setup_mocks
     @tag = mock('Tag')
-    @forum_tags.stub!(:new).and_return(@tags)
+    @forum_tags.stub!(:new).and_return(@tag)
   end
   
   def do_get
-    get :new, :forum_id => 1
+    get :new, :forum_id => 1, :tag => {"name" => "hello"}
   end
 
   it "should find the forum" do
@@ -154,8 +154,8 @@ describe "Requesting /forums/1/tags/new using GET" do
     response.should render_template('new')
   end
   
-  it "should create an new category" do
-    @forum_tags.should_receive(:new).and_return(@tag)
+  it "should create a new tag with params" do
+    @forum_tags.should_receive(:new).with("name" => "hello").and_return(@tag)
     do_get
   end
   
@@ -164,8 +164,13 @@ describe "Requesting /forums/1/tags/new using GET" do
     do_get
   end
   
-  it "should assign the new category for the view" do
+  it "should assign the new tag for the view" do
     do_get
     assigns[:tag].should equal(@tag)
+  end
+  
+  it "should send :resource= to controller with @tag" do
+    controller.should_receive(:resource=).with(@tag)
+    do_get
   end
 end
