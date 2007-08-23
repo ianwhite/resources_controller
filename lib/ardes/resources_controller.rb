@@ -229,9 +229,9 @@ module Ardes#:nodoc:
           
           self.enclosing_loaders = []
           
-          include InstanceMethods
-          include UrlHelper
-          helper Helper
+          include Ardes::ResourcesController::InstanceMethods
+          include Ardes::ResourcesController::UrlHelper
+          helper Ardes::ResourcesController::Helper
           
           options[:actions_include] = (options[:singleton] ? SingletonActions : Actions) if options[:actions_include].nil?
           
@@ -477,7 +477,7 @@ module Ardes#:nodoc:
       end
 
       def recognized_route
-        routes =  ::ActionController::Routing::Routes.routes_by_controller[controller_name][action_name].values.flatten
+        routes =  ::ActionController::Routing::Routes.routes_for_controller_and_action(controller_name, action_name)
         @recognized_route ||= routes.find do |route|
           route.recognize(request.path, ::ActionController::Routing::Routes.extract_request_environment(request))
         end
