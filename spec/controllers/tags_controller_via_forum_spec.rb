@@ -62,7 +62,7 @@ describe "resource_service in TagsController via Forum" do
     @other_forum = Forum.create
     @other_tag   = Tag.create :taggable_id => @other_forum.id, :taggable_type => 'Forum'
     
-    get :index, :forum_id => @forum.id
+    get :new, :forum_id => @forum.id
     @resource_service = controller.send :resource_service
   end
   
@@ -117,4 +117,55 @@ describe "Requesting /forums/1/tags using GET" do
     do_get
     @controller.resource_service.should == @forum_tags
   end 
+end
+
+describe "Requesting /forums/1/tags/new using GET" do
+  include TagsViaForumSpecHelper
+  controller_name :tags
+
+  before(:each) do
+    setup_mocks
+    @tag = mock('Tag')
+    @forum_tags.stub!(:new).and_return(@tags)
+  end
+  
+  def do_get
+    get :new, :forum_id => 1
+  end
+
+  it "should find the forum" do
+    Forum.should_receive(:find).with('1').and_return(@forum)
+    do_get
+  end
+
+  it "should assign the found forum for the view" do
+    do_get
+    assigns[:forum].should == @forum
+  end
+
+  it "should assign the forum_tags association as the tags resource_service" do
+    @forum.should_receive(:tags).and_return(@forum_tags)
+    do_get
+    @controller.resource_service.should == @forum_tags
+  end
+  
+  it "should render new template" do
+    do_get
+    response.should render_template('new')
+  end
+  
+  it "should create an new category" do
+    @forum_tags.should_receive(:new).and_return(@tag)
+    do_get
+  end
+  
+  it "should not save the new category" do
+    @tag.should_not_receive(:save)
+    do_get
+  end
+  
+  it "should assign the new category for the view" do
+    do_get
+    assigns[:tag].should equal(@tag)
+  end
 end
