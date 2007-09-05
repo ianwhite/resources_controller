@@ -2,49 +2,10 @@ http://plugins.ardes.com > resources_controller
 
 = resources_controller
 
-plugin to facilitate inheritance and DRYness in your resources controllers
+plugin to facilitate inheritance and DRYness in your resources controllers.
+See Ardes::ResourcesController for details
 
-Simple Usage (see Ardes::ResourcesController for more)
-
-  class ThingsController < ApplicationController
-    resources_controller_for :things
-  end
-
-Also supports nested resources
-
-  class CommentsController < ApplicationController
-    resources_controller_for :comments, :in => [:forum, :post]
-  end
-  
-Also support polymorphic associations, and arbitrary nesting
-
-  class TagsController < ApplicationController
-    resources_controller_for :tags
-    nested_in :taggable, :polymorphic => true, :load_enclosing => true
-  end
-  
-  # this controller will handle
-  #   /forums/1/tags
-  #   /forums/1/posts/2/tags
-  #   /users/3/tags
-  # etc
-
-=== For Rails <= 1.2.2
-
-If you are using non-edge rails <= 1.2.2 you should also install
-http://svn.ardes.com/rails_plugins/resources_controller_lte_1_2_2
-
-And you should install resources_controller r377 (later revisions do not support the
-<= 1.2.2 plugin)
-
-(To tell if you need the patch you can run the specs via rake - if you get failures to do with resource service, then you need the patch)
-
-=== Contributors
-* Ian White
-* Igor Alexeiuk for work on name_prefix and polymorphic routes
-* Dan Kubb
-
-See the {CHANGLELOG}[link:files/CHANGELOG.html] for recent changes
+See the {CHANGLELOG}[link:files/CHANGELOG.html] for recent changes and contributors
 
 === Specs and Coverage
 * {SPECDOC}[link:files/SPECDOC.html] lists the specifications

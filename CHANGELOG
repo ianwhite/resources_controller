@@ -1,3 +1,10 @@
+* Major internal changes, and some API change: see the rdoc for details.
+  The headlines:
+   - load_enclosing is now true by default
+   - BC: the old options work for now, but you'll get deprecation messages
+   - refactored a lot of code into friend classes - in particular there is now
+     ResourcesController::Specification which specifies how to find a resource from the route
+
 * Fixed some problems with internals of RC when :load_enclosing => true
 
 * resources_controller now supports singleton resources!  and much better :load_enclosing support
@@ -28,7 +35,6 @@
         /users/2/blog
         /campaigns/1/blog/posts
         /users/2/blog/posts
-        /blogs/2/posts
         
         etc...
   

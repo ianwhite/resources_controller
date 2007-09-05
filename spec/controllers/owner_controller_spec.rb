@@ -18,6 +18,7 @@ describe "Routing shortcuts for ForumOwner should map" do
   
   before(:each) do
     setup_mocks
+    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:forum_owner])
     get :show, :forum_id => "2"
   end
 
@@ -60,6 +61,7 @@ describe OwnerController, "#resource_service" do
   
   before(:each) do
     setup_mocks 
+    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:forum_owner])
     get :show, :forum_id => "2"
     @resource_service = controller.send :resource_service
   end
@@ -84,6 +86,7 @@ describe "Requesting /forums/2/owner using GET" do
   end
   
   def do_get
+    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:forum_owner])
     get :show, :forum_id => "2"
   end
 
@@ -128,6 +131,7 @@ describe "Requesting /forums/2/owner/new using GET" do
   end
   
   def do_get
+    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:new_forum_owner])
     get :new, :forum_id => "2"
   end
 
@@ -156,6 +160,7 @@ describe "Requesting /forums/2/owner/edit using GET" do
   end
   
   def do_get
+    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:edit_forum_owner])
     get :edit, :forum_id => "2"
   end
 
@@ -187,6 +192,7 @@ describe "Requesting /forums/2/owner using POST" do
   end
   
   def do_post
+    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:forum_owner])
     post :create, :forum_id => 2, :owner => {:name => 'Fred'}
   end
   
@@ -219,6 +225,7 @@ describe "Requesting /forums/2/owner using PUT" do
   end
   
   def do_update
+    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:forum_owner])
     put :update, :forum_id => "2", :owner => {:name => 'Fred'}
   end
   
@@ -254,6 +261,7 @@ describe "Requesting /forums/2/owner using DELETE" do
   end
   
   def do_delete
+    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:forum_owner])
     delete :destroy, :forum_id => "2"
   end
 

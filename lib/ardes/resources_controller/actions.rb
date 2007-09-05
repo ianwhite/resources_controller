@@ -93,7 +93,7 @@ module Ardes#:nodoc:
             format.xml  { head :created, :location => resource_url }
           else
             format.html { render :action => "new" }
-            format.js
+            format.js   { render :action => "new" }
             format.xml  { render :xml => resource.errors.to_xml, :status => :unprocessable_entity }
           end
         end
@@ -114,7 +114,7 @@ module Ardes#:nodoc:
             format.xml  { head :ok }
           else
             format.html { render :action => "edit" }
-            format.js
+            format.js   { render :action => "edit" }
             format.xml  { render :xml => resource.errors.to_xml, :status => :unprocessable_entity }
           end
         end

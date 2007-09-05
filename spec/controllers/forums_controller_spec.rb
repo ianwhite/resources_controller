@@ -116,11 +116,17 @@ describe "Routing shortcuts for Forums should map" do
   end
 
   it "resource_users_path should raise informative NoMethodError" do
-    lambda{ controller.resource_users_path }.should raise_error(NoMethodError, <<-end_str
-Tried to map :resource_users_path to :forum_users_path, which doesn't exist.
-You may not have defined the route in config/routes.rb. Or, you may need to
-explicictly set route_name and name_prefix in resources_controller_for.
-Currently route_name is 'forum' and name_prefix is ''
+    lambda{ controller.resource_users_path }.should raise_error(Ardes::ResourcesController::CantMapRoute, <<-end_str
+Tried to map :resource_users_path to :forum_users_path,
+which doesn't exist. You may not have defined the route in config/routes.rb.
+
+Or, if you have unconventianal route names or name prefixes, you may need
+to explicictly set the :route option in resources_controller_for, and set
+the :name_prefix option on your enclosing resources.
+
+Currently:
+  :route is 'forum'
+  generated name_prefix is ''
 end_str
     )
   end

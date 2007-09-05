@@ -5,7 +5,8 @@ Routing shortcuts for Account should map
 
 AccountController#resource_service
 - .new should call :new on User
-- .find should call :find_singleton lambda
+- .find should call :current_user
+- .find should call whatever is in resource_specification @find
 
 Routing shortcuts for Addresses (users/2/addresses/1) should map
 - resources_path to /users/2/addresses
@@ -567,17 +568,17 @@ Helper#remote_form_for_resource (when resource is existing record)
 A controller's resource_service
 - may be explicitly set with #resource_service=
 
-ResourcesController#resources_request (route_name:tag, :singleton:false)
+ResourcesController#route_resource_names (route_name:tag, :singleton:false)
 - :tags should be []
 - :new_tag should be []
 - :edit_tag should be []
 - :tag should be []
-- :forum_tags should be [{:name => "forums", :name_prefix => "forum_", :key => :forum_id}]
-- :forum_tag should be [{:name => "forums", :name_prefix => "forum_", :key => :forum_id}]
-- :user_addresses_tags should be [{:name => "users", :key => :user_id, :name_prefix => "user_"}, {:name => "addresses", :name_prefix => "address_", :key => :address_id}]
-- :account_info_tags should be [{:name => "account", :name_prefix => "account_"}, {:name => "info", :name_prefix => "info_"}]
-- :new_account_info_tag should be [{:name => "account", :name_prefix => "account_"}, {:name => "info", :name_prefix => "info_"}]
+- :forum_tags should be [["forums", false]]
+- :forum_tag should be [["forums", false]]
+- :user_addresses_tags should be [["users", false], ["addresses", false]]
+- :account_info_tags should be [["account", true], ["info", true]]
+- :new_account_info_tag should be [["account", true], ["info", true]]
 
-Finished in 3.641579 seconds
+Finished in 3.935699 seconds
 
-401 examples, 0 failures
+402 examples, 0 failures

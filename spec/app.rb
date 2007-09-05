@@ -142,30 +142,38 @@ end
 # Controllers
 ##############
 
-module AccountResource
-  def self.extended(base)
+module CurrentUser
+  def self.included(base)
     base.class_eval do
-      # we add this so that controllers know how to find the singleton :account if it appears
-      # in the enclosing resources
-      map_enclosing_resource :account, :singleton => true do
-        User.find(@current_user.id)
-      end
+      map_resource :account, :class => User, :singleton => true, :find => :current_user
+      #
+      # could also do
+      # 
+      # map_resource :account, :singleton => true do
+      #   @current_user
+      # end
+      #
     end
+  end
+  
+  def current_user
+    @current_user
   end
 end
 
 class AccountController < ActionController::Base
-  resources_controller_for :account, :class_name => 'User', :singleton => lambda { @current_user }  
+  include CurrentUser
+  resources_controller_for :account, :singleton => true, :source => :user, :find => :current_user
 end
 
 class InfoController < ActionController::Base
-  extend AccountResource
-  resources_controller_for :info, :singleton => true, :load_enclosing => true
+  include CurrentUser
+  resources_controller_for :info, :singleton => true
 end
 
 class TagsController < ActionController::Base
-  extend AccountResource
-  resources_controller_for :tags, :load_enclosing => true
+  include CurrentUser
+  resources_controller_for :tags
 end
 
 class UsersController < ActionController::Base
@@ -177,7 +185,7 @@ class ForumsController < ActionController::Base
 end
 
 class OwnerController < ActionController::Base
-  resources_controller_for :owner, :class_name => 'User', :singleton => true, :in => :forum
+  resources_controller_for :owner, :singleton => true, :class => User, :in => :forum
 end
 
 class PostsAbstractController < ActionController::Base
@@ -197,13 +205,13 @@ class PostsController < PostsAbstractController
   before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :posts}
   
   # example of providing options to resources_controller_for
-  resources_controller_for :posts, :class_name => 'Post', :route_name => 'posts'
+  resources_controller_for :posts, :class => Post, :route => 'posts'
   
-  def load_resources_with_trace(*args)
+  def load_enclosing_resources_with_trace(*args)
     self.filter_trace ||= []; self.filter_trace << :load_enclosing
-    load_resources_without_trace(*args)
+    load_enclosing_resources_without_trace(*args)
   end
-  alias_method_chain :load_resources, :trace
+  alias_method_chain :load_enclosing_resources, :trace
 end
 
 class UserPostsController < PostsController
@@ -211,7 +219,7 @@ class UserPostsController < PostsController
   before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :user_posts}
   
   # example of providing options to nested in
-  nested_in :user, :class_name => 'User', :foreign_key => 'user_id', :name_prefix => 'user_'
+  nested_in :user, :class => User, :key => 'user_id', :name_prefix => 'user_'
 end
 
 class AddressesController < ActionController::Base
@@ -234,5 +242,9 @@ end
 
 class InterestsController < ActionController::Base
   resources_controller_for :interests
-  nested_in :interested_in, :polymorphic => true # could also use :anonymous => true
+  before_filter :set_interested_in
+  
+  def set_interested_in
+    @interested_in = enclosing_resource
+  end
 end

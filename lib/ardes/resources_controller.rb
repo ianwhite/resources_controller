@@ -2,69 +2,261 @@ module Ardes#:nodoc:
   # With resources_controller (http://svn.ardes.com/rails_plugins/resources_controller) you can quickly add
   # an ActiveResource compliant controller for your your RESTful models.
   # 
-  # The intention is not to create an auto-scaffold, although it can be used for that.
-  # The intention is to DRY up some of the repetitive code associated with controllers.
-  # 
-  # === Simple Usage
+  # = Examples
+  # Here are some examples - for more on how to use  RC go to the Usage section at the bottom,
+  # for syntax head to resources_controller_for
+  #
+  # ==== Example 1: Super simple usage
   # Here's a simple example of how it works with a Forums has many Posts model:
   # 
   #   class ForumsController < ApplicationController
   #     resources_controller_for :forums
   #   end
+  #
+  # Your controller will get the standard CRUD actions, @forum will be set in member actions, @forums in
+  # index.
   # 
+  # ==== Example 2: Specifying enclosing resources
   #   class PostsController < ApplicationController
   #     resources_controller_for :posts, :in => :forum
   #   end
   #
-  #  class AccountController < ApplicationController
-  #    resources_controller_for :account, :singleton => true, :class_name => 'User'
-  #  protected
-  #    def find_resource
-  #      User.find(@current_user.id)
-  #    end
-  #  end
-  # 
-  # 
-  # === Inheritance
-  # But you can also use it to facilitate inheritance.  Let's say you have a Posts, User's Posts, and Forum's Posts controller,
-  # that all respond to an atom feed on the index.  You would do it like this:
-  # 
+  # As above, but the controller will load @forum on every action, and use @forum to find and create @posts
+  #
+  # ==== Wildcard enclosing resources
+  # All of the above examples will work for any routes that match what it specified
+  #
+  #              PATH                     RESOURCES CONTROLLER WILL DO:
+  #
+  #  Example 1  /forums                   @forums = Forum.find(:all)
+  #
+  #             /users/2/forums           @user = User.find(2)
+  #                                       @forums = @user.forums.find(:all)
+  #
+  #  Example 2  /posts                    @posts = Post.find(:all)
+  #
+  #             /forums/2/posts           @forum = Forum.find(2)
+  #                                       @posts = @forum.posts.find(:all)
+  #
+  #             /sites/4/forums/3/posts   @site = Site.find(4)
+  #                                       @forum = @site.forums.find(3)
+  #                                       @posts = @forum.posts.find(:all)
+  #
+  #             /users/2/posts/1          This won't work as the controller specified
+  #                                       that :posts are :in => :forum
+  #                                       
+  #
+  # It is up to you which routes to open to the controller (in config/routes.rb).  When
+  # you do, RC will use the route segments to drill down to the specified resource.  This means
+  # that if User 3 does not have Post 5, then /users/3/posts/5 will raise a RecordNotFound Error.
+  # You dont' have to write any extra code to do this oft repeated controller pattern.
+  #
+  # With RC, your route specification flows through to the controller - no need to repeat yourself.
+  #
+  # If you don't want to have RC match wildcard resources just pass :load_enclosing => false
+  #
+  #   resources_controller_for :posts, :in => :forum, :load_enclosing => 'false'
+  #
+  # ==== Example 3: Singleton resource
+  # Here's an example of a singleton, the account pattern that is so common.
+  #
+  #   class AccountController < ApplicationController
+  #     resources_controller_for :account, :class => User, :singleton => true do
+  #       @current_user
+  #     end
+  #   end
+  #
+  # Your controller will use the block to find the resource.  The @account will be assigned to @current_user
+  #
+  # ==== Example 4: Allowing PostsController to be used all over
+  # First thing to do is remove :in => :forum
+  #
   #   class PostsController < ApplicationController
   #     resources_controller_for :posts
-  # 
-  #     def index
-  #       self.resources = find_resources
-  #       respond_to do |format|
-  #         format.html
-  #         format.xml { render :xml => resources.to_xml }
-  #         # custom atom response here
-  #       end
-  #     end
   #   end
+  #
+  # This will now work for /users/2/posts.
+  #
+  # ==== Example 4 and a bit: Mapping non standard resources
+  # How about /account/posts?  The account is found in a non standard way - RC won't be able
+  # to figure out how tofind it if it appears in the route.  So we give it some help.
+  #
+  # (in PostsController)
+  #
+  #   map_resource :account, :singleton => true, :class => User, :find => :current_user
   # 
-  #   class UserPostsController < PostsController # notice inhertiance
-  #     nested_in :user
+  # Now, if :account apears in any part of a route (for PostsController) it will be mapped to
+  # (in this case) the current_user method of teh PostsController.
+  #
+  # To make the :account mapping available to all, just chuck it in ApplicationController
+  # 
+  # This will work for any resource which can't be inferred from its route segment name
+  #
+  #   map_resource :peeps, :source => :users
+  #   map_resource :posts, :class => BadlyNamedPostClass
+  #
+  # ==== Example 5: Singleton association
+  # Here's another singleton example - one where it corresponds to a has_one or belongs_to association
+  #
+  #   class ImageController < ApplicationController
+  #     resources_controller_for :image, :singleton => true
   #   end
+  #
+  # When invoked with /users/3/image RC will find @user, and use @user.image to find the resource, and
+  # @user.build_image, to create a new resource. 
+  #
+  # ==== Putting it all together
+  #
+  # An exmaple app
+  #
+  # config/routes.rb:
+  #  
+  #  map.resource :account do |account|
+  #    account.resource :image
+  #    account.resources :posts
+  #  end
+  #
+  #  map.resources :users do |user|
+  #    user.resource :image
+  #    user.resources :posts
+  #  end
+  #
+  #  map.resources :forums do |forum|
+  #    forum.resources :posts
+  #    forum.resource :image
+  #  end
+  #
+  # app/controllers:
+  #
+  #  class ApplicationController < ActionController::Base
+  #    map_resource :account, :singleton => true, :find => :current_user
+  #
+  #    def current_user # get it from session or whatnot
+  #  end
+  #
+  #  class ForumsController < AplicationController
+  #    resources_controller_for :forums
+  #  end
+  #    
+  #  class PostsController < AplicationController
+  #    resources_controller_for :posts
+  #  end
+  #
+  #  class UsersController < AplicationController
+  #    resources_controller_for :users
+  #  end
+  #
+  #  class ImageController < AplicationController
+  #    resources_controller_for :image, :singleton => true
+  #  end
+  #
+  #  class AccountController < ApplicationController
+  #    resources_controller_for :account, :singleton => true, :find => :current_user
+  #  end
+  #
+  # This is how the app will handle the following routes:
+  #
+  #  PATH                   CONTROLLER    WHICH WILL DO:
+  #  
+  #  /forums                forums        @forums = Forum.find(:all)
+  #  
+  #  /forums/2/posts        posts         @forum = Forum.find(2)
+  #                                       @posts = @forum.forums.find(:all)
+  #
+  #  /forums/2/image        image         @forum = Forum.find(2)
+  #                                       @image = @forum.image   
+  #  
+  #  /image                       <no route>
+  #
+  #  /posts                       <no route>
+  #
+  #  /users/2/posts/3       posts         @user = User.find(2)
+  #                                       @post = @user.posts.find(3)
+  #  
+  #  /users/2/image POST    image         @user = User.find(2)
+  #                                       @image = @user.build_image(params[:image])
+  #
+  #  /account               account       @account = self.current_user
+  #
+  #  /account/image         image         @account = self.current_user
+  #                                       @image = @account.image
+  #
+  #  /account/posts/3 PUT   posts         @account = self.current_user
+  #                                       @post = @account.posts.find(3)
+  #                                       @post.update_attributes(params[:post])
+  #
+  # === Views
+  #
+  # Ok - so how do I write the views?  
+  #
+  # For most cases, just in exactly the way you would expect to.  RC sets the instance variables
+  # to what they should be.
+  #
+  # But, in some cases, you are going to have different variables set - for example
+  #
+  #   /users/1/posts    =>  @user, @posts
+  #   /forums/2/posts   =>  @forum, @posts
   # 
-  #   class ForumPostsController < PostsController # notice inhertiance
-  #     nested_in :forum
-  #   end
-  # 
-  # === Customising nesting
-  # If you have some funky stuff going when you set the @forum, you can specify it like this:
-  # 
-  #   class ForumPostsController < PostsController
-  #     nested_in :forum do
-  #       Forum.find_activated params[:forum_id]
-  #     end
-  #   end
-  # 
-  # === Customising finding, and creating
+  # Here are some options (all are appropriate for different circumstances):
+  # * test for the existence of @user or @forum in the view, and display it differently
+  # * have two different controllers UserPostsController and ForumPostsController, with different views
+  #   (and direct the routes to them in routes.rb)
+  # * use enclosing_resource - which always refers to the... immediately enclosing resource.
+  #
+  # Using the last technique, you might write your posts index as follows
+  # (here assuming that both Forum and User have .name)
+  #
+  #   <h1>Posts for <%= link_to enclosing_resource_path, "#{enclosing_resource_name.humanize}: #{enclosing_resource.name}" %></h1>
+  #
+  #   <%= render :partial => 'post', :collection => @posts %>
+  #
+  # Notice *enclosing_resource_name* - this will be something like 'user', or 'post'.
+  # Also *enclosing_resource_path* - in RC you get all of the named route helpers relativised to the current resource
+  # and enclosing_resource.  See NamedRouteHelper for more details.
+  #
+  # This can useful when writing the _post partial:
+  #
+  #   <p>
+  #     <%= post.name %>
+  #     <%= link_to 'edit', edit_resource_path(tag) %>
+  #     <%= link_to 'destroy', resource_path(tag), :method => :delete %>
+  #   </p>
+  #
+  # when viewed at /users/1/posts it will show
+  #
+  #  <p>
+  #    Cool post
+  #    <a href="/users/1/posts/1/edit">edit</a>
+  #    <a href="js nightmare with /users/1/posts/1">delete</a>
+  #  </p>
+  #  ...
+  #
+  # when viewd at /forums/1/posts it will show
+  #
+  #  <p>
+  #    Other post
+  #    <a href="/forums/1/posts/3/edit">edit</a>
+  #    <a href="js nightmare with /forums/1/posts/3">delete</a>
+  #  </p>
+  #  ...
+  #
+  # This is like polymorphic urls, except that RC will just use whatever enclosing resources are loaded to generate the urls/paths.
+  #
+  # = Usage
+  # To use RC, there are just three class methods on controller to learn.
+  #
+  # resources_controller_for <name>, <options>, <&block>
+  #
+  # ClassMethods#nested_in <name>, <options>, <&block>
+  #
+  # map_resource <name>, <options>, <&block>
+  #
+  # === Customising finding and creating
   # If you want to implement something like query params you can override *find_resources*.  If you want to change the 
   # way your new resources are created you can override *new_resource*.
   #
   #   class PostsController < ApplicationController
-  #     resources_controller_for :forum
+  #     resources_controller_for :posts
   # 
   #     def find_resources
   #       resource_service.find :all, :order => params[:sort_by]
@@ -78,318 +270,155 @@ module Ardes#:nodoc:
   #   end
   #
   # In the same way, you can override *find_resource*.
-  # 
-  # === resource_service
-  # Internally, *resource_service* is used to find and create resources.  This is set to the resources
-  # class for a simple, non-nested, resource.  It is set to a has_many collection for nested resources.
-  # 
-  # But you can set it to any object that responds to :find and :new.
   #
-  # === Deeply nested resources
+  # === Writing controller actions
   #
-  # Finally, it works for deeply nested controllers as well:
-  # 
-  #   class CommentsController < ApplicationController
-  #     resources_controller_for :comments, :in => [:forum, :post]
-  #   end
-  # 
-  # The above code will add two before filters:
-  # 
-  #   @forum = Forum.find params[:forum_id]
-  #   @post = @forum.posts.find params[:post_id]
-  # 
-  # And sets the *resource_service* to:
-  # 
-  #   @post.comments
+  # You can make use of RC internals to simplify your actions.
   #
-  # === name_prefix
+  # Here's an example where you want to re-order an acts_as_list model.  You define a class method
+  # on the model (say *order_by_ids* which takes and array of ids).  You can then make use of *resource_service*
+  # (which makes use of awesome rails magic) to send correctly scoped messages to your models.
   #
-  # For routing to work, the controller must derive, or be told about the name_prefix.  If the name_prefix is not
-  # specified, it is derived by comparing the controller_name with the superclass controller_name.
+  # Here's how to write an order action
   #
-  # You can always set this yourself with self.name_prefix =
-  #
-  # Example
-  #   class PostsController < ApplicationController
-  #     resources_controller_for :posts # will use 'posts' as route_name, and '' as name_prefix
+  #   def order
+  #     resource_service.order_by_ids["things_order"]
   #   end
   #
-  #   class ForumPostsController < PostsController # notice inheritance
-  #     nested_in :forum # will use 'posts' as route_name, and 'forum_' as name_prefix
-  #   end
+  # the route
   #
-  # === polymorphic, or anonymous, resources
+  #   map.resources :things, :collection => {:order => :put}
   #
-  # If you have a controller for a polymorhpic association, you can use one resources controller to service all of the routes.
-  #   class TagsController < ApplicationController
-  #     resources_controller_for :tags
-  #     nested_in :taggable, :polymorphic => true
-  #   end
-  #   # This controller will work for routes with one level of nesting
-  #   # e.g. forums/2/tags and users/2/tags
+  # and the view can conatin a scriptaculous drag and drop with param name 'things_order'
   #
-  # If you want to have arbitrary nesting you can specify this with :load_enclosing
-  #   class TagsController < ApplicationController
-  #     resources_controller_for :tags
-  #     nested_in :taggable, :polymorphic => true, :load_enclosing => true
-  #   end
-  #   # This controller will work for routes with multiple level of nesting
-  #   #e.g. forums/2/tags, forums/2/posts/3/tags, forums/3/posts/1/comments/4/tags
-  #
-  # <b>Caveats for :anonymous and :load_enclosing</b>
-  # * This will only work properly if your model names and collections all follow the usual Rails conventions.  If they don't you can use before_filters and the block for nested_in to set things up correctly.
-  # * name_prefix is changed for each controller instance to reflect the way the resource was requested.  The usual conventions apply.
-  #
-  #   ActionController::Routing::Routes.draw do |map|
-  #     map.resources :forums do |forums|
-  #       forums.resources :tags, :name_prefix => 'forum_'
-  #       forums.resources :posts do |posts|
-  #         posts.resources :tags, :name_prefix => 'forum_post_'
-  #         posts.resources :comments do |comments|
-  #           comments.resources :tags, :name_prefix => 'forum_post_comment_'
-  #         end
-  #       end
-  #     end
-  #   end
-  #
-  # === Plays nice
-  # The assigns for the view will all be what you expect them to be (@post, @comment, etc) and the same goes for the params hash.
-  # 
+  # When this controller is invoked of /things the :order_by_ids message will be sent to the Thing class,
+  # when it's invoked by /foos/1/things, then :order_by_ids message will be send to Foo.find(1).things association
   module ResourcesController
-    # Specifies that this controller is a REST style controller for the named resource (a resources plural like :users, or a singleton resource like :account).  You can specify that the resource is a nested resource.
+    def self.extended(base)
+      base.class_eval do
+        class_inheritable_reader :resource_specification_map
+        write_inheritable_attribute(:resource_specification_map, {})
+      end
+    end
+    
+    # Specifies that this controller is a REST style controller for the named resource
     #
-    # Options:
-    # * <tt>:class_name:</tt> The class name of the resource, if it can't be inferred from its name
-    # * <tt>:collection_name:</tt> (synonym for :source)
-    # * <tt>:source:</tt> The name of the association used to get the resource(s)
-    # * <tt>:singleton:</tt> Default false, pass true if the resource is a singleton resource.  You may also pass a lambda which will be used to find the singleton.
-    # * <tt>:singleton_find_options:</tt> Passed to the class for finding the singleton record
-    # * <tt>:route_name:</tt> The name of the route (of the resources, i.e. :users), if it can't be inferred from the name of the controller
-    # * <tt>:name_prefix:</tt> The name_prefix of the named route, if it cannot be inferred from the controller heirachy (see nested_in)
-    # * <tt>:actions_include:</tt> A module, which will be included in the class, default is Ardes::ResourcesController::Actions, if set to false, no actions will be included.
-    # * <tt>:in:</tt> Ordered array of singular model names which correspond to nesting a resource.
-    # * <tt>:load_enclosing:</tt> Automagically load all of the enclosing resources, according to what route was used to invoke the controller
+    # Enclosing resources are loaded automatically by default, you can turn this off with
+    # :load_enclosing (see options below)
     #
-    # Examples:
-    #  
-    #  # resources examples
+    # resources_controller_for <name>, <options>, <&block>
     #
-    #  resources_controller_for :users
-    #  resources_controller_for :users, :class_name => 'Admin::Users', :actions_include => false
-    #  resources_controller_for :users, :route_name => :admin_users, :actions_include => MyOwnActions
-    #  resources_controller_for :posts, :in => :forum
-    #  resources_controller_for :comments, :in => [:forum, :post]
+    # ==== Options:
+    # * <tt>:singleton:</tt> (default false) set this to true if the resource is a Singleton
+    # * <tt>:find:</tt> (default null) set this to a symbol or Proc to specify how to find the resource.
+    #   Use this if the resource is found in an unconventional way.  Passing a block has the same effect as
+    #   setting :find => a Proc
+    # * <tt>:in:</tt> specify the enclosing resources, by name.  ClassMethods#nested_in can be used to 
+    #   specify this more fully.
+    # * <tt>:load_enclosing:</tt> (default true) loads enclosing resources automatically.
+    # * <tt>:actions:</tt? (default nil) set this to false if you don't want the default RC actions.  Set this
+    #   to a module to define your own actions.
     #
-    #  # singleton resource examples
+    # =====Options for unconvential use
+    # (otherwise these are all inferred from the _name_)
+    # * <tt>:route:</tt> the route name (without name_prefix) if it can't be inferred from _name_.
+    #   For a collection resource this should be plural, for a singleton it should be singular.
+    # * <tt>:source:</tt> a string or symbol (e.g. :users, or :user).  This is used to find the class or association name
+    # * <tt>:class:</tt> a Class.  This is the class of the resource (if it can't be inferred from _name_ or :source)
+    # * <tt>:key:</tt> (e.g. :user_id) used to find the resource id in params
+    # * <tt>:segment:</tt> (e.g. 'users') the segment name in the route that is matched
     #
-    #  resources_controller_for :user, :singleton => lambda{ @current_user }
-    #
-    #  resources_controller_for :user, :singleton => true, :in => :forum, :source => :owner
-    #
-    #  # load enclosing
-    #  resources_controller_for :tags, :load_enclosing => true
-    #
-    #    # if invoked by /forums/1/posts/2/tags/3 then the following will happen:
-    #    #
-    #    # @forum = Forum.find(1)
-    #    # @post = @forum.posts.find(2)
-    #    # @tag = @posts.tags.find(3)
-    #
-    #    # if invoked by /events/1/owner/tags/4 then the following will happen:
-    #    #
-    #    # @event = Event.find(1)
-    #    # @owner = @event.owner
-    #    # @tag = @owner.tags.find(4)
-    #
-    #
-    #  resources_controller_for :owner, :singleton => true, :load_enclosing => true
-    #
-    #    # if invoked by /events/1/owner then the following will happen:
-    #    #
-    #    # @event = Event.find(1)
-    #    # @owner = @event.owner
-    #    
-    #    # if invoked by /cats/3/owner
-    #    #
-    #    # @cat = Cat.find(3)
-    #    # @owner = @cat.owner
-    #  
     # === The :in option
+    # The default behavior is to set up before filters that load the enclosing resource, and to use associations on
+    # that model to find and create the resources.  See ClassMethods#nested_in for more details on this, and
+    # customising the default behaviour.
     #
-    # The default behavior is to set up before filters that load the enclosing resource, and to use associations on that
-    # model to find and create the resources.  See nested_in for more details on this, and customising the default behaviour
-    #
-    def resources_controller_for(name, options = {})
-      options.assert_valid_keys(:class_name, :collection_name, :source, :singleton, :actions_include, :route_name, :name_prefix, :in, :load_enclosing)
+    def resources_controller_for(name, options = {}, &block)
+      deprecated_resources_controller_for(options)
+      if included_modules.include?(ResourcesController::InstanceMethods)
+        raise ArgumentError, "controller is already resources_controller for '#{self.resource_name}'"
+      end
       
-      self.class_eval do
-        unless included_modules.include?(::Ardes::ResourcesController::InstanceMethods)
-          class_inheritable_accessor  :resources_name, :resource_name, :resource_class, :resource_source,
-            :resource_service_class, :enclosing_loaders, :name_prefix, :route_name, :find_singleton, :singleton
-          
-          self.enclosing_loaders = []
-          
-          include Ardes::ResourcesController::InstanceMethods
-          include Ardes::ResourcesController::UrlHelper
-          helper Ardes::ResourcesController::Helper
-          
-          options[:actions_include] = (options[:singleton] ? SingletonActions : Actions) if options[:actions_include].nil?
-          
-          prepend_before_filter :load_resources
+      options.assert_valid_keys(:class, :source, :singleton, :actions, :in, :find, :load_enclosing, :route, :segment)
+      
+      class_inheritable_reader :resource_specification, :specifications, :route_name
+      write_inheritable_attribute(:specifications, [])
+      
+      extend  ResourcesController::ClassMethods
+      helper  ResourcesController::Helper
+      include ResourcesController::InstanceMethods, ResourcesController::NamedRouteHelper
+      
+      if actions = options.delete(:actions)
+        include actions
+      elsif actions.nil?
+        include options[:singleton] ? ResourcesController::SingletonActions : ResourcesController::Actions
+      end
+      
+      route = (options.delete(:route) || name).to_s
+      name = options[:singleton] ? name.to_s : name.to_s.singularize
+      write_inheritable_attribute :route_name, options[:singleton] ? route : route.singularize
+      
+      prepend_before_filter :load_enclosing_resources
+      specifications << '*' unless options.delete(:load_enclosing) == false
+      if nested = options.delete(:in)
+        nested_in(*nested)
+      end
+      
+      write_inheritable_attribute(:resource_specification, Specification.new(name, options, &block))
+    end
+    
+    def deprecated_resources_controller_for(options)
+      options[:class] ||= options[:class_name] && options[:class_name].constantize
+      options[:source] ||= options[:collection_name]
+      options[:actions] = options[:actions_include] if options[:actions].nil?
+      options[:route] ||= options[:route_name]
+      [:class_name, :collection_name, :actions_include, :route_name].each do |k|
+        if options.key?(k)
+          ActiveSupport::Deprecation.warn("option :#{k} has been deprecated for resources_controller_for and will be removed soon")
+          options.delete(k)
         end
       end
-
-      include options[:actions_include] if options[:actions_include]
-
-      self.resource_source = options[:source] || options[:collection_name]
-      
-      if options[:singleton]
-        self.singleton = true
-        self.find_singleton = options[:singleton] if options[:singleton].is_a?(Proc)
-        self.resources_name, self.resource_name = name.to_s.pluralize, name.to_s
-        self.resource_service_class = SingletonResourceServiceProxy
-        self.resource_source ||= self.resource_name
-        self.route_name = (options[:route_name] || name).to_s
-      else
-        self.singleton = false
-        self.resources_name, self.resource_name = name.to_s, name.to_s.singularize
-        self.resource_source ||= self.resources_name
-        self.route_name = (options[:route_name] || name).to_s.singularize
+    end
+    
+    # Creates a resource specification mapping.  Use this to specify how to find an enclosing resource that
+    # does not obey usual rails conventions.  Most commonly this would be a singleton resource.
+    #
+    # See Specification#new for details of how to call this
+    def map_resource(name, options = {}, &block)
+      resource_specification_map[name.to_s] = Specification.new(name, options, &block)
+    end
+    
+    module ClassMethods
+      # Specifies that this controller has a particular enclosing resource.
+      #
+      # See Specification#new for details of how to call this.
+      def nested_in(*names, &block)
+        options = names.last.is_a?(Hash) ? names.pop : {}
+        raise ArgumentError, "when giving more than one nesting, you may not specify options or a block" if names.length > 1 and (block_given? or options.length > 0)
+        deprecated_nested_in(options)
+        names.each do |name|
+          specifications << (name.to_s == '*' ? '*' : Specification.new(name, options, &block))
+        end
       end
       
-      self.resource_class = (options[:class_name] || self.resource_name.camelize).constantize
-      self.name_prefix    = options[:name_prefix] if options[:name_prefix]
-      
-      add_load_enclosing(true) if options[:load_enclosing]
-      nested_in(*options[:in]) if options[:in]
-    end
-    
-    # Specifies that the resource is nested in another resource.  Can be called in two ways:
-    #
-    #   nested_in :resource[, options] [&block]
-    #   nested_in :resource1[, :resource2]...
-    #
-    # The latter version is equivalent to calling <tt>nested_in</tt> multiple times, and can only be used to provide the default functionality.
-    #
-    # The options for nested_in are
-    # * <tt>:class_name:</tt> The class name of the resource, if it can't be inferred from its name
-    # * <tt>:collection_name:</tt> synonym for :source
-    # * <tt>:source:</tt> The association that the resource belongs to, if it can't be inferred from its name
-    # * <tt>:foreign_key:</tt> The foreign key of the resource, if it can't be inferred from its name
-    # * <tt>:polymorphic:</tt> synonym for anonymous
-    # * <tt>:anonymous:</tt> set true if the nesting resource type should be inferred from the request
-    # * <tt>:load_enclosing:</tt> set true if you want the enclosing resources to be inferred from the request.  This can only be used on the last nested_in.
-    # * <tt>:name_prefix:</tt> The name_prefix of the named route, if it cannot be inferred from the controller heirachy (see nested_in).
-    # * <tt>:singleton:</tt> Pass true if the resource is a singleton resource
-    #
-    # <b>:anonymous and :name_prefix</b> If :anonymous has been set to true the name_prefix will be inferred from the request, pass false to not change the name prefix
-    #
-    # === Examples
-    # 
-    # Calling <tt>nested_in :foo</tt> will result in the following:
-    # * a before_filter which sets @foo according to params[:foo_id] (see load_enclosing_resource)
-    # * resource_service will change from being the resource class to being @foo.resources association
-    #
-    # === customise load_enclosing before_filter
-    # You can customise how the before_filter sets the nesting resource by passing a block which will be evaluated in the controller instance
-    # the value of this block is assigned to the nesting resource instance_variable
-    #  
-    #  resource_controller_for :posts
-    #  nested_in :forum do
-    #    Forum.find(params[:forum_id])  # e.g. @forum = Forum.find(2) (if params[:forum_id] == 2)
-    #  end
-    #
-    # (The above block just happens to be the default behaviour for a single nested controller)
-    #
-    #   resources_controller_for :info, :singular
-    #   nested_in :user, :singleton => true do
-    #     @current_user
-    #   end
-    
-    # === Deep nesting
-    # A typical resource that is multiply nested is found in the following way (example is forum has_many posts, each has_many comments):
-    # 
-    #  @forum = Forum.find(params[:forum_id])
-    #  @post = @forum.posts.fiind(params[:post_id])
-    #
-    #  @comments = @post.comments.find(:all)
-    #
-    # The first nesting resource is found from the class, and subsequent ones are found from a collection.  Because of this the first, and subsequent
-    # calls to nested_in have different options.
-    #
-    # * First nested_in: <tt>:class_name:</tt> the name of the class (e.g. 'Forum' in the above example) if it can't be inferred from the name
-    # * Subsequent nested_ins:<tt>:source:</tt> the name of the collection (e.g. 'posts' in the above example) if it can't be inferred from the name
-    #
-    # === Example using options
-    # If you're not using rails conventions that's ok.  Here's an example of how to do it
-    # 
-    # models are in Funky:: module, and collections are named 'the_*':
-    #  
-    #  class CommentsController < ApplicationController
-    #    resources_controller_for :comments, :source => :the_comments   # @post.the_comments will be used as the resource_service
-    #    nested_in :forum, :class_name => 'Funky::Forum'                # => Funky::Forum will be used to find @forum
-    #    nested_in :posts, :source => 'the_posts'                       # => @forum.the_posts will be used to find @post
-    #  end
-    #
-    # === Resource naming
-    # However, if your models are named according to the usual conventions, it will just work.
-    #
-    #  class CommentsController < ApplicationController
-    #    resources_controller_for :comments, :in => [:forum, :post]
-    #  end
-    #
-    def nested_in(*names, &block)
-      options = names.last.is_a?(Hash) ? names.pop : {}
-      raise ArgumentError "when giving more than one nesting, you may not specify options or a block" if names.length > 1 and (block_given? or options.length > 0)
-      names.each {|name| add_enclosing(name, options, &block)}
-    end
-    
-    def map_enclosing_resource(name, options = {}, &block)
-      enclosing_resource_map[name.to_s] = [options, block]
-    end
-    
-  private
-    def add_load_enclosing(load_all = false)
-      raise RuntimeError, "you can only specify :load_enclosing => true once" if read_inheritable_attribute(:_added_load_enclosing)
-      write_inheritable_attribute(:_added_load_enclosing, true)
-      enclosing_loaders << [:load_enclosing_resources, [load_all]]
-    end
-      
-    def add_enclosing(name, options = {}, &block)
-      raise RuntimeError, "you can't add any more nested_ins after :load_enclosing => true" if read_inheritable_attribute(:_added_load_enclosing)
-      
-      options.assert_valid_keys(:polymorphic, :anonymous, :load_enclosing, :class_name, :collection_name, :foreign_key, :name_prefix, :singleton)
-      options[:anonymous] = options[:anonymous] || options.delete(:polymorphic)
-      
-      unless options[:anonymous]
-        name_prefix = options.delete(:name_prefix) || "#{name}_"
-        self.name_prefix = "#{self.name_prefix}#{name_prefix}"
+      def deprecated_nested_in(options)
+        options[:class] ||= options[:class_name] && options[:class_name].constantize
+        options[:source] ||= options[:collection_name]
+        options[:key] ||= options[:foreign_key]
+        [:class_name, :collection_name, :load_enclosing, :polymorphic, :foreign_key].each do |k|
+          if options.key?(k)
+            ActiveSupport::Deprecation.warn("option :#{k} has been deprecated for nested_in and will be removed soon")
+            options.delete(k)
+          end
+        end      
       end
-      
-      add_load_enclosing if options[:load_enclosing]
-      enclosing_loaders << [:load_enclosing_resource, [name, options], block]
-    end
-    
-    def enclosing_resource_map
-      read_inheritable_attribute('_enclosing_resource_map') || write_inheritable_attribute('_enclosing_resource_map', {})
     end
     
     module InstanceMethods
       def self.included(base)
         base.send :hide_action, *instance_methods
-        
-        # the following accessors are set up to use the class attribute as default
-        # and also to allow setting on the instance, without affecting the class attribute
         base.class_eval do
-          attr_writer :name_prefix, :route_name
-                    
-          def route_name
-            @route_name ||= self.class.route_name
-          end
-          
-          def name_prefix
-            @name_prefix ||= self.class.name_prefix
-          end
+          attr_writer :resource_service
           
         protected
           # we define the find|new_resource(s) methods only if they're not already defined
@@ -413,8 +442,27 @@ module Ardes#:nodoc:
             def new_resource(attributes = params[resource_name])
               resource_service.new attributes
             end
-          end   
+          end
         end
+      end
+      
+      def name_prefix
+        @name_prefix ||= ''
+      end
+      
+      # name of the singular resource
+      def resource_name
+        resource_specification.name
+      end
+      
+      # name of the resource collection
+      def resources_name
+        @resources_name ||= resource_specification.name.pluralize
+      end
+      
+      # returns the controller's resource class
+      def resource_class
+        resource_specification.klass
       end
       
       # returns the controller's current resource
@@ -423,8 +471,8 @@ module Ardes#:nodoc:
       end
       
       # sets the controller's current resource
-      def resource=(elem)
-        instance_variable_set("@#{resource_name}", elem)
+      def resource=(record)
+        instance_variable_set("@#{resource_name}", record)
       end
   
       # returns the controller's current resources collection
@@ -433,187 +481,177 @@ module Ardes#:nodoc:
       end
       
       # sets the controller's current resource collection
-      def resources=(coll)
-        instance_variable_set("@#{resources_name}", coll)
+      def resources=(collection)
+        instance_variable_set("@#{resources_name}", collection)
       end
       
       # returns the immediately enclosing resource
       def enclosing_resource
-        @enclosing_resource ||= enclosing_resources.last
-      end
-    
-      # returns the current resource service.  This is used to find and create resources.  This will
-      # be either an ActiveRecord, or an association proxy, or a resource service proxy
-      def resource_service
-        @resource_service ||= if resource_service_class
-          resource_service_class.new(self)
-        elsif enclosing_resource
-          enclosing_resource.send(resource_source)
-        else
-          resource_class
-        end
+        enclosing_resources.last
       end
       
-      # sets the current resource service, which is usually an ActiveRecord class, or an association proxy
-      #
-      # If you wish to provide a customised resource service you need to make sure the object responds
-      # appropriately to:
-      # * find :all
-      # * find id
-      # * new
-      def resource_service=(service)
-        @resource_service = service
+      # returns the name of the immediately enclosing resource
+      def enclosing_resource_name
+        enclosing_resource && @enclosing_resource_name ||= enclosing_resource.class.name.underscore
       end
-    
+        
+      def resource_service
+        @resource_service ||= resource_specification.singleton? ? SingletonResourceService.new(self) : ResourceService.new(self)
+      end
+      
     private
       # returns an array of the controller's enclosing (nested in) resources
       def enclosing_resources
         @enclosing_resources ||= []
       end
   
-      # returns an array of the enclosing resources used for routes (i.e. non-singleton enclosing resources)
-      def route_resources
-        @route_resources ||= []
+      # returns an array of the non singleton enclosing resources, this is used for generating routes.
+      def non_singleton_resources
+        @non_singleton_resources ||= []
       end
 
+      # returns the route that was used to invoke this controller and current action
       def recognized_route
-        routes =  ::ActionController::Routing::Routes.routes_for_controller_and_action(controller_name, action_name)
-        @recognized_route ||= routes.find do |route|
+        @recognized_route ||= ::ActionController::Routing::Routes.routes_for_controller_and_action(controller_name, action_name).find do |route|
           route.recognize(request.path, ::ActionController::Routing::Routes.extract_request_environment(request))
         end
       end
       
-      # returns an array containing hashes like {:name => resource name, :key => params key, :value => params value, :name_prefix => 'prefix segment'}
-      # corresponding to the enclosing resources.
-      def resources_request
-        unless @resources_request
-          enclosing_request = enclosing_route_segments.inject([]) do |request, segment|
-            unless segment.is_optional or segment.is_a?(::ActionController::Routing::DividerSegment)
-              if segment.is_a?(::ActionController::Routing::StaticSegment)
-                request << {:name => segment.value}
-              elsif segment.is_a?(::ActionController::Routing::DynamicSegment)
-                request.last.merge!(:key => segment.key)
-              end
-            end
-            request
-          end
-          enclosing_request.each do |request|
-            request[:name_prefix] = (request[:key] ? request[:name].singularize : request[:name]) + '_'
-          end
-          @resources_request = enclosing_request
-        end
-        @resources_request
-      end
-      
-      # pop off segments up to and including the current resource.  This will also remove any static action segments 
+      # returns the all route segments except for the ones corresponding to the current resource and action
       def enclosing_route_segments
         segments = recognized_route.segments.dup
-        route_name = singleton ? self.route_name : self.route_name.pluralize
         while segments.size > 0
           segment = segments.pop
-          return segments if segment.is_a?(::ActionController::Routing::StaticSegment) and segment.value == route_name
+          return segments if segment.is_a?(::ActionController::Routing::StaticSegment) && segment.value == resource_specification.segment
         end
-        raise "Could not recognize '#{route_name}' in '#{recognized_route}'" if segments.size == 0
+        ResourcesController.raise_missing_route_segment(self)
       end
       
-      def load_resources
-        enclosing_loaders.each do |method|
-          send(method[0], *(method[1] || []), &method[2])
+      # Returns an array of pairs [<name>, <singleton?>] e.g. [[users, false], [blog, true], [posts, false]]
+      # corresponding to the enclosing resources.
+      #
+      # This is used to map resources and automatically load resources.
+      def route_resource_names
+        @route_resource_names ||= returning(Array.new) do |req|
+          enclosing_route_segments.each do |segment|
+            unless segment.is_optional or segment.is_a?(::ActionController::Routing::DividerSegment)
+              req << [segment.value, true] if segment.is_a?(::ActionController::Routing::StaticSegment)
+              req.last[1] = false if segment.is_a?(::ActionController::Routing::DynamicSegment)
+            end
+          end
         end
       end
       
-      # load any remaining enclosing resources that nest the current nested_in
-      def load_enclosing_resources(load_all = false)
-        enclosing_request = resources_request.dup
-        # ignore the lat request item if it's going to be loaded by a nested_in
-        enclosing_request.pop unless load_all 
-
-        enclosing_request.slice(enclosing_resources.size..-1).each do |request_item|
-          load_enclosing_resource(request_item[:name], :anonymous => true, :singleton => !request_item[:key])
+      def load_enclosing_resources
+        specifications.each_with_index do |spec, idx|
+          spec == '*' ? load_wildcards(specifications[idx+1]) : spec.load_into(self)
         end
+        resource_specification.controller = self
       end
     
-      def load_enclosing_resource(name, options = {}, &block)
-        name = options[:singleton] ? name.to_s : name.to_s.singularize
-        map = self.class.send(:enclosing_resource_map)
-        if map[name]
-          options = map[name].first.merge(:anonymous => true)
-          block = map[name].last
+      def load_wildcards(to_spec)
+        return if to_spec == '*'
+        route_resource_names.slice(enclosing_resources.size..-1).each do |segment, singleton|
+          return if to_spec && to_spec.segment == segment
+          name = singleton ? segment : segment.singularize
+          if resource_specification_map[name]
+            resource_specification_map[name].load_into(self)
+          else
+            Specification.new(name, :singleton => singleton).load_into(self)
+          end
         end
-        enclosing_resource = block ? instance_eval(&block) : find_enclosing_resource(name, options)
-        update_name_prefix(options[:name_prefix]) if options[:anonymous] && options[:name_prefix] != false
-        enclosing_resources.push(enclosing_resource)
-        route_resources.push(enclosing_resource) unless options[:singleton]
-        instance_variable_set("@#{name}", enclosing_resource)
       end
-    
+      
       def update_name_prefix(name_prefix)
-        name_prefix ||= resources_request[enclosing_resources.size][:name_prefix]
-        self.name_prefix = "#{self.name_prefix}#{name_prefix}"
+        @name_prefix = "#{@name_prefix}#{name_prefix}"
+      end
+    end
+    
+    # Proxy class to provide a consistent API for resource_service.  This is mostly
+    # required for Singleton resources. Also allows decoration of the resource service with custom finders
+    class ResourceService < Builder::BlankSlate
+      attr_reader :controller
+      delegate :resource_specification, :resource_class, :enclosing_resource, :to => :controller
+      
+      def initialize(controller)
+        @controller = controller
+      end
+            
+      def method_missing(*args, &block)
+        service.send(*args, &block)
+      end
+      
+      def find(*args, &block)
+        resource_specification.find ? resource_specification.find_custom : super
+      end
+      
+      def respond_to?(method)
+        super || service.respond_to?(method)
       end
     
-      # This is the default method for finding an enclosing resource, if a block is not given to nested_in
-      def find_enclosing_resource(name, options)
-        source_name = options[:anonymous] ? resources_request[enclosing_resources.size][:name] : options[:class_name] || options[:source] || name
-        
-        if options[:singleton]
-          raise_singleton_resource_find_error(name, source_name) if enclosing_resources.size == 0
-          enclosing_resources.last.send(source_name)
+      def service
+        @service ||= enclosing_resource ? enclosing_resource.send(resource_specification.source) : resource_class
+      end
+    end
+    
+    class SingletonResourceService < ResourceService
+      def find(*args)
+        if resource_specification.find
+          resource_specification.find_custom
+        elsif enclosing_resource
+          enclosing_resource.send(resource_specification.source)
         else
-          id_key = options[:anonymous] ? resources_request[enclosing_resources.size][:key] : options[:foreign_key] || name.foreign_key
-          source = enclosing_resources.size == 0 ? source_name.classify.constantize : enclosing_resources.last.send(source_name.tableize)
-          source.find(params[id_key])
+          ResourcesController.raise_cant_find_singleton(controller.resource_name, controller.resource_class)
         end
       end
-    
-      def raise_singleton_resource_find_error(name, class_name)
-        raise RuntimeError, <<-end_str
-Can't get singleton resource from class #{class_name}. You have have probably done something like:
 
-nested_in :#{name}, :singleton => true  # <= where this is the first nested_in
+      # build association on the enclosing resource if there is one
+      def new(*args)
+        enclosing_resource ? enclosing_resource.send("build_#{resource_specification.source}", *args) : super
+      end
+
+      def service
+        resource_class
+      end
+    end
+    
+    class CantFindSingleton < RuntimeError #:nodoc:
+    end
+
+    class MissingRouteSegment < RuntimeError #:nodoc:
+    end
+
+    class << self
+      def raise_cant_find_singleton(name, klass) #:nodoc:
+        raise CantFindSingleton, <<-end_str
+Can't get singleton resource from class #{klass.name}. You have have probably done something like:
+
+  nested_in :#{name}, :singleton => true  # <= where this is the first nested_in
 
 You should tell resources_controller how to find the singleton resource like this:
 
-nested_in :#{name}, :singleton => true do
-  #{class_name}.find(<.. your find args here ..>)
-end
+  nested_in :#{name}, :singleton => true do
+    #{klass.name}.find(<.. your find args here ..>)
+  end
 
-Or, you have :load_enclosing => true, and the route has a singleton resource as it's first segment.  In which
-case you need to tell the controller how to find that resource.  Do this by:
-  
-map_resource :#{name}, options, { how to find }
+Or: 
+  nested_in :#{name}, :singleton => true, :find => <.. method name or lambda ..>
+
+Or, you may be relying on the route to load the resource, in which case you need to give RC some
+help.  Do this by mapping the route segment to a resource in the controller, or a parent or mixin
+
+  map_resource :#{name}, :singleton => true <.. as above ..>
 end_str
       end
-    end
-    
-    class ResourceServiceProxy < Builder::BlankSlate
-      def initialize(controller)
-        @_controller = controller
-      end
-      
-      def method_missing(*args, &block)
-        @_controller.enclosing_resource ? @_controller.enclosing_resource.send(*args, &block) : @_controller.resource_class.send(*args, &block)
-      end
-    end
-    
-    # Singleton associations can have .find and .new sent to them
-    class SingletonResourceServiceProxy < ResourceServiceProxy
-      def find(*args)
-        if @_controller.find_singleton
-          @_controller.instance_eval(&@_controller.find_singleton)
-        elsif @_controller.enclosing_resource
-          @_controller.enclosing_resource.send(@_controller.resource_source)
-        else
-          @_controller.resource_class.find(*args)
-        end
-      end
-      
-      def new(*args)
-        if @_controller.enclosing_resource
-          @_controller.enclosing_resource.send("build_#{@_controller.resource_source}", *args)
-        else
-          @_controller.resource_class.new(*args)
-        end
+
+      def raise_missing_route_segment(controller) #:nodoc:
+        raise MissingRouteSegment, <<-end_str
+Could not recognize segment '#{controller.resource_specification.segment_name}' in route:
+  #{controller.send(:recognized_route)}
+
+Check that config/routes.rb defines a route named '#{controller.name_prefix}#{controller.route_name}'
+  for controller: #{controller.controller_name.camelize}Controller"
+end_str
       end
     end
   end

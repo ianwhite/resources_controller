@@ -14,6 +14,14 @@ module Ardes#:nodoc:
     #  <% for event in resources %>
     #    <%= link_to 'edit', edit_resource_path(event) %>
     #
+    # == Enclosing resource
+    #
+    # For controllers with enclosing resources instead of writing:
+    #  <%= link_to 'back to Forum', forum_path(@forum) %>
+    #
+    # you may write: (which will work for any enclosing path)
+    #  <%= link_to "back to #{enclosing_resource.class.name.titleize}", enclosing_resource_path %>
+    #
     # == Enclosing named routes:
     #
     # In addition you can reference named routes that are 'below' the current resource
@@ -31,12 +39,11 @@ module Ardes#:nodoc:
     #  <% for taggable in resources %>
     #    <%= link_to 'tags', resource_tags_path(taggable) %>
     #
-    # See UrlHelpers for more detail
     module Helper
       def self.included(base)
         base.class_eval do
-          alias_method_chain :method_missing, :url_helper
-          alias_method_chain :respond_to?, :url_helper
+          alias_method_chain :method_missing, :named_route_helper
+          alias_method_chain :respond_to?, :named_route_helper
         end
       end
 
@@ -65,7 +72,7 @@ module Ardes#:nodoc:
         resource = args[0] || self.resource
         options[:html]          ||= {}
         options[:html][:method] ||= resource.new_record? ? :post : :put
-        options[:url]           ||= resource.new_record? ? resources_path : resource_path
+        options[:url]           ||= resource.new_record? ? resources_path : resource_path(resource)
         form_for(resource_name, resource, options, &block)
       end
 
@@ -74,7 +81,7 @@ module Ardes#:nodoc:
         resource = args[0] || self.resource
         options[:html]          ||= {}
         options[:html][:method] ||= resource.new_record? ? :post : :put
-        options[:url]           ||= resource.new_record? ? resources_path : resource_path
+        options[:url]           ||= resource.new_record? ? resources_path : resource_path(resource)
         remote_form_for(resource_name, resource, options, &block)
       end
 
@@ -98,19 +105,22 @@ module Ardes#:nodoc:
         controller.enclosing_resource
       end
 
-      # delegate url helper method to the controller
-      def method_missing_with_url_helper(method, *args, &block)
-        if controller.resource_url_helper_method?(method) 
-          self.class.send :module_eval, "def #{method}(*args); controller.#{method}(*args); end"
+      def enclosing_resource_name
+        controller.enclosing_resource_name
+      end
+    
+      # delegate named_route helper method to the controller
+      def method_missing_with_named_route_helper(method, *args, &block)
+        if controller.resource_named_route_helper_method?(method) 
           controller.send(method, *args)
         else
-          method_missing_without_url_helper(method, *args, &block)
+          method_missing_without_named_route_helper(method, *args, &block)
         end
       end
 
       # delegate url help method creation to the controller
-      def respond_to_with_url_helper?(method)
-        respond_to_without_url_helper?(method) || controller.resource_url_helper_method?(method)
+      def respond_to_with_named_route_helper?(method)
+        respond_to_without_named_route_helper?(method) || controller.resource_named_route_helper_method?(method)
       end
     end
   end

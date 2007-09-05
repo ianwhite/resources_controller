@@ -1,5 +1,9 @@
 module Ardes#:nodoc:
   module ResourcesController
+    
+    class CantMapRoute < ArgumentError #:nodoc:
+    end
+    
     # This module provides methods are provided to aid in writing inheritable controllers.
     #
     # When writing an action that redirects to the list of resources, you may use *resources_url* and the controller
@@ -19,7 +23,7 @@ module Ardes#:nodoc:
     #    resource_tags_path(foo)               # => post_attachments_tags_paths(<current post>, foo)
     #
     #    enclosing_resource_path               # => post_path(<current post>)
-    #    route_resources_path              # => posts_path
+    #    enclosing_resources_path              # => posts_path
     #    enclosing_resource_tags_path          # => post_tags_path(<current post>)
     #    enclosing_resource_path(2)            # => post_path(2)
     #
@@ -27,34 +31,34 @@ module Ardes#:nodoc:
     #
     # These methods are defined as they are used.  The ActionView Helper module delegates to the current controller to access these
     # methods
-    module UrlHelper
+    module NamedRouteHelper
       def self.included(base)
         base.class_eval do
-          alias_method_chain :method_missing, :url_helper
-          alias_method_chain :respond_to?, :url_helper
+          alias_method_chain :method_missing, :named_route_helper
+          alias_method_chain :respond_to?, :named_route_helper
         end
       end
 
-      def method_missing_with_url_helper(method, *args, &block)
+      def method_missing_with_named_route_helper(method, *args, &block)
         # TODO: test that methods are only defined once
-        if resource_url_helper_method?(method, raise_error = true) 
-          define_resource_url_helper_method(method)
+        if resource_named_route_helper_method?(method, raise_error = true) 
+          define_resource_named_route_helper_method(method)
           send(method, *args)
-        elsif resource_url_helper_method_for_name_prefix?(method)
-          define_resource_url_helper_method_for_name_prefix(method)
+        elsif resource_named_route_helper_method_for_name_prefix?(method)
+          define_resource_named_route_helper_method_for_name_prefix(method)
           send(method, *args)
         else
-          method_missing_without_url_helper(method, *args, &block)
+          method_missing_without_named_route_helper(method, *args, &block)
         end
       end
 
-      def respond_to_with_url_helper?(method)
-        respond_to_without_url_helper?(method) || resource_url_helper_method?(method)
+      def respond_to_with_named_route_helper?(method)
+        respond_to_without_named_route_helper?(method) || resource_named_route_helper_method?(method)
       end
 
       # return true if the passed method (e.g. 'resources_path') corresponds to a defined
       # named route helper method
-      def resource_url_helper_method?(resource_method, raise_error = false)
+      def resource_named_route_helper_method?(resource_method, raise_error = false)
         if resource_method.to_s =~ /_(path|url)$/ && resource_method.to_s =~ /(^|^.*_)enclosing_resource(s)?_/
           _, route_method = *route_and_method_from_enclosing_resource_method_and_name_prefix(resource_method, name_prefix)
         elsif resource_method.to_s =~ /_(path|url)$/ && resource_method.to_s =~ /(^|^.*_)resource(s)?_/
@@ -62,16 +66,22 @@ module Ardes#:nodoc:
         else
           return false
         end
-        respond_to_without_url_helper?(route_method) || (raise_error && raise_resource_url_mapping_error(resource_method, route_method))
+        respond_to_without_named_route_helper?(route_method) || (raise_error && raise_resource_url_mapping_error(resource_method, route_method))
       end
 
     private
       def raise_resource_url_mapping_error(resource_method, route_method)
-        raise NoMethodError, <<-end_str
-Tried to map :#{resource_method} to :#{route_method}, which doesn't exist.
-You may not have defined the route in config/routes.rb. Or, you may need to
-explicictly set route_name and name_prefix in resources_controller_for.
-Currently route_name is '#{route_name}' and name_prefix is '#{name_prefix}'
+        raise CantMapRoute, <<-end_str
+Tried to map :#{resource_method} to :#{route_method},
+which doesn't exist. You may not have defined the route in config/routes.rb.
+
+Or, if you have unconventianal route names or name prefixes, you may need
+to explicictly set the :route option in resources_controller_for, and set
+the :name_prefix option on your enclosing resources.
+
+Currently:
+  :route is '#{route_name}'
+  generated name_prefix is '#{name_prefix}'
         end_str
       end
       
@@ -95,7 +105,7 @@ Currently route_name is '#{route_name}' and name_prefix is '#{name_prefix}'
       end
       
       # defines a method that calls the appropriate named route method, with appropraite args.
-      def define_resource_url_helper_method(method)
+      def define_resource_named_route_helper_method(method)
         self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
           def #{method}(*args)
             send "#{method}_for_\#{name_prefix}", *args
@@ -103,11 +113,11 @@ Currently route_name is '#{route_name}' and name_prefix is '#{name_prefix}'
         end_eval
       end
 
-      def resource_url_helper_method_for_name_prefix?(method)
-        method.to_s =~ /_for_.*$/ && resource_url_helper_method?(method.to_s.sub(/_for_.*$/,''))
+      def resource_named_route_helper_method_for_name_prefix?(method)
+        method.to_s =~ /_for_.*$/ && resource_named_route_helper_method?(method.to_s.sub(/_for_.*$/,''))
       end
 
-      def define_resource_url_helper_method_for_name_prefix(method)
+      def define_resource_named_route_helper_method_for_name_prefix(method)
         resource_method = method.to_s.sub(/_for_.*$/,'')
         name_prefix = method.to_s.sub(/^.*_for_/,'')
         if resource_method =~ /enclosing_resource/
@@ -117,7 +127,7 @@ Currently route_name is '#{route_name}' and name_prefix is '#{name_prefix}'
           self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
             def #{method}(*args)
               options = args.last.is_a?(Hash) ? args.pop : {}
-              args = args.size < #{required_args} ? route_resources + args : route_resources - [enclosing_resource] + args
+              args = args.size < #{required_args} ? non_singleton_resources + args : non_singleton_resources - [enclosing_resource] + args
               args = args + [options] if options.size > 0
               send :#{route_method}, *args
             end
@@ -130,9 +140,9 @@ Currently route_name is '#{route_name}' and name_prefix is '#{name_prefix}'
           self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
             def #{method}(*args)
               options = args.last.is_a?(Hash) ? args.pop : {}
-              #{"args = [resource] + args if route_resources.size + args.size < #{required_args}" if required_args > 0}
+              #{"args = [resource] + args if non_singleton_resources.size + args.size < #{required_args}" if required_args > 0}
               args = args + [options] if options.size > 0
-              send :#{route_method}, *(route_resources + args)
+              send :#{route_method}, *(non_singleton_resources + args)
             end
           end_eval
         end
