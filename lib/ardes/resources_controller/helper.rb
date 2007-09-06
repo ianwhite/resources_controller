@@ -109,7 +109,8 @@ module Ardes#:nodoc:
         controller.enclosing_resource_name
       end
     
-      # delegate named_route helper method to the controller, keep the delegation
+      # Delegate named_route helper method to the controller.  Create the delegation
+      # to short circuit the method_missing call for future invocations.
       def method_missing_with_named_route_helper(method, *args, &block)
         if controller.resource_named_route_helper_method?(method)
           self.class.send(:delegate, method, :to => :controller)
