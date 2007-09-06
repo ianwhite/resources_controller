@@ -1,3 +1,6 @@
+* The Routing patch has been removed from RC as it has been accepted and applied to edge (#8930).
+  This is not a dependency of RC, but it is of the specs - so grab latest edge to run them.
+
 * Major internal changes, and some API change: see the rdoc for details.
   The headlines:
    - load_enclosing is now true by default
