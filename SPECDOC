@@ -302,6 +302,7 @@ Requesting /forums using XHR POST
 - should create a new forum
 - should not set the flash notice
 - should render create.rjs
+- should render new.rjs if unsuccesful
 
 Requesting /forums/1 using PUT
 - should find the forum requested
@@ -316,6 +317,7 @@ Requesting /forums/1 using XHR PUT
 - should not set the flash notice
 - should assign the found forum for the view
 - should render update.rjs
+- should render edit.rjs, on unsuccessful save
 
 Requesting /forums/1 using DELETE
 - should find the forum requested
@@ -579,6 +581,6 @@ ResourcesController#route_resource_names (route_name:tag, :singleton:false)
 - :account_info_tags should be [["account", true], ["info", true]]
 - :new_account_info_tag should be [["account", true], ["info", true]]
 
-Finished in 3.935699 seconds
+Finished in 4.112751 seconds
 
-402 examples, 0 failures
+404 examples, 0 failures

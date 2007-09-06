@@ -490,6 +490,12 @@ describe "Requesting /forums using XHR POST" do
     do_post
     response.should render_template('create')
   end
+  
+  it "should render new.rjs if unsuccesful" do
+    @mock_forum.stub!(:save).and_return(false)
+    do_post
+    response.should render_template('new')
+  end
 end
 
 describe "Requesting /forums/1 using PUT" do
@@ -570,6 +576,12 @@ describe "Requesting /forums/1 using XHR PUT" do
   it "should render update.rjs" do
     do_update
     response.should render_template('update')
+  end
+  
+  it "should render edit.rjs, on unsuccessful save" do
+    @mock_forum.stub!(:update_attributes).and_return(false)
+    do_update
+    response.should render_template('edit')
   end
 end
 

@@ -499,7 +499,7 @@ module Ardes#:nodoc:
         @resource_service ||= resource_specification.singleton? ? SingletonResourceService.new(self) : ResourceService.new(self)
       end
       
-    private
+    protected
       # returns an array of the controller's enclosing (nested in) resources
       def enclosing_resources
         @enclosing_resources ||= []
@@ -510,6 +510,7 @@ module Ardes#:nodoc:
         @non_singleton_resources ||= []
       end
 
+    private
       # returns the route that was used to invoke this controller and current action
       def recognized_route
         @recognized_route ||= ::ActionController::Routing::Routes.routes_for_controller_and_action(controller_name, action_name).find do |route|
@@ -542,6 +543,9 @@ module Ardes#:nodoc:
         end
       end
       
+      # this is the before_filter that 
+      # * loads all specified and wilcard resources
+      # * sets the controller instance to the current resource specification
       def load_enclosing_resources
         specifications.each_with_index do |spec, idx|
           spec == '*' ? load_wildcards(specifications[idx+1]) : spec.load_into(self)
@@ -549,6 +553,9 @@ module Ardes#:nodoc:
         resource_specification.controller = self
       end
     
+      # loads resoources from the route segments, using the segment names to either
+      # * map to a specification, or
+      # * create a specification using the segment name
       def load_wildcards(to_spec)
         return if to_spec == '*'
         route_resource_names.slice(enclosing_resources.size..-1).each do |segment, singleton|
@@ -562,6 +569,9 @@ module Ardes#:nodoc:
         end
       end
       
+      # The name prefix is used for forwarding urls.  This is different dependning on
+      # which route the controller was invoked by.  The resource spcifications build
+      # up the name prefix as the resources are loaded.
       def update_name_prefix(name_prefix)
         @name_prefix = "#{@name_prefix}#{name_prefix}"
       end
