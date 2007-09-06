@@ -1,3 +1,6 @@
+* Minor doc improvements
+  Speced better js response on edit and new actions [Jason Lee <jlsync@gmail.com>]
+
 * The Routing patch has been removed from RC as it has been accepted and applied to edge (#8930).
   This is not a dependency of RC, but it is of the specs - so grab latest edge to run them.
 
