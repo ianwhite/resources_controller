@@ -656,7 +656,7 @@ end_str
 
       def raise_missing_route_segment(controller) #:nodoc:
         raise MissingRouteSegment, <<-end_str
-Could not recognize segment '#{controller.resource_specification.segment_name}' in route:
+Could not recognize segment '#{controller.resource_specification.segment}' in route:
   #{controller.send(:recognized_route)}
 
 Check that config/routes.rb defines a route named '#{controller.name_prefix}#{controller.route_name}'
