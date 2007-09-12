@@ -514,7 +514,24 @@ module Ardes#:nodoc:
       # returns the route that was used to invoke this controller and current action
       def recognized_route
         @recognized_route ||= ::ActionController::Routing::Routes.routes_for_controller_and_action(controller_name, action_name).find do |route|
-          route.recognize(request.path, ::ActionController::Routing::Routes.extract_request_environment(request))
+          route.recognize(request.path, ::ActionController::Routing::Routes.extract_request_environment(request)) or raise RuntimeError, <<-end_str
+resources_controller could not recognize a route that that the controller
+was invoked with.  This is probably being raised in a test.
+
+  The controller name is '#{controller_name}'
+  The request.path is '#{request.path}'
+  The route request environment is:
+    #{::ActionController::Routing::Routes.extract_request_environment(request).inspect}
+  
+Possible reasons for this:
+  - routes have not been loaded
+  - the controller has been invoked with params that don't correspond to a
+    route (and so would never be invoked in a real app)
+  - the test can't figure out which route corresponds to the params, in this 
+    case you may need to stub the recognized_route. (rspec example:)
+    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:the_route])
+    
+          end_str
         end
       end
       
