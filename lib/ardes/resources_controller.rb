@@ -677,7 +677,7 @@ end_str
 Could not recognize segment '#{controller.resource_specification.segment}' in route:
   #{controller.send(:recognized_route)}
 
-Check that config/routes.rb defines a route named '#{controller.name_prefix}#{controller.route_name}'
+Check that config/routes.rb defines a route named '#{controller.name_prefix}#{resource_specification.singleton? ? controller.route.pluralize : controller.route}'
   for controller: #{controller.controller_name.camelize}Controller"
 end_str
       end
