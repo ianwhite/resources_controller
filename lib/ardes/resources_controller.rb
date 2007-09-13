@@ -515,30 +515,15 @@ module Ardes#:nodoc:
       def recognized_route
         @recognized_route ||= ::ActionController::Routing::Routes.routes_for_controller_and_action(controller_name, action_name).find do |route|
           route.recognize(request.path, ::ActionController::Routing::Routes.extract_request_environment(request))
-        end
-        @recognized_route or raise RuntimeError, <<-end_str
-resources_controller could not recognize a route that that the controller
-was invoked with.  This is probably being raised in a test.
-
-The controller name is '#{controller_name}'
-The request.path is '#{request.path}'
-The route request environment is:
-  #{::ActionController::Routing::Routes.extract_request_environment(request).inspect}
-
-Possible reasons for this:
-- routes have not been loaded
-- the controller has been invoked with params that don't correspond to a
-  route (and so would never be invoked in a real app)
-- the test can't figure out which route corresponds to the params, in this 
-  case you may need to stub the recognized_route. (rspec example:)
-  @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:the_route])
-  
-        end_str
+        end or ResourcesController.raise_no_recognized_route(self)
       end
       
       # returns the all route segments except for the ones corresponding to the current resource and action
       def enclosing_route_segments
         segments = recognized_route.segments.dup
+        if segments.select{|s| s.is_a?(ActionController::Routing::DynamicSegment)}.collect(&:key) == [:controller, :action, :id]
+          logger.warn "resources_controller: #{controller_name} has recognized the default route: #{recognized_route}"
+        end
         while segments.size > 0
           segment = segments.pop
           return segments if segment.is_a?(::ActionController::Routing::StaticSegment) && segment.value == resource_specification.segment
@@ -649,6 +634,9 @@ Possible reasons for this:
     class MissingRouteSegment < RuntimeError #:nodoc:
     end
 
+    class NoRecognizedRoute < RuntimeError #:nodoc:
+    end
+
     class << self
       def raise_cant_find_singleton(name, klass) #:nodoc:
         raise CantFindSingleton, <<-end_str
@@ -680,6 +668,27 @@ Could not recognize segment '#{controller.resource_specification.segment}' in ro
 Check that config/routes.rb defines a route named '#{controller.name_prefix}#{controller.resource_specification.singleton? ? controller.route_name : controller.route_name.pluralize}'
   for controller: #{controller.controller_name.camelize}Controller"
 end_str
+      end
+      
+      def raise_no_recognized_route(controller) #:nodoc:
+        raise NoRecognizedRoute, <<-end_str
+resources_controller could not recognize a route that that the controller
+was invoked with.  This is probably being raised in a test.
+
+The controller name is '#{controller_name}'
+The request.path is '#{request.path}'
+The route request environment is:
+  #{::ActionController::Routing::Routes.extract_request_environment(request).inspect}
+
+Possible reasons for this:
+- routes have not been loaded
+- the controller has been invoked with params that don't correspond to a
+  route (and so would never be invoked in a real app)
+- the test can't figure out which route corresponds to the params, in this 
+  case you may need to stub the recognized_route. (rspec example:)
+  @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:the_route])
+  
+        end_str
       end
     end
   end
