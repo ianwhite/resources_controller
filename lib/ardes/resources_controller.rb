@@ -522,7 +522,7 @@ module Ardes#:nodoc:
       def enclosing_route_segments
         segments = recognized_route.segments.dup
         if segments.select{|s| s.is_a?(ActionController::Routing::DynamicSegment)}.collect(&:key) == [:controller, :action, :id]
-          logger.warn "resources_controller: #{controller_name} has recognized the default route: #{recognized_route}"
+          logger.warn "WARNING: resources_controller: #{controller_name} has recognized the default route: #{recognized_route}"
         end
         while segments.size > 0
           segment = segments.pop
