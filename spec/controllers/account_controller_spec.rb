@@ -52,7 +52,7 @@ describe AccountController, "#resource_service" do
   
   it ".find should call whatever is in resource_specification @find" do
     @controller.should_receive(:lambda_called).once.and_return(@current_user)
-    @controller.resource_specification.instance_variable_set "@find", lambda { lambda_called }
+    @controller.send(:resource_specification).instance_variable_set "@find", lambda { lambda_called }
     @resource_service.find
   end
 end

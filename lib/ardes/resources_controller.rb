@@ -341,7 +341,7 @@ module Ardes#:nodoc:
       
       options.assert_valid_keys(:class, :source, :singleton, :actions, :in, :find, :load_enclosing, :route, :segment)
       
-      class_inheritable_reader :resource_specification, :specifications, :route_name
+      class_inheritable_reader :specifications, :route_name
       write_inheritable_attribute(:specifications, [])
       
       extend  ResourcesController::ClassMethods
@@ -364,7 +364,7 @@ module Ardes#:nodoc:
         nested_in(*nested)
       end
       
-      write_inheritable_attribute(:resource_specification, Specification.new(name, options, &block))
+      write_inheritable_attribute(:resource_specification, Specification.new(name, options, &block).freeze)
     end
     
     def deprecated_resources_controller_for(options)
@@ -411,6 +411,10 @@ module Ardes#:nodoc:
             options.delete(k)
           end
         end      
+      end
+      
+      def resource_specification
+        read_inheritable_attribute(:resource_specification)
       end
     end
     
@@ -510,6 +514,12 @@ module Ardes#:nodoc:
         @non_singleton_resources ||= []
       end
 
+      def resource_specification
+        @resource_specification ||= returning self.class.resource_specification.dup do |specification|
+          specification.controller = self
+        end
+      end
+      
     private
       # returns the route that was used to invoke this controller and current action
       def recognized_route
@@ -553,7 +563,6 @@ module Ardes#:nodoc:
         specifications.each_with_index do |spec, idx|
           spec == '*' ? load_wildcards(specifications[idx+1]) : spec.load_into(self)
         end
-        resource_specification.controller = self
       end
     
       # loads resoources from the route segments, using the segment names to either
