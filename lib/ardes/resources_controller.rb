@@ -503,6 +503,12 @@ module Ardes#:nodoc:
         @resource_service ||= resource_specification.singleton? ? SingletonResourceService.new(self) : ResourceService.new(self)
       end
       
+      def resource_specification
+        @resource_specification ||= returning self.class.resource_specification.dup do |specification|
+          specification.controller = self
+        end
+      end
+      
     protected
       # returns an array of the controller's enclosing (nested in) resources
       def enclosing_resources
@@ -512,12 +518,6 @@ module Ardes#:nodoc:
       # returns an array of the non singleton enclosing resources, this is used for generating routes.
       def non_singleton_resources
         @non_singleton_resources ||= []
-      end
-
-      def resource_specification
-        @resource_specification ||= returning self.class.resource_specification.dup do |specification|
-          specification.controller = self
-        end
       end
       
     private
