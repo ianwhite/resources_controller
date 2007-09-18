@@ -523,14 +523,28 @@ module Ardes#:nodoc:
     private
       # returns the route that was used to invoke this controller and current action
       def recognized_route
-        @recognized_route ||= ::ActionController::Routing::Routes.routes_for_controller_and_action(controller_name, action_name).find do |route|
+        @recognized_route ||= ::ActionController::Routing::Routes.routes_for_controller_and_action(controller_path, action_name).find do |route|
           route.recognize(request.path, ::ActionController::Routing::Routes.extract_request_environment(request))
         end or ResourcesController.raise_no_recognized_route(self)
       end
       
-      # returns the all route segments except for the ones corresponding to the current resource and action
+      # returns the all route segments except for the ones corresponding to the current resource and action.
+      # Also remove any route segments from the front which correspond to modules (namespaces)
       def enclosing_route_segments
         segments = recognized_route.segments.dup
+        
+        # shift namespaces from segments, update the name_prefix accordingly for outgoing routes. 
+        namespaces = self.class.name.underscore.split('/') - [controller_name]
+        
+        while namespaces.size > 0
+          if segments[0].is_a?(ActionController::Routing::DividerSegment) && segments[1].is_a?(ActionController::Routing::StaticSegment) && segments[1].value == namespaces.first
+            segments.shift; segments.shift # remove the '/' & 'namespace' segments from the front
+            update_name_prefix("#{namespaces.shift}_")
+          else
+            break
+          end
+        end
+        
         if segments.select{|s| s.is_a?(ActionController::Routing::DynamicSegment)}.collect(&:key) == [:controller, :action, :id]
           logger.warn "WARNING: resources_controller: #{controller_name} has recognized the default route: #{recognized_route}"
         end

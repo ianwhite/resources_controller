@@ -1,3 +1,18 @@
+* First stab at namespace support:
+  map.namespace :admin do |admin|
+    admin.resources :forums
+  end
+  
+  module Admin
+    module Forums < ApplicationController
+      resources_controller_for :forums
+    end
+  end
+
+  in an action:
+    resources_path # => '/admin/forums'
+    enclosing_resources # => []
+
 * Minor doc improvements
   Speced better js response on edit and new actions [Jason Lee <jlsync@gmail.com>]
 

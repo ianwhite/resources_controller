@@ -8,6 +8,127 @@ AccountController#resource_service
 - .find should call :current_user
 - .find should call whatever is in resource_specification @find
 
+Routing shortcuts for Forums should map
+- resources_path to /admin/admin/forums
+- resources_path(:foo => 'bar') to /admin/forums?foo=bar
+- resource_path to /admin/forums/2
+- resource_path(:foo => 'bar') to /admin/forums/2?foo=bar
+- resource_path(9) to /admin/forums/9
+- resource_path(9, :foo => 'bar') to /admin/forums/2?foo=bar
+- edit_resource_path to /admin/forums/2/edit
+- edit_resource_path(9) to /admin/forums/9/edit
+- new_resource_path to /admin/forums/new
+- resources_url to http://test.host/admin/forums
+- resource_url to http://test.host/admin/forums/2
+- resource_url(9) to http://test.host/admin/forums/9
+- edit_resource_url to http://test.host/admin/forums/2/edit
+- edit_resource_url(9) to http://test.host/admin/forums/9/edit
+- new_resource_url to http://test.host/admin/forums/new
+- resource_interests_path to /admin/forums/2/interests
+- resource_interests_path(:foo => 'bar') to /admin/forums/2/interests?foo=bar
+- resource_interests_path(9) to /admin/forums/9/interests
+- resource_interests_path(9, :foo => 'bar') to /admin/forums/9/interests?foo=bar
+- resource_interest_path(5) to /admin/forums/2/interests/5
+- resource_interest_path(9,5) to /admin/forums/9/interests/5
+- resource_interest_path(9,5, :foo => 'bar') to /admin/forums/9/interests/5?foo=bar
+- new_resource_interest_path(9) to /admin/forums/9/interests/new
+- edit_resource_interest_path(5) to /admin/forums/2/interests/5/edit
+- edit_resource_interest_path(9,5) to /admin/forums/9/interests/5/edit
+- respond_to?(:edit_resource_interest_path) should == true
+- resource_users_path should raise informative NoMethodError
+- enclosing_resource_path should raise informative NoMethodError
+- any_old_missing_method should raise NoMethodError
+- respond_to?(:resource_users_path) should == false
+
+resource_service in ForumsController
+- should build new forum with new
+- should find @forum with find(@forum.id)
+- should find all forums with find(:all)
+
+Requesting /admin/forums using GET
+- should be successful
+- should render index.rhtml
+- should find all forums
+- should assign the found forums for the view
+
+Requesting /admin/forums.xml using GET
+- should be successful
+- should find all forums
+- should render the found forums as xml
+
+Requesting /admin/forums using XHR GET
+- should be successful
+- should find all forums
+- should render index.rjs
+
+Requesting /admin/forums/1 using GET
+- should be successful
+- should render show.rhtml
+- should find the forum requested
+- should assign the found forum for the view
+
+Requesting /admin/forums/1.xml using GET
+- should be successful
+- should find the forum requested
+- should render the found forum as xml
+
+Requesting /admin/forums/1 using XHR GET
+- should be successful
+- should render show.rjs
+- should find the forum requested
+- should assign the found forum for the view
+
+Requesting /admin/forums/new using GET
+- should be successful
+- should render new.rhtml
+- should create an new forum
+- should not save the new forum
+- should assign the new forum for the view
+
+Requesting /admin/forums/1/edit using GET
+- should be successful
+- should render edit.rhtml
+- should find the forum requested
+- should assign the found Forum for the view
+
+Requesting /admin/forums using POST
+- should create a new forum
+- should set the flash notice
+- should redirect to the new forum
+
+Requesting /admin/forums using XHR POST
+- should create a new forum
+- should not set the flash notice
+- should render create.rjs
+- should render new.rjs if unsuccesful
+
+Requesting /admin/forums/1 using PUT
+- should find the forum requested
+- should set the flash notice
+- should update the found forum
+- should assign the found forum for the view
+- should redirect to the forum
+
+Requesting /admin/forums/1 using XHR PUT
+- should find the forum requested
+- should update the found forum
+- should not set the flash notice
+- should assign the found forum for the view
+- should render update.rjs
+- should render edit.rjs, on unsuccessful save
+
+Requesting /admin/forums/1 using DELETE
+- should find the forum requested
+- should call destroy on the found forum
+- should set the flash notice
+- should redirect to the forums list
+
+Requesting /admin/forums/1 using XHR DELETE
+- should find the forum requested
+- should not set the flash notice
+- should call destroy on the found forum
+- should render destroy.rjs
+
 Routing shortcuts for Addresses (users/2/addresses/1) should map
 - resources_path to /users/2/addresses
 - resource_path to /users/2/addresses/1
@@ -581,6 +702,6 @@ ResourcesController#route_resource_names (route_name:tag, :singleton:false)
 - :account_info_tags should be [["account", true], ["info", true]]
 - :new_account_info_tag should be [["account", true], ["info", true]]
 
-Finished in 4.112751 seconds
+Finished in 3.689697 seconds
 
-404 examples, 0 failures
+493 examples, 0 failures

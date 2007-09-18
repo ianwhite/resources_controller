@@ -5,6 +5,12 @@
 ##########
 
 ActionController::Routing::Routes.draw do |map|
+  map.namespace :admin do |admin|
+    admin.resources :forums do |forum|
+      forum.resources :interests
+    end
+  end
+  
   map.resource :account do |account|
     account.resources :posts
     account.resource :info do |info|
@@ -158,6 +164,16 @@ module CurrentUser
   
   def current_user
     @current_user
+  end
+end
+
+module Admin
+  class ForumsController < ActionController::Base
+    resources_controller_for :forums
+  end
+  
+  class InterestsController < ActionController::Base
+    resources_controller_for :interests
   end
 end
 
