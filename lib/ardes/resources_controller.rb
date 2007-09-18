@@ -684,10 +684,10 @@ end_str
 resources_controller could not recognize a route that that the controller
 was invoked with.  This is probably being raised in a test.
 
-The controller name is '#{controller_name}'
-The request.path is '#{request.path}'
+The controller name is '#{controller.controller_name}'
+The request.path is '#{controller.request.path}'
 The route request environment is:
-  #{::ActionController::Routing::Routes.extract_request_environment(request).inspect}
+  #{::ActionController::Routing::Routes.extract_request_environment(controller.request).inspect}
 
 Possible reasons for this:
 - routes have not been loaded
