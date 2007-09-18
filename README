@@ -7,6 +7,11 @@ See Ardes::ResourcesController for details
 
 See the {CHANGLELOG}[link:files/CHANGELOG.html] for recent changes and contributors
 
+= rails 1.2.3
+
+You should be using < r410 of resources_controller for rails 1.2.3
+  http::/svn.ardes.com/rails_plugins/resources_controller -r411
+
 === Specs and Coverage
 * {SPECDOC}[link:files/SPECDOC.html] lists the specifications
 * {RSpec Report}[link:rspec_report.html] is a report of spec pass/fails
