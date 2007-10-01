@@ -1,0 +1,7 @@
+* end-to-end tests
+* re-introduce :polymorphic option (it can be simulated now - but it's a common use-case for many people)
+* when :in specified, then don't add the load_enclosing wildcard
+* add '?' wildcard (which can be used to implement the :polymorphic option)
+* write some docs on how RC could be improved by having the resources passed to the controller
+* rationalise test suite - make a better app
+* stories
