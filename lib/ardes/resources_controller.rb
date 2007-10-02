@@ -334,18 +334,20 @@ module Ardes#:nodoc:
     #
     def resources_controller_for(name, options = {}, &block)
       deprecated_resources_controller_for(options)
-      if included_modules.include?(ResourcesController::InstanceMethods)
-        raise ArgumentError, "controller is already resources_controller for '#{self.resource_name}'"
-      end
       
       options.assert_valid_keys(:class, :source, :singleton, :actions, :in, :find, :load_enclosing, :route, :segment)
       
-      class_inheritable_reader :specifications, :route_name
-      write_inheritable_attribute(:specifications, [])
+      unless included_modules.include? ResourcesController::InstanceMethods
+        class_inheritable_reader :specifications, :route_name
+        
+        extend  ResourcesController::ClassMethods
+        helper  ResourcesController::Helper
+        include ResourcesController::InstanceMethods, ResourcesController::NamedRouteHelper
+        
+        prepend_before_filter :load_enclosing_resources
+      end
       
-      extend  ResourcesController::ClassMethods
-      helper  ResourcesController::Helper
-      include ResourcesController::InstanceMethods, ResourcesController::NamedRouteHelper
+      write_inheritable_attribute(:specifications, [])
       
       if actions = options.delete(:actions)
         include actions
@@ -357,7 +359,6 @@ module Ardes#:nodoc:
       name = options[:singleton] ? name.to_s : name.to_s.singularize
       write_inheritable_attribute :route_name, options[:singleton] ? route : route.singularize
       
-      prepend_before_filter :load_enclosing_resources
       specifications << '*' unless options.delete(:load_enclosing) == false
       if nested = options.delete(:in)
         nested_in(*nested)

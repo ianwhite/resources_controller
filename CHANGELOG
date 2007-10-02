@@ -1,3 +1,7 @@
+* resources_controller_for can now be specified more than once in a controller 
+  heirachy.  The latter definition will overwrite the previous one, and will 
+  also 'reset' the nestings.
+
 * First stab at namespace support:
   map.namespace :admin do |admin|
     admin.resources :forums

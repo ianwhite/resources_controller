@@ -246,6 +246,8 @@ class ForumPostsController < PostsController
   # for testing filter load order
   before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :forum_posts}
 
+  # test inherited resources_controller_for use
+  resources_controller_for :posts
   # example of providing a custom finder for the nesting resource
   nested_in :forum do
     Forum.find(params[:forum_id])

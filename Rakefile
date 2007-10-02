@@ -30,7 +30,7 @@ namespace :spec do
   namespace :rcov do
     desc "Verify RCov threshold for #{plugin_name}"
     RCov::VerifyTask.new(:verify => "spec:rcov") do |t|
-      t.threshold = 93.7
+      t.threshold = 93.9
       t.index_html = File.join(File.dirname(__FILE__), 'doc/coverage/index.html')
     end
   end
