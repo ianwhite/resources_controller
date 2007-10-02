@@ -1,8 +1,8 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
 require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
 
-describe "Routing shortcuts for Forums should map" do
-  controller_name "admin/admin/forums"
+describe "Routing shortcuts for Admin::Forums should map" do
+  controller_name "admin/forums"
   
   before(:each) do
     @forum = mock('Forum')
@@ -11,7 +11,7 @@ describe "Routing shortcuts for Forums should map" do
     get :show, :id => "2"
   end
   
-  it "resources_path to /admin/admin/forums" do
+  it "resources_path to /admin/forums" do
     controller.resources_path.should == '/admin/forums'
   end
 
@@ -144,7 +144,7 @@ end_str
   end
 end
 
-describe "resource_service in ForumsController" do
+describe "resource_service in Admin::ForumsController" do
   controller_name "admin/forums"
   
   before(:each) do
