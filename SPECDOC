@@ -8,8 +8,8 @@ AccountController#resource_service
 - .find should call :current_user
 - .find should call whatever is in resource_specification @find
 
-Routing shortcuts for Forums should map
-- resources_path to /admin/admin/forums
+Routing shortcuts for Admin::Forums should map
+- resources_path to /admin/forums
 - resources_path(:foo => 'bar') to /admin/forums?foo=bar
 - resource_path to /admin/forums/2
 - resource_path(:foo => 'bar') to /admin/forums/2?foo=bar
@@ -40,7 +40,7 @@ Routing shortcuts for Forums should map
 - any_old_missing_method should raise NoMethodError
 - respond_to?(:resource_users_path) should == false
 
-resource_service in ForumsController
+resource_service in Admin::ForumsController
 - should build new forum with new
 - should find @forum with find(@forum.id)
 - should find all forums with find(:all)
@@ -702,6 +702,6 @@ ResourcesController#route_resource_names (route_name:tag, :singleton:false)
 - :account_info_tags should be [["account", true], ["info", true]]
 - :new_account_info_tag should be [["account", true], ["info", true]]
 
-Finished in 3.851834 seconds
+Finished in 4.901457 seconds
 
 493 examples, 0 failures
