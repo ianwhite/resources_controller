@@ -325,7 +325,6 @@ module Ardes#:nodoc:
     #   For a collection resource this should be plural, for a singleton it should be singular.
     # * <tt>:source:</tt> a string or symbol (e.g. :users, or :user).  This is used to find the class or association name
     # * <tt>:class:</tt> a Class.  This is the class of the resource (if it can't be inferred from _name_ or :source)
-    # * <tt>:key:</tt> (e.g. :user_id) used to find the resource id in params
     # * <tt>:segment:</tt> (e.g. 'users') the segment name in the route that is matched
     #
     # === The :in option
