@@ -33,7 +33,8 @@ module Ardes#:nodoc:
   #             /users/2/forums           @user = User.find(2)
   #                                       @forums = @user.forums.find(:all)
   #
-  #  Example 2  /posts                    @posts = Post.find(:all)
+  #  Example 2  /posts                    This won't work as the controller specified
+  #                                       that :posts are :in => :forum
   #
   #             /forums/2/posts           @forum = Forum.find(2)
   #                                       @posts = @forum.posts.find(:all)
@@ -55,7 +56,7 @@ module Ardes#:nodoc:
   #
   # If you don't want to have RC match wildcard resources just pass :load_enclosing => false
   #
-  #   resources_controller_for :posts, :in => :forum, :load_enclosing => 'false'
+  #   resources_controller_for :posts, :in => :forum, :load_enclosing => false
   #
   # ==== Example 3: Singleton resource
   # Here's an example of a singleton, the account pattern that is so common.
@@ -316,8 +317,8 @@ module Ardes#:nodoc:
     # * <tt>:in:</tt> specify the enclosing resources, by name.  ClassMethods#nested_in can be used to 
     #   specify this more fully.
     # * <tt>:load_enclosing:</tt> (default true) loads enclosing resources automatically.
-    # * <tt>:actions:</tt? (default nil) set this to false if you don't want the default RC actions.  Set this
-    #   to a module to define your own actions.
+    # * <tt>:actions:</tt> (default nil) set this to false if you don't want the default RC actions.  Set this
+    #   to a module to use that module for your own actions.
     #
     # =====Options for unconvential use
     # (otherwise these are all inferred from the _name_)
@@ -407,6 +408,9 @@ module Ardes#:nodoc:
     module ClassMethods
       # Specifies that this controller has a particular enclosing resource.
       #
+      # This can be called with an array of symbols (in which case options can't be specified) or
+      # a symbol with options.
+      #
       # See Specification#new for details of how to call this.
       def nested_in(*names, &block)
         options = names.last.is_a?(Hash) ? names.pop : {}
@@ -429,6 +433,7 @@ module Ardes#:nodoc:
         end      
       end
       
+      # return the class resource_specification
       def resource_specification
         read_inheritable_attribute(:resource_specification)
       end
@@ -514,11 +519,14 @@ module Ardes#:nodoc:
       def enclosing_resource_name
         enclosing_resource && @enclosing_resource_name ||= enclosing_resource.class.name.underscore
       end
-        
+      
+      # returns the resource service for the controller - this will be lazilly created
+      # to a ResourceService, or a SingletonResourceService (if :singelton => true)
       def resource_service
         @resource_service ||= resource_specification.singleton? ? SingletonResourceService.new(self) : ResourceService.new(self)
       end
       
+      # returns the instance resource_specification
       def resource_specification
         @resource_specification ||= returning self.class.resource_specification.dup do |specification|
           specification.controller = self
