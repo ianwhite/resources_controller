@@ -282,7 +282,7 @@ resource_service in ForumPostsController
 - should find only posts belonging to @forum with find(:all)
 
 ForumPostsController order of before_filters
-- should == [:load_enclosing, :abstract, :posts, :forum_posts]
+- should == [:abstract, :posts, :load_enclosing, :forum_posts]
 
 Requesting /forums/2/posts (testing the before filters)
 - should find the forum
@@ -702,6 +702,6 @@ ResourcesController#route_resource_names (route_name:tag, :singleton:false)
 - :account_info_tags should be [["account", true], ["info", true]]
 - :new_account_info_tag should be [["account", true], ["info", true]]
 
-Finished in 4.901457 seconds
+Finished in 4.063754 seconds
 
 493 examples, 0 failures

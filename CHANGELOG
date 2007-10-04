@@ -1,3 +1,15 @@
+* resources_controller now uses before_filter (instead of prepend_before_filter)
+  for load_enclosing_resources.  So the resources will be loaded at the point
+  where resources_controller_for is specified.  However, it only adds the
+  filter if it's not already there - so you can play around with the order if
+  you need to:
+  
+    prepend_before_filter :load_enclosing_resources
+    resources_controller_for :foos
+  
+  (common case for the above is where superclass defines filters that need 
+  access to enclosing resources)
+
 * resources_controller_for can now be specified more than once in a controller 
   heirachy.  The latter definition will overwrite the previous one, and will 
   also 'reset' the nestings.

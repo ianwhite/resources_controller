@@ -134,7 +134,7 @@ describe ForumPostsController, ' order of before_filters' do
     get :index, :forum_id => @forum.id
   end
   
-  it { @controller.filter_trace.should == [:load_enclosing, :abstract, :posts, :forum_posts] }
+  it { @controller.filter_trace.should == [:abstract, :posts, :load_enclosing, :forum_posts] }
 end
 
 describe "Requesting /forums/2/posts (testing the before filters)" do
