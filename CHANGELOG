@@ -1,3 +1,5 @@
+* Updated actions to be more in line with recent rails scaffold [Jason Lee <jlsync@gmail.com>]
+
 * resources_controller now uses before_filter (instead of prepend_before_filter)
   for load_enclosing_resources.  So the resources will be loaded at the point
   where resources_controller_for is specified.  However, it only adds the

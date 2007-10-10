@@ -702,6 +702,6 @@ ResourcesController#route_resource_names (route_name:tag, :singleton:false)
 - :account_info_tags should be [["account", true], ["info", true]]
 - :new_account_info_tag should be [["account", true], ["info", true]]
 
-Finished in 4.063754 seconds
+Finished in 3.999181 seconds
 
 493 examples, 0 failures

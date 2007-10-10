@@ -7,20 +7,32 @@ module Ardes#:nodoc:
         self.resource = find_resource
 
         respond_to do |format|
-          format.html # show.rhtml
+          format.html # show.erb.html
           format.js
-          format.xml  { render :xml => resource.to_xml }
+          format.xml  { render :xml => resource }
         end
       end
 
       # GET /event/new
       def new
         self.resource = new_resource
+
+        respond_to do |format|
+          format.html # new.html.erb
+          format.js
+          format.xml  { render :xml => resource }
+        end
       end
 
       # GET /event/edit
       def edit
         self.resource = find_resource
+
+        respond_to do |format|
+          format.html # edit.html.erb
+          format.js
+          format.xml  { render :xml => resource }
+        end
       end
 
       # POST /event
@@ -35,11 +47,11 @@ module Ardes#:nodoc:
               redirect_to resource_url
             end
             format.js
-            format.xml  { head :created, :location => resource_url }
+            format.xml  { render :xml => resource, :status => :created, :location => resource_url }
           else
             format.html { render :action => "new" }
             format.js   { render :action => "new" }
-            format.xml  { render :xml => resource.errors.to_xml, :status => :unprocessable_entity }
+            format.xml  { render :xml => resource.errors, :status => :unprocessable_entity }
           end
         end
       end
@@ -60,7 +72,7 @@ module Ardes#:nodoc:
           else
             format.html { render :action => "edit" }
             format.js   { render :action => "edit" }
-            format.xml  { render :xml => resource.errors.to_xml, :status => :unprocessable_entity }
+            format.xml  { render :xml => resource.errors, :status => :unprocessable_entity }
           end
         end
       end
