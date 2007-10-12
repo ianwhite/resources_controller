@@ -294,6 +294,66 @@ module Ardes#:nodoc:
   #
   # When this controller is invoked of /things the :order_by_ids message will be sent to the Thing class,
   # when it's invoked by /foos/1/things, then :order_by_ids message will be send to Foo.find(1).things association
+  #
+  # === using non standard ids
+  #
+  # Lets say you want to set to_param to login, and use find_by_login
+  # for your users in your URLs, with routes as follows:
+  #
+  #   map.reosurces :users do |user|
+  #     user.resources :addresses
+  #   end
+  #
+  # First, the users controller needs to find reosurces using find_by_login
+  #
+  #   class UsersController < ApplicationController
+  #     resources_controller_for :users
+  #
+  #   protected
+  #     def find_resource(id = params[:id])
+  #       resource_service.find_by_login(id)
+  #     end
+  #   end
+  #
+  # This controller will find users (for editing, showing, and destroying) as
+  # directed.  (this controller will work for any route where user is the
+  # last resource, including the /users/dave route)
+  #
+  # Now you need to specify that the user as enclosing resource needs to be found
+  # with find_by_login.  For the addresses case above, you would do this:
+  #
+  #   class AddressesController < ApplicationController
+  #     resources_controller_for :addresses
+  #     nested_in :user do
+  #       User.find_by_login(params[:user_id])
+  #     end
+  #   end
+  #
+  # If you wanted to open up more nested resources under user, you could repeat
+  # this specification in all such controllers, alternatively, you could map the
+  # resource in the ApplicationController, which would be usable by any controller
+  #
+  # If you know that user is never nested (i.e. /users/dave/addresses), then do this:
+  #
+  #   class ApplicationController < ActionController::Base
+  #     map_resource :user do
+  #       User.find(params[:user_id])
+  #     end
+  #   end
+  #
+  # or, if user is sometimes nested (i.e. /forums/1/users/dave/addresses), do this:
+  #
+  #     map_resource :user do
+  #       ((enclosing_resource && enclosing_resource.users) || User).find(params[:user_id])
+  #     end
+  #
+  # Your Addresses controller will now be the very simple one, and the resource map will
+  # load user as specified when it is hit by a route /users/dave/addresses.
+  #
+  #   class AddressesController < ApplicationController
+  #     resources_controller_for :addresses
+  #   end
+  #
   module ResourcesController
     def self.extended(base)
       base.class_eval do
@@ -402,7 +462,8 @@ module Ardes#:nodoc:
     #
     # See Specification#new for details of how to call this
     def map_resource(name, options = {}, &block)
-      resource_specification_map[name.to_s] = Specification.new(name, options, &block)
+      spec = Specification.new(name, options, &block)
+      resource_specification_map[spec.segment] = spec
     end
     
     module ClassMethods
@@ -610,10 +671,10 @@ module Ardes#:nodoc:
         return if to_spec == '*'
         route_resource_names.slice(enclosing_resources.size..-1).each do |segment, singleton|
           return if to_spec && to_spec.segment == segment
-          name = singleton ? segment : segment.singularize
-          if resource_specification_map[name]
-            resource_specification_map[name].load_into(self)
+          if resource_specification_map[segment]
+            resource_specification_map[segment].load_into(self)
           else
+            name = singleton ? segment : segment.singularize
             Specification.new(name, :singleton => singleton).load_into(self)
           end
         end

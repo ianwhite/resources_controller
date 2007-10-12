@@ -5,13 +5,13 @@ module InterestsViaUserSpecHelper
   def setup_mocks
     @user = mock('User')
     @user_interests = mock('user_interests assoc')
-    User.stub!(:find).and_return(@user)
+    User.stub!(:find_by_login).and_return(@user)
     @user.stub!(:interests).and_return(@user_interests)
-    @user.stub!(:to_param).and_return('1')
+    @user.stub!(:to_param).and_return('dave')
   end
 end
 
-describe "Routing shortcuts for Interests via User (users/1/interests/2) should map" do
+describe "Routing shortcuts for Interests via User (users/dave/interests/2) should map" do
   include InterestsViaUserSpecHelper
   controller_name :interests
   
@@ -21,31 +21,31 @@ describe "Routing shortcuts for Interests via User (users/1/interests/2) should 
     @interest.stub!(:to_param).and_return('2')
     @user_interests.stub!(:find).and_return(@interest)
     
-    get :show, :user_id => "1", :id => "2"
+    get :show, :user_id => "dave", :id => "2"
   end
   
-  it "resources_path to /users/1/interests" do
-    controller.resources_path.should == '/users/1/interests'
+  it "resources_path to /users/dave/interests" do
+    controller.resources_path.should == '/users/dave/interests'
   end
 
-  it "resource_path to /users/1/interests/2" do
-    controller.resource_path.should == '/users/1/interests/2'
+  it "resource_path to /users/dave/interests/2" do
+    controller.resource_path.should == '/users/dave/interests/2'
   end
   
-  it "resource_path(9) to /users/1/interests/9" do
-    controller.resource_path(9).should == '/users/1/interests/9'
+  it "resource_path(9) to /users/dave/interests/9" do
+    controller.resource_path(9).should == '/users/dave/interests/9'
   end
 
-  it "edit_resource_path to /users/1/interests/2/edit" do
-    controller.edit_resource_path.should == '/users/1/interests/2/edit'
+  it "edit_resource_path to /users/dave/interests/2/edit" do
+    controller.edit_resource_path.should == '/users/dave/interests/2/edit'
   end
   
-  it "edit_resource_path(9) to /users/1/interests/9/edit" do
-    controller.edit_resource_path(9).should == '/users/1/interests/9/edit'
+  it "edit_resource_path(9) to /users/dave/interests/9/edit" do
+    controller.edit_resource_path(9).should == '/users/dave/interests/9/edit'
   end
   
-  it "new_resource_path to /users/1/interests/new" do
-    controller.new_resource_path.should == '/users/1/interests/new'
+  it "new_resource_path to /users/dave/interests/new" do
+    controller.new_resource_path.should == '/users/dave/interests/new'
   end
 end
 
@@ -53,12 +53,12 @@ describe "resource_service in InterestsController via Forum" do
   controller_name :interests
   
   before(:each) do
-    @user           = User.create
+    @user           = User.create :login => 'dave'
     @interest       = Interest.create :interested_in_id => @user.id, :interested_in_type => 'User'
     @other_user     = User.create
     @other_interest = Interest.create :interested_in_id => @other_user.id, :interested_in_type => 'User'
     
-    get :index, :user_id => @user.id
+    get :index, :user_id => @user.login
     @resource_service = controller.send :resource_service
   end
   
@@ -84,7 +84,7 @@ describe "resource_service in InterestsController via Forum" do
   end
 end
 
-describe "Requesting /users/1/interests using GET" do
+describe "Requesting /users/dave/interests using GET" do
   include InterestsViaUserSpecHelper
   controller_name :interests
 
@@ -95,11 +95,11 @@ describe "Requesting /users/1/interests using GET" do
   end
   
   def do_get
-    get :index, :user_id => 1
+    get :index, :user_id => "dave"
   end
 
   it "should find the user" do
-    User.should_receive(:find).with('1').and_return(@user)
+    User.should_receive(:find_by_login).with('dave').and_return(@user)
     do_get
   end
 

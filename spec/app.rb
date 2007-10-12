@@ -26,6 +26,7 @@ ActionController::Routing::Routes.draw do |map|
       address.resources :tags
     end
   end
+  
   map.resources :forums do |forum|
     forum.resource :owner do |owner|
       owner.resources :posts do |post|
@@ -56,6 +57,7 @@ end
 ActiveRecord::Migration.suppress_messages do
   ActiveRecord::Schema.define(:version => 0) do
     create_table :users, :force => true do |t|
+      t.string :login
     end
     
     create_table :infos, :force => true do |t|
@@ -111,6 +113,10 @@ class User < ActiveRecord::Base
   has_many :interests, :as => :interested_in
   has_many :addresses
   has_one :info
+  
+  def to_param
+    login
+  end
 end
 
 class Info < ActiveRecord::Base
@@ -148,63 +154,59 @@ end
 # Controllers
 ##############
 
-module CurrentUser
-  def self.included(base)
-    base.class_eval do
-      map_resource :account, :class => User, :singleton => true, :find => :current_user
-      #
-      # could also do
-      # 
-      # map_resource :account, :singleton => true do
-      #   @current_user
-      # end
-      #
-    end
+class ApplicationController < ActionController::Base
+  map_resource :account, :class => User, :singleton => true, :find => :current_user
+
+  map_resource :user do
+    User.find_by_login(params[:user_id])
   end
-  
+    
+protected
   def current_user
     @current_user
   end
 end
 
 module Admin
-  class ForumsController < ActionController::Base
+  class ForumsController < ApplicationController
     resources_controller_for :forums
   end
   
-  class InterestsController < ActionController::Base
+  class InterestsController < ApplicationController
     resources_controller_for :interests
   end
 end
 
-class AccountController < ActionController::Base
-  include CurrentUser
+class AccountController < ApplicationController
   resources_controller_for :account, :singleton => true, :source => :user, :find => :current_user
 end
 
-class InfoController < ActionController::Base
-  include CurrentUser
+class InfoController < ApplicationController
   resources_controller_for :info, :singleton => true
 end
 
-class TagsController < ActionController::Base
-  include CurrentUser
+class TagsController < ApplicationController
   resources_controller_for :tags
 end
 
-class UsersController < ActionController::Base
+class UsersController < ApplicationController
   resources_controller_for :users
+  
+protected
+  def find_resource(id = params[:id])
+    resource_service.find_by_login(id)
+  end
 end
 
-class ForumsController < ActionController::Base
+class ForumsController < ApplicationController
   resources_controller_for :forums
 end
 
-class OwnerController < ActionController::Base
+class OwnerController < ApplicationController
   resources_controller_for :owner, :singleton => true, :class => User, :in => :forum
 end
 
-class PostsAbstractController < ActionController::Base
+class PostsAbstractController < ApplicationController
   attr_accessor :filter_trace
   
   # for testing filter load order
@@ -238,8 +240,8 @@ class UserPostsController < PostsController
   nested_in :user, :class => User, :key => 'user_id', :name_prefix => 'user_'
 end
 
-class AddressesController < ActionController::Base
-  resources_controller_for :addresses, :in => :user
+class AddressesController < ApplicationController
+  resources_controller_for :addresses
 end
 
 class ForumPostsController < PostsController
@@ -254,11 +256,11 @@ class ForumPostsController < PostsController
   end
 end
 
-class CommentsController < ActionController::Base
+class CommentsController < ApplicationController
   resources_controller_for :comments, :in => [:forum, :post]
 end
 
-class InterestsController < ActionController::Base
+class InterestsController < ApplicationController
   resources_controller_for :interests
   before_filter :set_interested_in
   

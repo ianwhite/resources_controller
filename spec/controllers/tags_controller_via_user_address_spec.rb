@@ -4,8 +4,8 @@ require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
 module TagsViaUserAddressSpecHelper
   def setup_mocks
     @user = mock_model(User)
-    User.stub!(:find).and_return(@user)
-    @user.stub!(:to_param).and_return('1')
+    User.stub!(:find_by_login).and_return(@user)
+    @user.stub!(:to_param).and_return('dave')
     @user_addresses = mock('user_addresses assoc')
     @user.stub!(:addresses).and_return(@user_addresses)
     
@@ -17,7 +17,7 @@ module TagsViaUserAddressSpecHelper
   end
 end
 
-describe "Routing shortcuts for Tags via User and Address (users/1/addresses/2/tags/3) should map" do
+describe "Routing shortcuts for Tags via User and Address (users/dave/addresses/2/tags/3) should map" do
   include TagsViaUserAddressSpecHelper
   controller_name :tags
   
@@ -27,35 +27,35 @@ describe "Routing shortcuts for Tags via User and Address (users/1/addresses/2/t
     @tag.stub!(:to_param).and_return('3')
     @address_tags.stub!(:find).and_return(@tag)
     
-    get :show, :user_id => "1", :address_id => "2", :id => "3"
+    get :show, :user_id => "dave", :address_id => "2", :id => "3"
   end
   
-  it "resources_path to /users/1/addresses/2/tags" do
-    controller.resources_path.should == '/users/1/addresses/2/tags'
+  it "resources_path to /users/dave/addresses/2/tags" do
+    controller.resources_path.should == '/users/dave/addresses/2/tags'
   end
 
-  it "resource_path to /users/1/addresses/2/tags/3" do
-    controller.resource_path.should == '/users/1/addresses/2/tags/3'
+  it "resource_path to /users/dave/addresses/2/tags/3" do
+    controller.resource_path.should == '/users/dave/addresses/2/tags/3'
   end
   
-  it "resource_path(9) to /users/1/addresses/2/tags/9" do
-    controller.resource_path(9).should == '/users/1/addresses/2/tags/9'
+  it "resource_path(9) to /users/dave/addresses/2/tags/9" do
+    controller.resource_path(9).should == '/users/dave/addresses/2/tags/9'
   end
 
-  it "edit_resource_path to /users/1/addresses/2/tags/3/edit" do
-    controller.edit_resource_path.should == '/users/1/addresses/2/tags/3/edit'
+  it "edit_resource_path to /users/dave/addresses/2/tags/3/edit" do
+    controller.edit_resource_path.should == '/users/dave/addresses/2/tags/3/edit'
   end
   
-  it "edit_resource_path(9) to /users/1/addresses/2/tags/9/edit" do
-    controller.edit_resource_path(9).should == '/users/1/addresses/2/tags/9/edit'
+  it "edit_resource_path(9) to /users/dave/addresses/2/tags/9/edit" do
+    controller.edit_resource_path(9).should == '/users/dave/addresses/2/tags/9/edit'
   end
   
-  it "new_resource_path to /users/1/addresses/2/tags/new" do
-    controller.new_resource_path.should == '/users/1/addresses/2/tags/new'
+  it "new_resource_path to /users/dave/addresses/2/tags/new" do
+    controller.new_resource_path.should == '/users/dave/addresses/2/tags/new'
   end
   
-  it "enclosing_resource_path to /users/1/addresses/2" do
-    controller.enclosing_resource_path.should == "/users/1/addresses/2"
+  it "enclosing_resource_path to /users/dave/addresses/2" do
+    controller.enclosing_resource_path.should == "/users/dave/addresses/2"
   end
 end
 
@@ -95,7 +95,7 @@ describe "resource_service in TagsController via User and Address" do
   end
 end
 
-describe "Requesting /users/1/addresses/2/tags using GET" do
+describe "Requesting /users/dave/addresses/2/tags using GET" do
   include TagsViaUserAddressSpecHelper
   controller_name :tags
 
@@ -106,11 +106,11 @@ describe "Requesting /users/1/addresses/2/tags using GET" do
   end
   
   def do_get
-    get :index, :user_id => 1, :address_id => 2
+    get :index, :user_id => "dave", :address_id => 2
   end
 
   it "should find the user" do
-    User.should_receive(:find).with('1').and_return(@user)
+    User.should_receive(:find_by_login).with('dave').and_return(@user)
     do_get
   end
   

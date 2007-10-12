@@ -1,3 +1,14 @@
+* added specs for when you want to find_by_(something other than id) (users,
+  addresses, interests)
+  
+  Fixed a bug where the resource mapping was using name instead of segment to
+  match when a map should be used (this meant mapping didn't work for non 
+  singleton resources)
+  
+  Thanks to Inviz <invi...@gmail.com> and Matt Mower <matt.mo...@gmail.com> 
+  in http://groups.google.com/group/resources_controller/browse_thread/thread/b71b2ce196a09d15
+  for the bug reports
+    
 * Updated actions to be more in line with recent rails scaffold [Jason Lee <jlsync@gmail.com>]
 
 * resources_controller now uses before_filter (instead of prepend_before_filter)

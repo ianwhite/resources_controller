@@ -129,13 +129,13 @@ Requesting /admin/forums/1 using XHR DELETE
 - should call destroy on the found forum
 - should render destroy.rjs
 
-Routing shortcuts for Addresses (users/2/addresses/1) should map
-- resources_path to /users/2/addresses
-- resource_path to /users/2/addresses/1
-- resource_path(9) to /users/2/addresses/9
-- edit_resource_path to /users/2/addresses/1/edit
-- edit_resource_path(9) to /users/2/addresses/9/edit
-- new_resource_path to /users/2/addresses/new
+Routing shortcuts for Addresses (users/dave/addresses/1) should map
+- resources_path to /users/dave/addresses
+- resource_path to /users/dave/addresses/1
+- resource_path(9) to /users/dave/addresses/9
+- edit_resource_path to /users/dave/addresses/1/edit
+- edit_resource_path(9) to /users/dave/addresses/9/edit
+- new_resource_path to /users/dave/addresses/new
 
 resource_service in AddressesController
 - should build new address with @user foreign key with new
@@ -143,50 +143,47 @@ resource_service in AddressesController
 - should raise RecordNotFound with find(@other_address.id)
 - should find only addresses belonging to @user with find(:all)
 
-Requesting /users/2/addresses
+Requesting /users/dave/addresses
 - should find the user
 - should assign the found user for the view
 - should assign the user_addresses association as the addresses resource_service
 
-Requesting /users/foo/addresses (testing non-integer ids)
-- should try and find user with id == 'foo'
-
-Requesting /users/2/addresses using GET
+Requesting /users/dave/addresses using GET
 - should be successful
 - should render index.rhtml
 - should find all addresses
 - should assign the found addresses for the view
 
-Requesting /users/2/addresses/1 using GET
+Requesting /users/dave/addresses/1 using GET
 - should be successful
 - should render show.rhtml
 - should find the thing requested
 - should assign the found thing for the view
 
-Requesting /users/2/addresses/new using GET
+Requesting /users/dave/addresses/new using GET
 - should be successful
 - should render new.rhtml
 - should create an new thing
 - should not save the new thing
 - should assign the new thing for the view
 
-Requesting /users/2/addresses/1/edit using GET
+Requesting /users/dave/addresses/1/edit using GET
 - should be successful
 - should render edit.rhtml
 - should find the thing requested
 - should assign the found Thing for the view
 
-Requesting /users/2/addresses using POST
+Requesting /users/dave/addresses using POST
 - should create a new address
 - should redirect to the new address
 
-Requesting /users/2/addresses/1 using PUT
+Requesting /users/dave/addresses/1 using PUT
 - should find the address requested
 - should update the found address
 - should assign the found address for the view
 - should redirect to the address
 
-Requesting /users/2/addresses/1 using DELETE
+Requesting /users/dave/addresses/1 using DELETE
 - should find the address requested
 - should call destroy on the found thing
 - should redirect to the things list
@@ -471,13 +468,13 @@ Requesting /forums/1/interests using GET
 - should assign the found forum as :interested_in for the view
 - should assign the forum_interests association as the interests resource_service
 
-Routing shortcuts for Interests via User (users/1/interests/2) should map
-- resources_path to /users/1/interests
-- resource_path to /users/1/interests/2
-- resource_path(9) to /users/1/interests/9
-- edit_resource_path to /users/1/interests/2/edit
-- edit_resource_path(9) to /users/1/interests/9/edit
-- new_resource_path to /users/1/interests/new
+Routing shortcuts for Interests via User (users/dave/interests/2) should map
+- resources_path to /users/dave/interests
+- resource_path to /users/dave/interests/2
+- resource_path(9) to /users/dave/interests/9
+- edit_resource_path to /users/dave/interests/2/edit
+- edit_resource_path(9) to /users/dave/interests/9/edit
+- new_resource_path to /users/dave/interests/new
 
 resource_service in InterestsController via Forum
 - should build new interest with @user fk and type with new
@@ -485,7 +482,7 @@ resource_service in InterestsController via Forum
 - should raise RecordNotFound with find(@other_interest.id)
 - should find only interests belonging to @user with find(:all)
 
-Requesting /users/1/interests using GET
+Requesting /users/dave/interests using GET
 - should find the user
 - should assign the found user as :interested_in for the view
 - should assign the user_interests association as the interests resource_service
@@ -650,14 +647,14 @@ Requesting /forums/1/tags/new using GET
 - should assign the new tag for the view
 - should send :resource= to controller with @tag
 
-Routing shortcuts for Tags via User and Address (users/1/addresses/2/tags/3) should map
-- resources_path to /users/1/addresses/2/tags
-- resource_path to /users/1/addresses/2/tags/3
-- resource_path(9) to /users/1/addresses/2/tags/9
-- edit_resource_path to /users/1/addresses/2/tags/3/edit
-- edit_resource_path(9) to /users/1/addresses/2/tags/9/edit
-- new_resource_path to /users/1/addresses/2/tags/new
-- enclosing_resource_path to /users/1/addresses/2
+Routing shortcuts for Tags via User and Address (users/dave/addresses/2/tags/3) should map
+- resources_path to /users/dave/addresses/2/tags
+- resource_path to /users/dave/addresses/2/tags/3
+- resource_path(9) to /users/dave/addresses/2/tags/9
+- edit_resource_path to /users/dave/addresses/2/tags/3/edit
+- edit_resource_path(9) to /users/dave/addresses/2/tags/9/edit
+- new_resource_path to /users/dave/addresses/2/tags/new
+- enclosing_resource_path to /users/dave/addresses/2
 
 resource_service in TagsController via User and Address
 - should build new tag with @address fk and type with new
@@ -665,11 +662,80 @@ resource_service in TagsController via User and Address
 - should raise RecordNotFound with find(@other_tag.id)
 - should find only tags belonging to @address with find(:all)
 
-Requesting /users/1/addresses/2/tags using GET
+Requesting /users/dave/addresses/2/tags using GET
 - should find the user
 - should find the address
 - should assign the found address for the view
 - should assign the address_tags association as the tags resource_service
+
+UsersController#route_for
+- should map { :controller => 'users', :action => 'index' } to /users
+- should map { :controller => 'users', :action => 'new' } to /users/new
+- should map { :controller => 'users', :action => 'show', :id => 'dave' } to /users/dave
+- should map { :controller => 'users', :action => 'edit', :id => 'dave' } to /users/dave/edit
+- should map { :controller => 'users', :action => 'update', :id => 'dave'} to /users/dave
+- should map { :controller => 'users', :action => 'destroy', :id => 'dave'} to /users/dave
+
+UsersController#params_from
+- should generate params { :controller => 'users', action => 'index' } from GET /users
+- should generate params { :controller => 'users', action => 'new' } from GET /users/new
+- should generate params { :controller => 'users', action => 'create' } from POST /users
+- should generate params { :controller => 'users', action => 'show', id => '1' } from GET /users/dave
+- should generate params { :controller => 'users', action => 'edit', id => '1' } from GET /users/dave;edit
+- should generate params { :controller => 'users', action => 'update', id => '1' } from PUT /users/dave
+- should generate params { :controller => 'users', action => 'destroy', id => '1' } from DELETE /users/dave
+
+UsersController handling GET /users
+- should be successful
+- should render index template
+- should find all users
+- should assign the found users for the view
+
+UsersControllerhandling GET /users.xml
+- should be successful
+- should find all users
+- should render the found users as xml
+
+UsersController handling GET /users/dave
+- should be successful
+- should render show template
+- should find the user requested
+- should assign the found user for the view
+
+UsersControllerhandling GET /users/dave.xml
+- should be successful
+- should find the user requested
+- should render the found user as xml
+
+UsersController handling GET /users/new
+- should be successful
+- should render new template
+- should create an new user
+- should not save the new user
+- should assign the new user for the view
+
+UsersController handling GET /users/dave/edit
+- should be successful
+- should render edit template
+- should find the user requested
+- should assign the found User for the view
+
+UsersController handling POST /users
+- should create a new user
+- should redirect to the new user on successful save
+- should re-render 'new' on failed save
+
+UsersController handling PUT /users/dave
+- should find the user requested
+- should update the found user
+- should assign the found user for the view
+- should redirect to the user on successful update
+- should re-render 'edit' on failed update
+
+UsersController handling DELETE /users/dave
+- should find the user requested
+- should call destroy on the found user
+- should redirect to the users list
 
 ActionView with resources_controller Helper
 - should forward #resource_name to controller
@@ -702,6 +768,6 @@ ResourcesController#route_resource_names (route_name:tag, :singleton:false)
 - :account_info_tags should be [["account", true], ["info", true]]
 - :new_account_info_tag should be [["account", true], ["info", true]]
 
-Finished in 3.999181 seconds
+Finished in 4.40074 seconds
 
-493 examples, 0 failures
+539 examples, 0 failures
