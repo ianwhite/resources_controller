@@ -7,10 +7,21 @@ See Ardes::ResourcesController for details
 
 See the {CHANGLELOG}[link:files/CHANGELOG.html] for recent changes and contributors
 
-= rails 1.2.3
+= rails 1.2.x
 
-You should be using < r410 of resources_controller for rails 1.2.3
-  http::/svn.ardes.com/rails_plugins/resources_controller -r411
+I target edge as my development platform, so the specs are written accordingly.
+
+The specs won't pass on rails 1.2.x as the named routes have changed, among
+other things.  Some people have reported success on rails 1.2.3 with the latest
+version of RC.  
+
+If you're faint hearted, and a rails 1.2.x user you should be using
+<= r410 of resources_controller for rails 1.2.3
+
+  http://svn.ardes.com/rails_plugins/resources_controller -r410
+
+If someone wants to maintain a 1.2.x branch of RC, and translate the specs, 
+drop me a line.
 
 === Specs and Coverage
 * {SPECDOC}[link:files/SPECDOC.html] lists the specifications
