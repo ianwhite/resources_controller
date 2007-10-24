@@ -127,7 +127,7 @@ Currently:
           self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
             def #{method}(*args)
               options = args.last.is_a?(Hash) ? args.pop : {}
-              args = args.size < #{required_args} ? non_singleton_resources + args : non_singleton_resources - [enclosing_resource] + args
+              args = args.size < #{required_args} ? enclosing_collection_resources + args : enclosing_collection_resources - [enclosing_resource] + args
               args = args + [options] if options.size > 0
               send :#{route_method}, *args
             end
@@ -140,9 +140,9 @@ Currently:
           self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
             def #{method}(*args)
               options = args.last.is_a?(Hash) ? args.pop : {}
-              #{"args = [resource] + args if non_singleton_resources.size + args.size < #{required_args}" if required_args > 0}
+              #{"args = [resource] + args if enclosing_collection_resources.size + args.size < #{required_args}" if required_args > 0}
               args = args + [options] if options.size > 0
-              send :#{route_method}, *(non_singleton_resources + args)
+              send :#{route_method}, *(enclosing_collection_resources + args)
             end
           end_eval
         end

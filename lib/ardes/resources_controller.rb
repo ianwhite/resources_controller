@@ -425,6 +425,7 @@ module Ardes#:nodoc:
       before_filter :load_enclosing_resources unless find_filter(:load_enclosing_resources)
       
       write_inheritable_attribute(:specifications, [])
+      specifications << '*' unless options.delete(:load_enclosing) == false
       
       if actions = options.delete(:actions)
         include actions
@@ -436,19 +437,16 @@ module Ardes#:nodoc:
       name = options[:singleton] ? name.to_s : name.to_s.singularize
       write_inheritable_attribute :route_name, options[:singleton] ? route : route.singularize
       
-      specifications << '*' unless options.delete(:load_enclosing) == false
-      if nested = options.delete(:in)
-        nested_in(*nested)
-      end
+      nested_in(*options.delete(:in)) if options[:in]
       
-      write_inheritable_attribute(:resource_specification, Specification.new(name, options, &block).freeze)
+      write_inheritable_attribute(:resource_specification, Specification.new(name, options, &block))
     end
     
     def deprecated_resources_controller_for(options)
-      options[:class] ||= options[:class_name] && options[:class_name].constantize
-      options[:source] ||= options[:collection_name]
-      options[:actions] = options[:actions_include] if options[:actions].nil?
-      options[:route] ||= options[:route_name]
+      options[:class_name]      and options[:class] ||= options[:class_name].constantize
+      options[:collection_name] and options[:source] ||= options[:collection_name] 
+      options[:actions_include] and options[:actions] = options[:actions_include] if options[:actions].nil?
+      options[:route_name]      and options[:route] ||= options[:route_name]
       [:class_name, :collection_name, :actions_include, :route_name].each do |k|
         if options.key?(k)
           ActiveSupport::Deprecation.warn("option :#{k} has been deprecated for resources_controller_for and will be removed soon")
@@ -477,16 +475,27 @@ module Ardes#:nodoc:
         options = names.last.is_a?(Hash) ? names.pop : {}
         raise ArgumentError, "when giving more than one nesting, you may not specify options or a block" if names.length > 1 and (block_given? or options.length > 0)
         deprecated_nested_in(options)
+        
+        # convert :polymorphic option to '?'
+        if options.delete(:polymorphic)
+          raise ArgumentError, "when specifying :polymorphic => true, no block or other options may be given" if block_given? or options.length > 0
+          names = ["?#{names.first}"] 
+        end
+
+        # ignore first '*' if it has already been specified by :load_enclosing == true
+        names.shift if specifications == ['*'] && names.first == '*'
+        
         names.each do |name|
-          specifications << (name.to_s == '*' ? '*' : Specification.new(name, options, &block))
+          ensure_sane_wildcard if name == '*'
+          specifications << (name.to_s =~ /^(\*|\?(.*))$/ ? name.to_s : Specification.new(name, options, &block))
         end
       end
       
       def deprecated_nested_in(options)
-        options[:class] ||= options[:class_name] && options[:class_name].constantize
-        options[:source] ||= options[:collection_name]
-        options[:key] ||= options[:foreign_key]
-        [:class_name, :collection_name, :load_enclosing, :polymorphic, :foreign_key].each do |k|
+        options[:class_name]      and options[:class]  ||= options[:class_name].constantize
+        options[:collection_name] and options[:source] ||= options[:collection_name]
+        options[:foreign_key]     and options[:key]    ||= options[:foreign_key]
+        [:class_name, :collection_name, :load_enclosing, :anonymous, :foreign_key].each do |k|
           if options.key?(k)
             ActiveSupport::Deprecation.warn("option :#{k} has been deprecated for nested_in and will be removed soon")
             options.delete(k)
@@ -497,6 +506,20 @@ module Ardes#:nodoc:
       # return the class resource_specification
       def resource_specification
         read_inheritable_attribute(:resource_specification)
+      end
+      
+    private
+      # ensure that specifications array is determinate w.r.t route matching
+      def ensure_sane_wildcard
+        idx = specifications.length
+        while (idx -= 1) >= 0
+          if specifications[idx] == '*'
+            raise ArgumentError, "Can only specify one wildcard '*' in between resource specifications"
+          elsif specifications[idx].is_a?(Specification)
+            break
+          end
+        end
+        true
       end
     end
     
@@ -578,31 +601,28 @@ module Ardes#:nodoc:
       
       # returns the name of the immediately enclosing resource
       def enclosing_resource_name
-        enclosing_resource && @enclosing_resource_name ||= enclosing_resource.class.name.underscore
+        enclosing_resource.class.name.underscore
       end
       
       # returns the resource service for the controller - this will be lazilly created
-      # to a ResourceService, or a SingletonResourceService (if :singelton => true)
+      # to a ResourceService, or a SingletonResourceService (if :singleton => true)
       def resource_service
         @resource_service ||= resource_specification.singleton? ? SingletonResourceService.new(self) : ResourceService.new(self)
       end
       
       # returns the instance resource_specification
       def resource_specification
-        @resource_specification ||= returning self.class.resource_specification.dup do |specification|
-          specification.controller = self
-        end
+        self.class.resource_specification
       end
       
-    protected
       # returns an array of the controller's enclosing (nested in) resources
       def enclosing_resources
         @enclosing_resources ||= []
       end
   
-      # returns an array of the non singleton enclosing resources, this is used for generating routes.
-      def non_singleton_resources
-        @non_singleton_resources ||= []
+      # returns an array of the collection (non singleton) enclosing resources, this is used for generating routes.
+      def enclosing_collection_resources
+        @enclosing_collection_resources ||= []
       end
       
     private
@@ -615,21 +635,8 @@ module Ardes#:nodoc:
       
       # returns the all route segments except for the ones corresponding to the current resource and action.
       # Also remove any route segments from the front which correspond to modules (namespaces)
-      def enclosing_route_segments
-        segments = recognized_route.segments.dup
-        
-        # shift namespaces from segments, update the name_prefix accordingly for outgoing routes. 
-        namespaces = self.class.name.underscore.split('/') - [controller_name]
-        
-        while namespaces.size > 0
-          if segments[0].is_a?(ActionController::Routing::DividerSegment) && segments[1].is_a?(ActionController::Routing::StaticSegment) && segments[1].value == namespaces.first
-            segments.shift; segments.shift # remove the '/' & 'namespace' segments from the front
-            update_name_prefix("#{namespaces.shift}_")
-          else
-            break
-          end
-        end
-        
+      def enclosing_segments
+        segments = remove_namespaces_from_segments(recognized_route.segments.dup)
         if segments.select{|s| s.is_a?(ActionController::Routing::DynamicSegment)}.collect(&:key) == [:controller, :action, :id]
           logger.warn "WARNING: resources_controller: #{controller_name} has recognized the default route: #{recognized_route}"
         end
@@ -637,16 +644,30 @@ module Ardes#:nodoc:
           segment = segments.pop
           return segments if segment.is_a?(::ActionController::Routing::StaticSegment) && segment.value == resource_specification.segment
         end
-        ResourcesController.raise_missing_route_segment(self)
+        ResourcesController.raise_missing_segment(self)
+      end
+      
+      # shift namespaces from segments, update the name_prefix accordingly for outgoing routes. 
+      def remove_namespaces_from_segments(segments)
+        namespaces = controller_path.sub(controller_name,'').sub(/\/$/,'').split('/')
+        while namespaces.size > 0
+          if segments[0].is_a?(ActionController::Routing::DividerSegment) && segments[1].is_a?(ActionController::Routing::StaticSegment) && segments[1].value == namespaces.first
+            segments.shift; segments.shift # shift the '/' & 'namespace' segments
+            update_name_prefix("#{namespaces.shift}_")
+          else
+            break
+          end
+        end
+        segments
       end
       
       # Returns an array of pairs [<name>, <singleton?>] e.g. [[users, false], [blog, true], [posts, false]]
-      # corresponding to the enclosing resources.
+      # corresponding to the enclosing resource route segments
       #
       # This is used to map resources and automatically load resources.
-      def route_resource_names
-        @route_resource_names ||= returning(Array.new) do |req|
-          enclosing_route_segments.each do |segment|
+      def route_enclosing_names
+        @route_enclosing_names ||= returning(Array.new) do |req|
+          enclosing_segments.each do |segment|
             unless segment.is_optional or segment.is_a?(::ActionController::Routing::DividerSegment)
               req << [segment.value, true] if segment.is_a?(::ActionController::Routing::StaticSegment)
               req.last[1] = false if segment.is_a?(::ActionController::Routing::DynamicSegment)
@@ -655,33 +676,60 @@ module Ardes#:nodoc:
         end
       end
       
-      # this is the before_filter that 
-      # * loads all specified and wilcard resources
-      # * sets the controller instance to the current resource specification
+      # this is the before_filter that loads all specified and wildcard resources
       def load_enclosing_resources
         specifications.each_with_index do |spec, idx|
-          spec == '*' ? load_wildcards(specifications[idx+1]) : spec.load_into(self)
-        end
-      end
-    
-      # loads resoources from the route segments, using the segment names to either
-      # * map to a specification, or
-      # * create a specification using the segment name
-      def load_wildcards(to_spec)
-        return if to_spec == '*'
-        route_resource_names.slice(enclosing_resources.size..-1).each do |segment, singleton|
-          return if to_spec && to_spec.segment == segment
-          if resource_specification_map[segment]
-            resource_specification_map[segment].load_into(self)
-          else
-            name = singleton ? segment : segment.singularize
-            Specification.new(name, :singleton => singleton).load_into(self)
+          case spec
+            when '*' then load_wildcards_from(idx)
+            when /^\?(.*)/ then load_wildcard($1)
+            else load_enclosing_resource_from_specification(spec)
           end
         end
       end
       
-      # The name prefix is used for forwarding urls.  This is different dependning on
-      # which route the controller was invoked by.  The resource spcifications build
+      # load a wildcard resource by either
+      # * matching the segment to mapped resource specification, or
+      # * creating one using the segment name
+      # Optionally takes a variable name to set the instance variable as (for polymorphic use)
+      def load_wildcard(as = nil)
+        route_enclosing_names[enclosing_resources.size] or ResourcesController.raise_resource_mismatch(self)
+        segment, singleton = *route_enclosing_names[enclosing_resources.size]
+        spec = resource_specification_map[segment] || Specification.new(singleton ? segment : segment.singularize, :singleton => singleton)
+        load_enclosing_resource_from_specification(spec, as)
+      end
+      
+      # loads a series of wildcard resources, from the specified specification idx
+      #
+      # To do this, we need to figure out where the next specified resource is
+      # and how many single wildcards are prior to that.  What is left over from
+      # the current route enclosing names will be the number of wildcards we need to load
+      def load_wildcards_from(start)
+        specs = specifications.slice(start..-1)
+        encls = route_enclosing_names.slice(enclosing_resources.size..-1)
+        
+        if spec = specs.find {|s| s.is_a?(Specification)}
+          spec_seg = encls.index([spec.segment, spec.singleton?]) or ResourcesController.raise_resource_mismatch(self)
+          number_of_wildcards = spec_seg - (specs.index(spec) -1)
+        else
+          number_of_wildcards = encls.length - (specs.length - 1)
+        end        
+
+        number_of_wildcards.times { load_wildcard }
+      end
+         
+      def load_enclosing_resource_from_specification(spec, as = nil)
+        spec.segment == route_enclosing_names[enclosing_resources.size].first or ResourcesController.raise_resource_mismatch(self)
+        returning spec.find_from(self) do |resource|
+          update_name_prefix(spec.name_prefix)
+          enclosing_resources << resource
+          enclosing_collection_resources << resource unless spec.singleton?
+          instance_variable_set("@#{spec.name}", resource)
+          instance_variable_set("@#{as}", resource) if as
+        end
+      end
+        
+      # The name prefix is used for forwarding urls and will be different depending on
+      # which route the controller was invoked by.  The resource specifications build
       # up the name prefix as the resources are loaded.
       def update_name_prefix(name_prefix)
         @name_prefix = "#{@name_prefix}#{name_prefix}"
@@ -703,7 +751,7 @@ module Ardes#:nodoc:
       end
       
       def find(*args, &block)
-        resource_specification.find ? resource_specification.find_custom : super
+        resource_specification.find ? resource_specification.find_custom(controller) : super
       end
       
       def respond_to?(method)
@@ -718,7 +766,7 @@ module Ardes#:nodoc:
     class SingletonResourceService < ResourceService
       def find(*args)
         if resource_specification.find
-          resource_specification.find_custom
+          resource_specification.find_custom(controller)
         elsif enclosing_resource
           enclosing_resource.send(resource_specification.source)
         else
@@ -739,10 +787,13 @@ module Ardes#:nodoc:
     class CantFindSingleton < RuntimeError #:nodoc:
     end
 
-    class MissingRouteSegment < RuntimeError #:nodoc:
+    class MissingSegment < RuntimeError #:nodoc:
     end
 
     class NoRecognizedRoute < RuntimeError #:nodoc:
+    end
+    
+    class ResourceMismatch < RuntimeError #:nodoc:
     end
 
     class << self
@@ -768,8 +819,8 @@ help.  Do this by mapping the route segment to a resource in the controller, or 
 end_str
       end
 
-      def raise_missing_route_segment(controller) #:nodoc:
-        raise MissingRouteSegment, <<-end_str
+      def raise_missing_segment(controller) #:nodoc:
+        raise MissingSegment, <<-end_str
 Could not recognize segment '#{controller.resource_specification.segment}' in route:
   #{controller.send(:recognized_route)}
 
@@ -795,7 +846,16 @@ Possible reasons for this:
 - the test can't figure out which route corresponds to the params, in this 
   case you may need to stub the recognized_route. (rspec example:)
   @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:the_route])
+        end_str
+      end
+      
+      def raise_resource_mismatch(controller) #:nodoc:
+        raise ResourceMismatch, <<-end_str
+resources_controller can't match the route to the resource specification
+  route:         #{controller.send(:recognized_route)}
+  specification: enclosing: [#{controller.specifications.collect{|s| s.is_a?(Specification) ? ":#{s.segment}" : s}.join(', ')}], resource :#{controller.resource_specification.segment}
   
+the successfully loaded enclosing resources are: #{controller.enclosing_resources.join(', ')}
         end_str
       end
     end

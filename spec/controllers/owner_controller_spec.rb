@@ -211,6 +211,12 @@ describe "Requesting /forums/2/owner using POST" do
     response.should be_redirect
     response.redirect_url.should == "http://test.host/forums/2/owner"
   end
+  
+  it "should render new when post unsuccesful" do
+    @owner.stub!(:save).and_return(false)
+    do_post
+    response.should render_template('new')
+  end
 end
 
 

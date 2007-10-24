@@ -1,3 +1,21 @@
+* - :polymorphic => true is back:
+      resources_controller_for :tags
+      nested_in :taggable, :polymorphic => true
+
+    This will load the enclosing resource (which can be a mapped resource) as
+    @taggable as well as its default name
+  
+    The following syntax is equivalent to the above two lines:
+      resources_controller_for :tags, :in => '?taggable'
+  
+    And you can specify a single wildcard '?' as well as expanding wildcards '*':
+      resources_controller_for :images, :in => '?', :load_enclosing => false
+      # this will work for routes like /users/1/images, /forums/2/images, /featured/images
+  
+  - test coverage is up
+  
+  - moved some of the 'friend' functionality out of Specification, as it smelt bad
+
 * added specs for when you want to find_by_(something other than id) (users,
   addresses, interests)
   

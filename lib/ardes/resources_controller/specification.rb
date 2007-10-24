@@ -3,16 +3,17 @@ module Ardes#:nodoc:
     # This class holds all the info that is required to find a resource, or determine a name prefix, based on a route segment
     # or segment pair (e.g. /blog or /users/3).
     #
-    # You don't need to instatiate this class directly - it is created by ResourcesController::ClassMethods#nested_in,
-    # ResourcesController#map_resource (and ResourcesController::InstanceMethods#load_wildcards)
+    # You don't need to instantiate this class directly - it is created by ResourcesController::ClassMethods#nested_in,
+    # ResourcesController#map_resource (and ResourcesController::InstanceMethods#load_wildcard)
     #
-    # This class is 'friendly' with controller, see load_into 
+    # This is primarily a container class.  A summary of its behaviour:
+    # 1. setting defaults for its own variables on initialize, and
+    # 2. finding an enclosing resource, given a controller object
+    #
     class Specification
       attr_reader :name, :source, :klass, :key, :name_prefix, :segment, :find
-      attr_accessor :controller
-      delegate :enclosing_resource, :to => :controller
-
-      # acts as a factory for Specification and SingletonSpecification
+      
+      # factory for Specification and SingletonSpecification
       #
       # you can call Specification.new 'name', :singleton => true
       def self.new(name, options = {}, &block)
@@ -54,29 +55,21 @@ module Ardes#:nodoc:
       def singleton?
         false
       end
-      
-      # This method loads the resource into the passed controller, accessing some of the controller's
-      # internals to do so.
-      #
-      # This is the 'friend' functionality
-      def load_into(controller)
-        self.controller = controller
-        resource = find ? find_custom : find_resource
-        controller.send(:update_name_prefix, name_prefix)
-        controller.send(:enclosing_resources) << resource
-        controller.send(:non_singleton_resources) << resource unless singleton?
-        controller.send(:instance_variable_set, "@#{name}", resource)
-      end
 
+      # given a controller object, returns the resource according to this specification
+      def find_from(controller)
+        find ? find_custom(controller) : find_resource(controller)
+      end
+      
       # finds the resource using the custom :find Proc or symbol
-      def find_custom
+      def find_custom(controller)
         raise "This specification has no custom :find attribute" unless find
         find.is_a?(Proc) ? controller.instance_eval(&find) : controller.send(find)
       end
       
-      # finds the resource using enclosing resources or resource class
-      def find_resource
-        (enclosing_resource ? enclosing_resource.send(source) : klass).find controller.params[key]
+      # finds the resource on a controller using enclosing resources or resource class
+      def find_resource(controller)
+        (controller.enclosing_resource ? controller.enclosing_resource.send(source) : klass).find controller.params[key]
       end
     end
   
@@ -100,9 +93,9 @@ module Ardes#:nodoc:
       end
     
       # finds the resource from the enclosing resource.  Raise CantFindSingleton if there is no enclosing resource
-      def find_resource
-        ResourcesController.raise_cant_find_singleton(name, klass) unless enclosing_resource
-        enclosing_resource.send(source)
+      def find_resource(controller)
+        ResourcesController.raise_cant_find_singleton(name, klass) unless controller.enclosing_resource
+        controller.enclosing_resource.send(source)
       end
     end
   end

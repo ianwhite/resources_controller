@@ -7,6 +7,7 @@ AccountController#resource_service
 - .new should call :new on User
 - .find should call :current_user
 - .find should call whatever is in resource_specification @find
+- .find should raise CantFindSingleton when no custom finder (and no enclosing resource)
 
 Routing shortcuts for Admin::Forums should map
 - resources_path to /admin/forums
@@ -35,7 +36,7 @@ Routing shortcuts for Admin::Forums should map
 - edit_resource_interest_path(5) to /admin/forums/2/interests/5/edit
 - edit_resource_interest_path(9,5) to /admin/forums/9/interests/5/edit
 - respond_to?(:edit_resource_interest_path) should == true
-- resource_users_path should raise informative NoMethodError
+- resource_users_path should raise informative CantMapRoute
 - enclosing_resource_path should raise informative NoMethodError
 - any_old_missing_method should raise NoMethodError
 - respond_to?(:resource_users_path) should == false
@@ -271,6 +272,11 @@ Routing shortcuts for ForumPosts (forums/2/posts/1) should map
 - enclosing_resource_tags_path to /forums/2/tags
 - enclosing_resource_tag_path(9) to /forums/2/tags/9
 - enclosing_resource_tag_path(8,9) to /forums/8/tags/9
+
+ForumPostsController errors
+- should raise ResourceMismatch for /posts
+- should raise MissingSegment, when route does not contain the resource segment
+- should raise NoRecognizedRoute when no route is recognized
 
 resource_service in ForumPostsController
 - should build new post with @forum foreign key with new
@@ -523,6 +529,7 @@ Requesting /forums/2/owner using POST
 - should build a new owner
 - should set the flash notice
 - should redirect to the new owner
+- should render new when post unsuccesful
 
 Requesting /forums/2/owner using PUT
 - should find the owner from forum.owner
@@ -743,6 +750,7 @@ ActionView with resources_controller Helper
 - should forward #resource to controller
 - should forward #resources to controller
 - should forward #enclosing_resource to controller
+- should forward #enclosing_resource_name to controller
 - should not forward unknown url helper to controller
 
 Helper#form_for_resource (when resource is new record)
@@ -754,10 +762,51 @@ Helper#form_for_resource (when resource is existing record)
 Helper#remote_form_for_resource (when resource is existing record)
 - should call remote_form_for with update form options
 
+#load_enclosing_resources for resources_controller_for :tags (when route_enclosing_names is [['users', false]])
+- should call load_wildcard once
+- should call Specification.new('user', :singleton => false)
+
+#load_enclosing_resources for resources_controller_for :tags, with :account mapping (when route_enclosing_names is [['account', true]])
+- should call load_wildcard once
+- should call load_enclosing_resource_from_specification with account specification
+- should not call Specification.new
+
+#load_enclosing_resources for resources_controller_for :tags (when route_enclosing_names is [['users', false], ['forums', false]])
+- should call load_wildcard twice
+- should call Specification.new with ('user', :singleton => false), then ('forum', :singleton => false)
+
+#load_enclosing_resources for resources_controller_for :tags, :in => ['*', :comment] (when route_enclosing_names is [['comments', false]])
+- should not call load_wildcard
+- should not call Specification.new
+
+#load_enclosing_resources for resources_controller_for :tags, :in => ['*', :comment] (when route_enclosing_names is [['users', false], ['forums', false], ['comments', false]])
+- should call load_wildcard twice
+- should call Specification.new with ('user', :singleton => false), then ('forum', :singleton => false)
+
+#load_enclosing_resources for resources_controller_for :tags, :in => ['*', :comment] (when route_enclosing_names is [['users', false], ['forums', false], ['special', true], ['comments', false]])
+- should call load_wildcard three times
+- should call Specification.new with ('user', :singleton => false), ('forum', :singleton => false), then ('special', :singleton => true)
+
+#load_enclosing_resources for resources_controller_for :tags, :in => ['*', '?commentable', :comment] (when route_enclosing_names is [['users', false], ['comments', false]])
+- should call load_wildcard once with 'commentable'
+- should call Specification.new with ('user', :singleton => false)
+
+#load_enclosing_resources for resources_controller_for :tags, :in => ['*', '?commentable', :comment] (when route_enclosing_names is [['users', false], ['forums', false], ['comments', false]])
+- should call load_wildcard once, then once with 'commentable'
+- should call Specification.new with ('user', :singleton => false), ('forum', :singleton => false)
+
+#load_enclosing_resources for resources_controller_for :tags, :in => ['*', '?commentable', :comment] (when route_enclosing_names is [['users', false], ['forums', false], ['posts', false], ['comments', false]])
+- should call load_wildcard twice, then once with 'commentable'
+- should call Specification.new with ('user', :singleton => false), ('forum', :singleton => false), then ('post', :singleton => false)
+
+#load_enclosing_resources for resources_controller_for :tags, :in => ['user', '*', '?taggable'] (when route_enclosing_names is [['users', false], ['comments', false]])
+- should call load_enclosing_resource_from_specification with user spec, then load_wildcard once with 'taggable'
+- should call Specification.new with ('comment', :singleton => false)
+
 A controller's resource_service
 - may be explicitly set with #resource_service=
 
-ResourcesController#route_resource_names (route_name:tag, :singleton:false)
+#route_enclosing_names (route_name:tag, :singleton:false) for named_route:
 - :tags should be []
 - :new_tag should be []
 - :edit_tag should be []
@@ -768,6 +817,6 @@ ResourcesController#route_resource_names (route_name:tag, :singleton:false)
 - :account_info_tags should be [["account", true], ["info", true]]
 - :new_account_info_tag should be [["account", true], ["info", true]]
 
-Finished in 4.40074 seconds
+Finished in 5.243358 seconds
 
-539 examples, 0 failures
+566 examples, 0 failures

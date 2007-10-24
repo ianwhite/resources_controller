@@ -115,7 +115,7 @@ describe "Routing shortcuts for Admin::Forums should map" do
     controller.should respond_to(:edit_resource_interest_path)
   end
 
-  it "resource_users_path should raise informative NoMethodError" do
+  it "resource_users_path should raise informative CantMapRoute" do
     lambda{ controller.resource_users_path }.should raise_error(Ardes::ResourcesController::CantMapRoute, <<-end_str
 Tried to map :resource_users_path to :admin_forum_users_path,
 which doesn't exist. You may not have defined the route in config/routes.rb.

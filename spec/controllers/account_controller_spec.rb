@@ -26,7 +26,7 @@ describe "Routing shortcuts for Account should map" do
    
   it "resource_info_tags_path to /account/info/tags" do
     controller.resource_info_tags_path.should == "/account/info/tags"
-  end
+  end    
 end
 
 describe AccountController, "#resource_service" do
@@ -52,7 +52,12 @@ describe AccountController, "#resource_service" do
   
   it ".find should call whatever is in resource_specification @find" do
     @controller.should_receive(:lambda_called).once.and_return(@current_user)
-    @controller.send(:resource_specification).instance_variable_set "@find", lambda { lambda_called }
+    @controller.send(:resource_specification).stub!(:find).and_return(lambda { lambda_called })
     @resource_service.find
+  end
+  
+  it ".find should raise CantFindSingleton when no custom finder (and no enclosing resource)" do
+    @controller.send(:resource_specification).stub!(:find).and_return nil
+    lambda{ @resource_service.find }.should raise_error(Ardes::ResourcesController::CantFindSingleton)
   end
 end

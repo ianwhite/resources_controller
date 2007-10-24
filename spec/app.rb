@@ -45,6 +45,12 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :tags
   
+  # the following routes are for testing errors
+  map.resources :posts, :controller => 'forum_posts'
+  map.resources :foos do |foo|
+    foo.resources :bars, :controller => 'forum_posts'
+  end
+  
   map.connect ':controller/:action/:id.:format'
   map.connect ':controller/:action/:id'
 end
@@ -248,8 +254,9 @@ class ForumPostsController < PostsController
   # for testing filter load order
   before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :forum_posts}
 
-  # test inherited resources_controller_for use
+  # test override resources_controller_for use
   resources_controller_for :posts
+  
   # example of providing a custom finder for the nesting resource
   nested_in :forum do
     Forum.find(params[:forum_id])
@@ -257,14 +264,13 @@ class ForumPostsController < PostsController
 end
 
 class CommentsController < ApplicationController
-  resources_controller_for :comments, :in => [:forum, :post]
+  resources_controller_for :comments, :in => [:forum, :post], :load_enclosing => false
 end
 
 class InterestsController < ApplicationController
   resources_controller_for :interests
-  before_filter :set_interested_in
+  nested_in :interested_in, :polymorphic => true
   
-  def set_interested_in
-    @interested_in = enclosing_resource
-  end
+  # the above two lines are the same as:
+  #   resources_controller_for :interests, :in => '?interested_in'
 end
