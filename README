@@ -7,13 +7,11 @@ See Ardes::ResourcesController for details
 
 See the {CHANGLELOG}[link:files/CHANGELOG.html] for recent changes and contributors
 
-= works with rails edge and rails 1.2.5
+= works with rails edge
 
-resources_controller works with rails edge, and 1.2.5.  To check what specific revision of
-edge RC has been recently tested against, go to http://plugins.ardes.com/doc/_ci_report.txt
+resources_controller works with rails edge.
 
-RC probably works fine with rails 1.2.3, but the specs don't pass because of the changes
-to named routes.
+It probably works with 1.2.5.  Hold fire, and check back for details of 1.2.5 and 1.2.3 testing
 
 === Specs and Coverage
 * {SPECDOC}[link:files/SPECDOC.html] lists the specifications
