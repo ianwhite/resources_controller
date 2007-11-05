@@ -183,7 +183,7 @@ module Admin
   end
 end
 
-class AccountController < ApplicationController
+class AccountsController < ApplicationController
   resources_controller_for :account, :singleton => true, :source => :user, :find => :current_user
 end
 
@@ -208,7 +208,7 @@ class ForumsController < ApplicationController
   resources_controller_for :forums
 end
 
-class OwnerController < ApplicationController
+class OwnersController < ApplicationController
   resources_controller_for :owner, :singleton => true, :class => User, :in => :forum
 end
 

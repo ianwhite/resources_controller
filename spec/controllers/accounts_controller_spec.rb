@@ -1,7 +1,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
 require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
 
-module AccountControllerSpecHelper
+module AccountsControllerSpecHelper
   def setup_mocks
     @current_user = mock('user')
     @current_user.stub!(:id).and_return('1')
@@ -11,12 +11,11 @@ module AccountControllerSpecHelper
 end
 
 describe "Routing shortcuts for Account should map" do
-  include AccountControllerSpecHelper
-  controller_name :account
+  include AccountsControllerSpecHelper
+  controller_name :accounts
   
   before(:each) do
     setup_mocks
-    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:account])
     get :show
   end
 
@@ -29,13 +28,12 @@ describe "Routing shortcuts for Account should map" do
   end    
 end
 
-describe AccountController, "#resource_service" do
-  include AccountControllerSpecHelper
-  controller_name :account
+describe AccountsController, "#resource_service" do
+  include AccountsControllerSpecHelper
+  controller_name :accounts
   
   before(:each) do
     setup_mocks 
-    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:account])
     get :show
     @resource_service = controller.send :resource_service
   end
