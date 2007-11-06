@@ -32,8 +32,8 @@ describe "#load_enclosing_resources for resources_controller_for :tags (when rou
     @controller.send(:load_enclosing_resources)
   end
   
-  it "should call Specification.new('user', :singleton => false)" do
-    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false)
+  it "should call Specification.new('user', :singleton => false, :as => nil)" do
+    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false, :as => nil)
     @controller.send(:load_enclosing_resources)
   end
 end
@@ -54,7 +54,7 @@ describe "#load_enclosing_resources for resources_controller_for :tags, with :ac
   end
   
   it "should call load_enclosing_resource_from_specification with account specification" do
-    @controller.should_receive(:load_enclosing_resource_from_specification).with(@account_spec, nil)
+    @controller.should_receive(:load_enclosing_resource_from_specification).with(@account_spec)
     @controller.send(:load_enclosing_resources)
   end
   
@@ -77,9 +77,9 @@ describe "#load_enclosing_resources for resources_controller_for :tags (when rou
     @controller.send(:load_enclosing_resources)
   end
   
-  it "should call Specification.new with ('user', :singleton => false), then ('forum', :singleton => false)" do
-    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false).ordered
-    Ardes::ResourcesController::Specification.should_receive(:new).with('forum', :singleton => false).ordered
+  it "should call Specification.new with ('user', :singleton => false, :as => nil), then ('forum', :singleton => false, :as => nil)" do
+    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false, :as => nil).ordered
+    Ardes::ResourcesController::Specification.should_receive(:new).with('forum', :singleton => false, :as => nil).ordered
     @controller.send(:load_enclosing_resources)
   end
 end
@@ -116,9 +116,9 @@ describe "#load_enclosing_resources for resources_controller_for :tags, :in => [
     @controller.send(:load_enclosing_resources)
   end
   
-  it "should call Specification.new with ('user', :singleton => false), then ('forum', :singleton => false)" do
-    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false).ordered
-    Ardes::ResourcesController::Specification.should_receive(:new).with('forum', :singleton => false).ordered
+  it "should call Specification.new with ('user', :singleton => false, :as => nil), then ('forum', :singleton => false, :as => nil)" do
+    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false, :as => nil).ordered
+    Ardes::ResourcesController::Specification.should_receive(:new).with('forum', :singleton => false, :as => nil).ordered
     @controller.send(:load_enclosing_resources)
   end
 end
@@ -136,10 +136,10 @@ describe "#load_enclosing_resources for resources_controller_for :tags, :in => [
     @controller.send(:load_enclosing_resources)
   end
   
-  it "should call Specification.new with ('user', :singleton => false), ('forum', :singleton => false), then ('special', :singleton => true)" do
-    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false).ordered
-    Ardes::ResourcesController::Specification.should_receive(:new).with('forum', :singleton => false).ordered
-    Ardes::ResourcesController::Specification.should_receive(:new).with('special', :singleton => true).ordered
+  it "should call Specification.new with ('user', :singleton => false, :as => nil), ('forum', :singleton => false, :as => nil), then ('special', :singleton => true, :as => nil)" do
+    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false, :as => nil).ordered
+    Ardes::ResourcesController::Specification.should_receive(:new).with('forum', :singleton => false, :as => nil).ordered
+    Ardes::ResourcesController::Specification.should_receive(:new).with('special', :singleton => true, :as => nil).ordered
     @controller.send(:load_enclosing_resources)
   end
 end
@@ -157,8 +157,8 @@ describe "#load_enclosing_resources for resources_controller_for :tags, :in => [
     @controller.send(:load_enclosing_resources)
   end
   
-  it "should call Specification.new with ('user', :singleton => false)" do
-    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false).ordered
+  it "should call Specification.new with ('user', :singleton => false, :as => 'commentable')" do
+    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false, :as => 'commentable').ordered
     @controller.send(:load_enclosing_resources)
   end
 end
@@ -171,15 +171,15 @@ describe "#load_enclosing_resources for resources_controller_for :tags, :in => [
     @controller.stub!(:route_enclosing_names).and_return [['users', false], ['forums', false], ['comments', false]]
   end
   
-  it "should call load_wildcard once, then once with 'commentable'" do
+  it "should call load_wildcard twice" do
     @controller.should_receive(:load_wildcard).with().once.ordered
     @controller.should_receive(:load_wildcard).with('commentable').once.ordered
     @controller.send(:load_enclosing_resources)
   end
   
-  it "should call Specification.new with ('user', :singleton => false), ('forum', :singleton => false)" do
-    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false).once.ordered
-    Ardes::ResourcesController::Specification.should_receive(:new).with('forum', :singleton => false).once.ordered
+  it "should call Specification.new with ('user', :singleton => false, :as => nil), ('forum', :singleton => false, :as => 'commentable')" do
+    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false, :as => nil).once.ordered
+    Ardes::ResourcesController::Specification.should_receive(:new).with('forum', :singleton => false, :as => 'commentable').once.ordered
     @controller.send(:load_enclosing_resources)
   end
 end
@@ -198,10 +198,10 @@ describe "#load_enclosing_resources for resources_controller_for :tags, :in => [
     @controller.send(:load_enclosing_resources)
   end
   
-  it "should call Specification.new with ('user', :singleton => false), ('forum', :singleton => false), then ('post', :singleton => false)" do
-    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false).once.ordered
-    Ardes::ResourcesController::Specification.should_receive(:new).with('forum', :singleton => false).once.ordered
-    Ardes::ResourcesController::Specification.should_receive(:new).with('post', :singleton => false).once.ordered
+  it "should call Specification.new with ('user', :singleton => false, :as => nil), ('forum', :singleton => false, :as => nil), then ('post', :singleton => false, :as => 'commentable')" do
+    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false, :as => nil).once.ordered
+    Ardes::ResourcesController::Specification.should_receive(:new).with('forum', :singleton => false, :as => nil).once.ordered
+    Ardes::ResourcesController::Specification.should_receive(:new).with('post', :singleton => false, :as => 'commentable').once.ordered
     @controller.send(:load_enclosing_resources)
   end
 end
@@ -223,8 +223,8 @@ describe "#load_enclosing_resources for resources_controller_for :tags, :in => [
     @controller.send(:load_enclosing_resources)
   end
   
-  it "should call Specification.new with ('comment', :singleton => false)" do
-    Ardes::ResourcesController::Specification.should_receive(:new).with('comment', :singleton => false).ordered
+  it "should call Specification.new with ('comment', :singleton => false, :as => 'taggable')" do
+    Ardes::ResourcesController::Specification.should_receive(:new).with('comment', :singleton => false, :as => 'taggable').ordered
     @controller.send(:load_enclosing_resources)
   end
 end

@@ -12,6 +12,7 @@ module Ardes#:nodoc:
     #
     class Specification
       attr_reader :name, :source, :klass, :key, :name_prefix, :segment, :find
+      attr_accessor :as
       
       # factory for Specification and SingletonSpecification
       #
@@ -41,7 +42,7 @@ module Ardes#:nodoc:
       #
       # Passing a block is the same as passing :find => Proc
       def initialize(spec_name, options = {}, &block)
-        options.assert_valid_keys(:class, :source, :key, :find, :name_prefix, :segment)
+        options.assert_valid_keys(:class, :source, :key, :find, :name_prefix, :segment, :as)
         @name        = spec_name.to_s
         @find        = block || options.delete(:find)
         @segment     = (options[:segment] && options[:segment].to_s) || name.pluralize
@@ -49,6 +50,7 @@ module Ardes#:nodoc:
         @name_prefix = options[:name_prefix] || (options[:name_prefix] == false ? '' : "#{name}_")
         @klass       = options[:class] || ((source && source.classify) || name.camelize).constantize
         @key         = (options[:key] && options[:key].to_s) || name.foreign_key
+        @as          = options[:as]
       end
 
       # returns false

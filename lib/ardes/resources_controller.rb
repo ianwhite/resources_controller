@@ -414,7 +414,7 @@ module Ardes#:nodoc:
     def resources_controller_for(name, options = {}, &block)
       deprecated_resources_controller_for(options)
       
-      options.assert_valid_keys(:class, :source, :singleton, :actions, :in, :find, :load_enclosing, :route, :segment, :only, :except)
+      options.assert_valid_keys(:class, :source, :singleton, :actions, :in, :find, :load_enclosing, :route, :segment, :as, :only, :except)
       when_options = {:only => options.delete(:only), :except => options.delete(:except)}
       
       unless included_modules.include? ResourcesController::InstanceMethods
@@ -719,8 +719,13 @@ module Ardes#:nodoc:
       def load_wildcard(as = nil)
         route_enclosing_names[enclosing_resources.size] or ResourcesController.raise_resource_mismatch(self)
         segment, singleton = *route_enclosing_names[enclosing_resources.size]
-        spec = resource_specification_map[segment] || Specification.new(singleton ? segment : segment.singularize, :singleton => singleton)
-        load_enclosing_resource_from_specification(spec, as)
+        if resource_specification_map[segment]
+          spec = resource_specification_map[segment]
+          spec = returning(spec.dup) {|s| s.as = as} if as
+        else
+          spec = Specification.new(singleton ? segment : segment.singularize, :singleton => singleton, :as => as)
+        end
+        load_enclosing_resource_from_specification(spec)
       end
       
       # loads a series of wildcard resources, from the specified specification idx
@@ -742,14 +747,14 @@ module Ardes#:nodoc:
         number_of_wildcards.times { load_wildcard }
       end
          
-      def load_enclosing_resource_from_specification(spec, as = nil)
+      def load_enclosing_resource_from_specification(spec)
         spec.segment == route_enclosing_names[enclosing_resources.size].first or ResourcesController.raise_resource_mismatch(self)
         returning spec.find_from(self) do |resource|
           update_name_prefix(spec.name_prefix)
           enclosing_resources << resource
           enclosing_collection_resources << resource unless spec.singleton?
           instance_variable_set("@#{spec.name}", resource)
-          instance_variable_set("@#{as}", resource) if as
+          instance_variable_set("@#{spec.as}", resource) if spec.as
         end
       end
         

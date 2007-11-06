@@ -289,6 +289,7 @@ ForumPostsController order of before_filters
 
 Requesting /forums/2/posts (testing the before filters)
 - should find the forum
+- should assign the form as other_name_for_forum
 - should assign the found forum for the view
 - should assign the forum_posts association as the posts resource_service
 
@@ -762,7 +763,7 @@ Helper#remote_form_for_resource (when resource is existing record)
 
 #load_enclosing_resources for resources_controller_for :tags (when route_enclosing_names is [['users', false]])
 - should call load_wildcard once
-- should call Specification.new('user', :singleton => false)
+- should call Specification.new('user', :singleton => false, :as => nil)
 
 #load_enclosing_resources for resources_controller_for :tags, with :account mapping (when route_enclosing_names is [['account', true]])
 - should call load_wildcard once
@@ -771,7 +772,7 @@ Helper#remote_form_for_resource (when resource is existing record)
 
 #load_enclosing_resources for resources_controller_for :tags (when route_enclosing_names is [['users', false], ['forums', false]])
 - should call load_wildcard twice
-- should call Specification.new with ('user', :singleton => false), then ('forum', :singleton => false)
+- should call Specification.new with ('user', :singleton => false, :as => nil), then ('forum', :singleton => false, :as => nil)
 
 #load_enclosing_resources for resources_controller_for :tags, :in => ['*', :comment] (when route_enclosing_names is [['comments', false]])
 - should not call load_wildcard
@@ -779,27 +780,27 @@ Helper#remote_form_for_resource (when resource is existing record)
 
 #load_enclosing_resources for resources_controller_for :tags, :in => ['*', :comment] (when route_enclosing_names is [['users', false], ['forums', false], ['comments', false]])
 - should call load_wildcard twice
-- should call Specification.new with ('user', :singleton => false), then ('forum', :singleton => false)
+- should call Specification.new with ('user', :singleton => false, :as => nil), then ('forum', :singleton => false, :as => nil)
 
 #load_enclosing_resources for resources_controller_for :tags, :in => ['*', :comment] (when route_enclosing_names is [['users', false], ['forums', false], ['special', true], ['comments', false]])
 - should call load_wildcard three times
-- should call Specification.new with ('user', :singleton => false), ('forum', :singleton => false), then ('special', :singleton => true)
+- should call Specification.new with ('user', :singleton => false, :as => nil), ('forum', :singleton => false, :as => nil), then ('special', :singleton => true, :as => nil)
 
 #load_enclosing_resources for resources_controller_for :tags, :in => ['*', '?commentable', :comment] (when route_enclosing_names is [['users', false], ['comments', false]])
 - should call load_wildcard once with 'commentable'
-- should call Specification.new with ('user', :singleton => false)
+- should call Specification.new with ('user', :singleton => false, :as => 'commentable')
 
 #load_enclosing_resources for resources_controller_for :tags, :in => ['*', '?commentable', :comment] (when route_enclosing_names is [['users', false], ['forums', false], ['comments', false]])
-- should call load_wildcard once, then once with 'commentable'
-- should call Specification.new with ('user', :singleton => false), ('forum', :singleton => false)
+- should call load_wildcard twice
+- should call Specification.new with ('user', :singleton => false, :as => nil), ('forum', :singleton => false, :as => 'commentable')
 
 #load_enclosing_resources for resources_controller_for :tags, :in => ['*', '?commentable', :comment] (when route_enclosing_names is [['users', false], ['forums', false], ['posts', false], ['comments', false]])
 - should call load_wildcard twice, then once with 'commentable'
-- should call Specification.new with ('user', :singleton => false), ('forum', :singleton => false), then ('post', :singleton => false)
+- should call Specification.new with ('user', :singleton => false, :as => nil), ('forum', :singleton => false, :as => nil), then ('post', :singleton => false, :as => 'commentable')
 
 #load_enclosing_resources for resources_controller_for :tags, :in => ['user', '*', '?taggable'] (when route_enclosing_names is [['users', false], ['comments', false]])
 - should call load_enclosing_resource_from_specification with user spec, then load_wildcard once with 'taggable'
-- should call Specification.new with ('comment', :singleton => false)
+- should call Specification.new with ('comment', :singleton => false, :as => 'taggable')
 
 A controller's resource_service
 - may be explicitly set with #resource_service=
@@ -815,6 +816,6 @@ A controller's resource_service
 - :account_info_tags should be [["account", true], ["info", true]]
 - :new_account_info_tag should be [["account", true], ["info", true]]
 
-Finished in 5.001324 seconds
+Finished in 4.984696 seconds
 
-560 examples, 0 failures
+561 examples, 0 failures

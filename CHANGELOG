@@ -1,3 +1,16 @@
+* you can alias an enclosing resource with :as
+
+  This can be useful when you have a tree like domain:
+  
+    map.resources :categories do |category|
+      category.resources :categories
+    end
+  
+    class CategoriesController < ApplicationController
+      resources_controller_for :categories
+      map_resource :category, :as => :parent
+    end
+
 * you can now specify which actions are loaded from the actions module
   
     resources_controller_for :forums, :only => [:index, :show]

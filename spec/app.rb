@@ -258,7 +258,9 @@ class ForumPostsController < PostsController
   resources_controller_for :posts
   
   # example of providing a custom finder for the nesting resource
-  nested_in :forum do
+  # also example of :as option, which allows you to assign an alias
+  # for an enclosing resource
+  nested_in :forum, :as => :other_name_for_forum do
     Forum.find(params[:forum_id])
   end
 end
@@ -268,8 +270,8 @@ class CommentsController < ApplicationController
 end
 
 class InterestsController < ApplicationController
-  resources_controller_for :interests
-  nested_in :interested_in, :polymorphic => true
+  resources_controller_for :interests, :in => '?interested_in'
+#  nested_in :interested_in, :polymorphic => true
   
   # the above two lines are the same as:
   #   resources_controller_for :interests, :in => '?interested_in'

@@ -173,6 +173,11 @@ describe "Requesting /forums/2/posts (testing the before filters)" do
     do_get
   end
   
+  it "should assign the form as other_name_for_forum" do
+    do_get
+    assigns[:other_name_for_forum].should == assigns[:forum]
+  end
+  
   it "should assign the found forum for the view" do
     do_get
     assigns[:forum].should == @forum
