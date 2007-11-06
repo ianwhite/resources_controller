@@ -3,7 +3,7 @@ Routing shortcuts for Account should map
 - resource_path to /account
 - resource_info_tags_path to /account/info/tags
 
-AccountController#resource_service
+AccountsController#resource_service
 - .new should call :new on User
 - .find should call :current_user
 - .find should call whatever is in resource_specification @find
@@ -366,6 +366,9 @@ Routing shortcuts for Forums should map
 - any_old_missing_method should raise NoMethodError
 - respond_to?(:resource_users_path) should == false
 
+ForumsController (checking that non actions are hidden)
+- should only have CRUD actions as action_methods
+
 resource_service in ForumsController
 - should build new forum with new
 - should find @forum with find(@forum.id)
@@ -455,6 +458,9 @@ Requesting /forums/1 using XHR DELETE
 - should call destroy on the found forum
 - should render destroy.rjs
 
+Routing shortcuts for Infos should map
+- resource_path to /account/info
+
 Routing shortcuts for Interests via Forum (forums/1/interests/2) should map
 - resources_path to /forums/1/interests
 - resource_path to /forums/1/interests/2
@@ -503,7 +509,7 @@ Routing shortcuts for ForumOwner should map
 - resource_post_path(5) to /forums/2/owner/posts/5
 - enclosing_resource_path to /forums/2
 
-OwnerController#resource_service
+OwnersController#resource_service
 - .new should call :build_owner on @forum
 - .find should call :owner on @forum
 
@@ -715,11 +721,7 @@ UsersControllerhandling GET /users/dave.xml
 - should render the found user as xml
 
 UsersController handling GET /users/new
-- should be successful
-- should render new template
-- should create an new user
-- should not save the new user
-- should assign the new user for the view
+- should be unknown action
 
 UsersController handling GET /users/dave/edit
 - should be successful
@@ -728,9 +730,7 @@ UsersController handling GET /users/dave/edit
 - should assign the found User for the view
 
 UsersController handling POST /users
-- should create a new user
-- should redirect to the new user on successful save
-- should re-render 'new' on failed save
+- should be unknown action
 
 UsersController handling PUT /users/dave
 - should find the user requested
@@ -740,9 +740,7 @@ UsersController handling PUT /users/dave
 - should re-render 'edit' on failed update
 
 UsersController handling DELETE /users/dave
-- should find the user requested
-- should call destroy on the found user
-- should redirect to the users list
+- should be unknown action
 
 ActionView with resources_controller Helper
 - should forward #resource_name to controller
@@ -817,6 +815,6 @@ A controller's resource_service
 - :account_info_tags should be [["account", true], ["info", true]]
 - :new_account_info_tag should be [["account", true], ["info", true]]
 
-Finished in 5.243358 seconds
+Finished in 5.001324 seconds
 
-566 examples, 0 failures
+560 examples, 0 failures

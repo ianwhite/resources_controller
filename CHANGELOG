@@ -1,3 +1,12 @@
+* you can now specify which actions are loaded from the actions module
+  
+    resources_controller_for :forums, :only => [:index, :show]
+    resources_controller_for :forums, :actions => MyActions, :except => :destroy
+    
+  The method used to achieve this is Ardes::ResourcesController::include_actions
+  which can be used in any ActionController when resources_controller is in your
+  plugins directory
+
 * - :polymorphic => true is back:
       resources_controller_for :tags
       nested_in :taggable, :polymorphic => true

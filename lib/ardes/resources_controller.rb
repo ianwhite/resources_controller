@@ -379,6 +379,8 @@ module Ardes#:nodoc:
     # * <tt>:load_enclosing:</tt> (default true) loads enclosing resources automatically.
     # * <tt>:actions:</tt> (default nil) set this to false if you don't want the default RC actions.  Set this
     #   to a module to use that module for your own actions.
+    # * <tt>:only:</tt> only include the specified actions.
+    # * <tt>:except:</tt> include all actions except the specified actions.
     #
     # =====Options for unconvential use
     # (otherwise these are all inferred from the _name_)
@@ -412,25 +414,25 @@ module Ardes#:nodoc:
     def resources_controller_for(name, options = {}, &block)
       deprecated_resources_controller_for(options)
       
-      options.assert_valid_keys(:class, :source, :singleton, :actions, :in, :find, :load_enclosing, :route, :segment)
+      options.assert_valid_keys(:class, :source, :singleton, :actions, :in, :find, :load_enclosing, :route, :segment, :only, :except)
+      when_options = {:only => options.delete(:only), :except => options.delete(:except)}
       
       unless included_modules.include? ResourcesController::InstanceMethods
         class_inheritable_reader :specifications, :route_name
-        
+        hide_action :specifications, :route_name
         extend  ResourcesController::ClassMethods
         helper  ResourcesController::Helper
         include ResourcesController::InstanceMethods, ResourcesController::NamedRouteHelper
       end
 
-      before_filter :load_enclosing_resources unless find_filter(:load_enclosing_resources)
+      before_filter(:load_enclosing_resources, when_options) unless find_filter(:load_enclosing_resources)
       
       write_inheritable_attribute(:specifications, [])
       specifications << '*' unless options.delete(:load_enclosing) == false
       
-      if actions = options.delete(:actions)
-        include actions
-      elsif actions.nil?
-        include options[:singleton] ? ResourcesController::SingletonActions : ResourcesController::Actions
+      unless (actions = options.delete(:actions)) == false
+        actions ||= options[:singleton] ? ResourcesController::SingletonActions : ResourcesController::Actions
+        include_actions actions, when_options
       end
       
       route = (options.delete(:route) || name).to_s
@@ -462,6 +464,27 @@ module Ardes#:nodoc:
     def map_resource(name, options = {}, &block)
       spec = Specification.new(name, options, &block)
       resource_specification_map[spec.segment] = spec
+    end
+    
+    # Include the specified module, optionally specifying which public methods to include
+    #
+    # eg
+    # 
+    #   include_actions ActionMixin, :only => :index
+    #   include_actions ActionMixin, :except => [:create, :new]
+    def include_actions(mixin, options = {})
+      options.assert_valid_keys(:only, :except)
+      raise ArgumentError, "you can only specify either :except or :only, not both" if options[:only] && options[:except]
+      
+      mixin = mixin.dup
+      if only = options[:only]
+        only = (only.is_a?(Array) ? only : [only]).collect(&:to_s)
+        mixin.instance_methods.each {|m| mixin.send(:undef_method, m) unless only.include?(m)}
+      elsif except = options[:except]
+        except = (except.is_a?(Array) ? except : [except]).collect(&:to_s)
+        mixin.instance_methods.each {|m| mixin.send(:undef_method, m) if except.include?(m)}
+      end
+      include mixin
     end
     
     module ClassMethods
@@ -525,10 +548,7 @@ module Ardes#:nodoc:
     
     module InstanceMethods
       def self.included(base)
-        base.send :hide_action, *instance_methods
         base.class_eval do
-          attr_writer :resource_service
-          
         protected
           # we define the find|new_resource(s) methods only if they're not already defined
           # this allows abstract controllers to define the resource service methods
@@ -553,6 +573,11 @@ module Ardes#:nodoc:
             end
           end
         end
+        base.send :hide_action, *instance_methods
+      end
+      
+      def resource_service=(service)
+        @resource_service = service
       end
       
       def name_prefix
@@ -767,7 +792,7 @@ module Ardes#:nodoc:
       def find(*args)
         if resource_specification.find
           resource_specification.find_custom(controller)
-        elsif enclosing_resource
+        elsif controller.enclosing_resources.size > 0
           enclosing_resource.send(resource_specification.source)
         else
           ResourcesController.raise_cant_find_singleton(controller.resource_name, controller.resource_class)

@@ -184,39 +184,8 @@ describe UsersController, "handling GET /users/dave.xml" do
 end
 
 describe UsersController, "handling GET /users/new" do
-
-  before do
-    @user = mock_model(User)
-    User.stub!(:new).and_return(@user)
-  end
-  
-  def do_get
-    get :new
-  end
-
-  it "should be successful" do
-    do_get
-    response.should be_success
-  end
-  
-  it "should render new template" do
-    do_get
-    response.should render_template('new')
-  end
-  
-  it "should create an new user" do
-    User.should_receive(:new).and_return(@user)
-    do_get
-  end
-  
-  it "should not save the new user" do
-    @user.should_not_receive(:save)
-    do_get
-  end
-  
-  it "should assign the new user for the view" do
-    do_get
-    assigns[:user].should equal(@user)
+  it "should be unknown action" do
+    lambda{ get :new }.should raise_error(ActionController::UnknownAction)
   end
 end
 
@@ -253,35 +222,8 @@ describe UsersController, "handling GET /users/dave/edit" do
 end
 
 describe UsersController, "handling POST /users" do
-
-  before do
-    @user = mock_model(User, :to_param => "dave")
-    User.stub!(:new).and_return(@user)
-  end
-  
-  def post_with_successful_save
-    @user.should_receive(:save).and_return(true)
-    post :create, :user => {}
-  end
-  
-  def post_with_failed_save
-    @user.should_receive(:save).and_return(false)
-    post :create, :user => {}
-  end
-  
-  it "should create a new user" do
-    User.should_receive(:new).with({}).and_return(@user)
-    post_with_successful_save
-  end
-
-  it "should redirect to the new user on successful save" do
-    post_with_successful_save
-    response.should redirect_to(user_url("dave"))
-  end
-
-  it "should re-render 'new' on failed save" do
-    post_with_failed_save
-    response.should render_template('new')
+  it "should be unknown action" do
+    lambda{ post :create }.should raise_error(ActionController::UnknownAction)
   end
 end
 
@@ -329,28 +271,7 @@ describe UsersController, "handling PUT /users/dave" do
 end
 
 describe UsersController, "handling DELETE /users/dave" do
-
-  before do
-    @user = mock_model(User, :destroy => true)
-    User.stub!(:find_by_login).and_return(@user)
-  end
-  
-  def do_delete
-    delete :destroy, :id => "dave"
-  end
-
-  it "should find the user requested" do
-    User.should_receive(:find_by_login).with("dave").and_return(@user)
-    do_delete
-  end
-  
-  it "should call destroy on the found user" do
-    @user.should_receive(:destroy)
-    do_delete
-  end
-  
-  it "should redirect to the users list" do
-    do_delete
-    response.should redirect_to(users_url)
+  it "should be unknown action" do
+    lambda{ delete :destroy, :id => "dave" }.should raise_error(ActionController::UnknownAction)
   end
 end

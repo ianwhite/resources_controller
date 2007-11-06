@@ -144,6 +144,14 @@ end_str
   end
 end
 
+describe ForumsController, " (checking that non actions are hidden)" do
+  it "should only have CRUD actions as action_methods" do
+    @controller.class.send(:action_methods).should == Set.new([
+      'index', 'show', 'edit', 'new', 'update', 'create', 'destroy'
+    ])
+  end
+end
+
 describe "resource_service in ForumsController" do
   controller_name :forums
   

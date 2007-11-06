@@ -187,8 +187,8 @@ class AccountsController < ApplicationController
   resources_controller_for :account, :singleton => true, :source => :user, :find => :current_user
 end
 
-class InfoController < ApplicationController
-  resources_controller_for :info, :singleton => true
+class InfosController < ApplicationController
+  resources_controller_for :info, :singleton => true, :only => [:show, :edit, :update]
 end
 
 class TagsController < ApplicationController
@@ -196,7 +196,7 @@ class TagsController < ApplicationController
 end
 
 class UsersController < ApplicationController
-  resources_controller_for :users
+  resources_controller_for :users, :except => [:new, :create, :destroy]
   
 protected
   def find_resource(id = params[:id])
