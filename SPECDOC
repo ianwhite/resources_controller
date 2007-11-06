@@ -8,6 +8,67 @@ AccountsController#resource_service
 - .find should call :current_user
 - .find should call whatever is in resource_specification @find
 - .find should raise CantFindSingleton when no custom finder (and no enclosing resource)
+- .foo should call foo on User
+- .respond_to?(:foo) should call respond_to?(:foo) on User
+
+Routing shortcuts for Addresses (users/dave/addresses/1) should map
+- resources_path to /users/dave/addresses
+- resource_path to /users/dave/addresses/1
+- resource_path(9) to /users/dave/addresses/9
+- edit_resource_path to /users/dave/addresses/1/edit
+- edit_resource_path(9) to /users/dave/addresses/9/edit
+- new_resource_path to /users/dave/addresses/new
+
+resource_service in AddressesController
+- should build new address with @user foreign key with new
+- should find @address with find(@address.id)
+- should raise RecordNotFound with find(@other_address.id)
+- should find only addresses belonging to @user with find(:all)
+
+Requesting /users/dave/addresses
+- should find the user
+- should assign the found user for the view
+- should assign the user_addresses association as the addresses resource_service
+
+Requesting /users/dave/addresses using GET
+- should be successful
+- should render index.rhtml
+- should find all addresses
+- should assign the found addresses for the view
+
+Requesting /users/dave/addresses/1 using GET
+- should be successful
+- should render show.rhtml
+- should find the thing requested
+- should assign the found thing for the view
+
+Requesting /users/dave/addresses/new using GET
+- should be successful
+- should render new.rhtml
+- should create an new thing
+- should not save the new thing
+- should assign the new thing for the view
+
+Requesting /users/dave/addresses/1/edit using GET
+- should be successful
+- should render edit.rhtml
+- should find the thing requested
+- should assign the found Thing for the view
+
+Requesting /users/dave/addresses using POST
+- should create a new address
+- should redirect to the new address
+
+Requesting /users/dave/addresses/1 using PUT
+- should find the address requested
+- should update the found address
+- should assign the found address for the view
+- should redirect to the address
+
+Requesting /users/dave/addresses/1 using DELETE
+- should find the address requested
+- should call destroy on the found thing
+- should redirect to the things list
 
 Routing shortcuts for Admin::Forums should map
 - resources_path to /admin/forums
@@ -129,65 +190,6 @@ Requesting /admin/forums/1 using XHR DELETE
 - should not set the flash notice
 - should call destroy on the found forum
 - should render destroy.rjs
-
-Routing shortcuts for Addresses (users/dave/addresses/1) should map
-- resources_path to /users/dave/addresses
-- resource_path to /users/dave/addresses/1
-- resource_path(9) to /users/dave/addresses/9
-- edit_resource_path to /users/dave/addresses/1/edit
-- edit_resource_path(9) to /users/dave/addresses/9/edit
-- new_resource_path to /users/dave/addresses/new
-
-resource_service in AddressesController
-- should build new address with @user foreign key with new
-- should find @address with find(@address.id)
-- should raise RecordNotFound with find(@other_address.id)
-- should find only addresses belonging to @user with find(:all)
-
-Requesting /users/dave/addresses
-- should find the user
-- should assign the found user for the view
-- should assign the user_addresses association as the addresses resource_service
-
-Requesting /users/dave/addresses using GET
-- should be successful
-- should render index.rhtml
-- should find all addresses
-- should assign the found addresses for the view
-
-Requesting /users/dave/addresses/1 using GET
-- should be successful
-- should render show.rhtml
-- should find the thing requested
-- should assign the found thing for the view
-
-Requesting /users/dave/addresses/new using GET
-- should be successful
-- should render new.rhtml
-- should create an new thing
-- should not save the new thing
-- should assign the new thing for the view
-
-Requesting /users/dave/addresses/1/edit using GET
-- should be successful
-- should render edit.rhtml
-- should find the thing requested
-- should assign the found Thing for the view
-
-Requesting /users/dave/addresses using POST
-- should create a new address
-- should redirect to the new address
-
-Requesting /users/dave/addresses/1 using PUT
-- should find the address requested
-- should update the found address
-- should assign the found address for the view
-- should redirect to the address
-
-Requesting /users/dave/addresses/1 using DELETE
-- should find the address requested
-- should call destroy on the found thing
-- should redirect to the things list
 
 Routing shortcuts for Comments (forums/3/posts/2/comments/1) should map
 - resources_path to /forums/3/posts/2/comments
@@ -461,6 +463,16 @@ Requesting /forums/1 using XHR DELETE
 
 Routing shortcuts for Infos should map
 - resource_path to /account/info
+- resource_tags_path to /account/info/tags
+
+InfosController (its actions)
+- should have only ['show', 'edit', 'update'] in action_methods
+- GET /account/info should be successful
+- GET /account/info/edit should be successful
+- PUT /account/info should be successful
+- GET /account/info/new should raise UnknownAction
+- POST /account/info should raise UnknownAction
+- DELETE /account/info/new should raise UnknownAction
 
 Routing shortcuts for Interests via Forum (forums/1/interests/2) should map
 - resources_path to /forums/1/interests
@@ -802,10 +814,17 @@ Helper#remote_form_for_resource (when resource is existing record)
 - should call load_enclosing_resource_from_specification with user spec, then load_wildcard once with 'taggable'
 - should call Specification.new with ('comment', :singleton => false, :as => 'taggable')
 
+ResourcesController (in general)
+- nested_in :foo, :polymorphic => true, :class => User should raise argument error (no options or block with polymorphic)
+- resources_controller_for :forums, :in => [:user, '*', '*', :comment] should raise argument error (no multiple wildcards in a row)
+
+ResourcesController#enclosing_resource_name
+- should be the class name underscored
+
 A controller's resource_service
 - may be explicitly set with #resource_service=
 
-#route_enclosing_names (route_name:tag, :singleton:false) for named_route:
+#route_enclosing_names TagsController for named_route:
 - :tags should be []
 - :new_tag should be []
 - :edit_tag should be []
@@ -816,6 +835,16 @@ A controller's resource_service
 - :account_info_tags should be [["account", true], ["info", true]]
 - :new_account_info_tag should be [["account", true], ["info", true]]
 
-Finished in 4.984696 seconds
+#route_enclosing_names Admin::ForumsController for named_route:
+- :admin_forums should be [[]]
 
-561 examples, 0 failures
+#route_enclosing_names Admin::InterestsController for named_route:
+- :admin_forum_interests should be [["forums", false]]
+- :forums_interests should be ["forums", false]]
+
+#route_enclosing_names Admin::Superduper::ForumsController for named_route:
+- :admin_superduper_forums should be []
+
+Finished in 4.568625 seconds
+
+578 examples, 0 failures

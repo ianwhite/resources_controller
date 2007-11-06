@@ -24,47 +24,48 @@ describe "Routing shortcuts for Infos should map" do
   it "resource_path to /account/info" do
     controller.resource_path.should == '/account/info'
   end
-   
-  #it "resource_tags_path to /account/info/tags" do
-  #  controller.resource_tags_path.should == "/account/info/tags"
-  #end    
+  
+  it "resource_tags_path to /account/info/tags" do
+    controller.resource_tags_path.should == "/account/info/tags"
+  end    
 end
 
-#describe InfosController, " (its actions)" do
-#  include InfosControllerSpecHelper
-#  
-#  before do
-#    setup_mocks
-#  end
-#  
-#  it "should have only ['show', 'edit', 'update'] in action_methods" do
-#    @controller.class.send(:action_methods).should == Set.new(['show', 'edit', 'update'])
-#  end
-#  
-#  it "GET /account/info should be successful" do
-#    get :show
-#    response.should be_success
-#  end
-#
-#  it "GET /account/info/edit should be successful" do
-#    get :edit
-#    response.should be_success
-#  end
-#  
-#  it "PUT /account/info should be successful" do
-#    put :update
-#    response.should be_success
-#  end
-#  
-#  it "GET /account/info/new should raise UnknownAction" do
-#    lambda { get :new }.should raise_error(ActionController::UnknownAction)
-#  end
-#  
-#  it "POST /account/info should raise UnknownAction" do
-#    lambda { post :create }.should raise_error(ActionController::UnknownAction)
-#  end
-#
-#  it "DELETE /account/info/new should raise UnknownAction" do
-#    lambda { delete :destroy }.should raise_error(ActionController::UnknownAction)
-#  end
-#end
+describe InfosController, " (its actions)" do
+  include InfosControllerSpecHelper
+  
+  before do
+    setup_mocks
+  end
+  
+  it "should have only ['show', 'edit', 'update'] in action_methods" do
+    @controller.class.send(:action_methods).should == Set.new(['show', 'edit', 'update'])
+  end
+  
+  it "GET /account/info should be successful" do
+    get :show
+    response.should be_success
+  end
+
+  it "GET /account/info/edit should be successful" do
+    get :edit
+    response.should be_success
+  end
+  
+  it "PUT /account/info should be successful" do
+    @info.stub!(:update_attributes)
+    put :update
+    response.should be_success
+  end
+  
+  it "GET /account/info/new should raise UnknownAction" do
+    lambda { get :new }.should raise_error(ActionController::UnknownAction)
+  end
+  
+  it "POST /account/info should raise UnknownAction" do
+    lambda { post :create }.should raise_error(ActionController::UnknownAction)
+  end
+
+  it "DELETE /account/info/new should raise UnknownAction" do
+    lambda { delete :destroy }.should raise_error(ActionController::UnknownAction)
+  end
+end

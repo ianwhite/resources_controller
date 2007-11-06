@@ -1,12 +1,10 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
 require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
 
-describe "#route_enclosing_names (route_name:tag, :singleton:false) for named_route:" do
+describe "#route_enclosing_names TagsController for named_route:" do
   before do
     @routes = ActionController::Routing::Routes.named_routes
     @controller = TagsController.new
-    @controller.stub!(:route_name).and_return('tag')
-    @controller.stub!(:singleton).and_return(false)
   end
   
   it ':tags should be []' do
@@ -52,5 +50,46 @@ describe "#route_enclosing_names (route_name:tag, :singleton:false) for named_ro
   it ':new_account_info_tag should be [["account", true], ["info", true]]' do
     @controller.stub!(:recognized_route).and_return(@routes[:new_account_info_tag])
     @controller.send(:route_enclosing_names).should == [["account", true], ["info", true]]
+  end
+end
+
+describe "#route_enclosing_names Admin::ForumsController for named_route:" do
+  before do
+    @routes = ActionController::Routing::Routes.named_routes
+    @controller = Admin::ForumsController.new
+  end
+
+  it ':admin_forums should be [[]]' do
+    @controller.stub!(:recognized_route).and_return(@routes[:admin_forums])
+    @controller.send(:route_enclosing_names).should == []
+  end
+end
+
+describe "#route_enclosing_names Admin::InterestsController for named_route:" do
+  before do
+    @routes = ActionController::Routing::Routes.named_routes
+    @controller = Admin::InterestsController.new
+  end
+
+  it ':admin_forum_interests should be [["forums", false]]' do
+    @controller.stub!(:recognized_route).and_return(@routes[:admin_forum_interests])
+    @controller.send(:route_enclosing_names).should == [["forums", false]]
+  end
+  
+  it ':forums_interests should be ["forums", false]]' do
+    @controller.stub!(:recognized_route).and_return(@routes[:forum_interests])
+    @controller.send(:route_enclosing_names).should == [["forums", false]]
+  end
+end
+
+describe "#route_enclosing_names Admin::Superduper::ForumsController for named_route:" do
+  before do
+    @routes = ActionController::Routing::Routes.named_routes
+    @controller = Admin::Superduper::ForumsController.new
+  end
+
+  it ':admin_superduper_forums should be []' do
+    @controller.stub!(:recognized_route).and_return(@routes[:admin_superduper_forums])
+    @controller.send(:route_enclosing_names).should == []
   end
 end

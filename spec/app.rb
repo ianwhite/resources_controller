@@ -9,6 +9,9 @@ ActionController::Routing::Routes.draw do |map|
     admin.resources :forums do |forum|
       forum.resources :interests
     end
+    admin.namespace :superduper do |superduper|
+      superduper.resources :forums
+    end
   end
   
   map.resource :account do |account|
@@ -51,7 +54,6 @@ ActionController::Routing::Routes.draw do |map|
     foo.resources :bars, :controller => 'forum_posts'
   end
   
-  map.connect ':controller/:action/:id.:format'
   map.connect ':controller/:action/:id'
 end
 
@@ -181,6 +183,18 @@ module Admin
   class InterestsController < ApplicationController
     resources_controller_for :interests
   end
+  
+  module NotANamespace
+    class ForumsController < ApplicationController
+      resources_controller_for :forums
+    end
+  end
+  
+  module Superduper
+    class ForumsController < ApplicationController
+      resources_controller_for :forums
+    end
+  end
 end
 
 class AccountsController < ApplicationController
@@ -270,8 +284,8 @@ class CommentsController < ApplicationController
 end
 
 class InterestsController < ApplicationController
-  resources_controller_for :interests, :in => '?interested_in'
-#  nested_in :interested_in, :polymorphic => true
+  resources_controller_for :interests
+  nested_in :interested_in, :polymorphic => true
   
   # the above two lines are the same as:
   #   resources_controller_for :interests, :in => '?interested_in'

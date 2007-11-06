@@ -58,4 +58,14 @@ describe AccountsController, "#resource_service" do
     @controller.send(:resource_specification).stub!(:find).and_return nil
     lambda{ @resource_service.find }.should raise_error(Ardes::ResourcesController::CantFindSingleton)
   end
+  
+  it ".foo should call foo on User" do
+    User.should_receive(:foo).once
+    @resource_service.foo
+  end
+  
+  it ".respond_to?(:foo) should call respond_to?(:foo) on User" do
+    User.stub!(:foo)
+    @resource_service.respond_to?(:foo).should be_true
+  end
 end

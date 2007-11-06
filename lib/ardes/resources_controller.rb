@@ -412,8 +412,6 @@ module Ardes#:nodoc:
     #   resources_controller_for :foos
     #   before_filter :do_something_else     # chain => [:load_enclosing_resources, :do_something, :do_something_else]
     def resources_controller_for(name, options = {}, &block)
-      deprecated_resources_controller_for(options)
-      
       options.assert_valid_keys(:class, :source, :singleton, :actions, :in, :find, :load_enclosing, :route, :segment, :as, :only, :except)
       when_options = {:only => options.delete(:only), :except => options.delete(:except)}
       
@@ -442,19 +440,6 @@ module Ardes#:nodoc:
       nested_in(*options.delete(:in)) if options[:in]
       
       write_inheritable_attribute(:resource_specification, Specification.new(name, options, &block))
-    end
-    
-    def deprecated_resources_controller_for(options)
-      options[:class_name]      and options[:class] ||= options[:class_name].constantize
-      options[:collection_name] and options[:source] ||= options[:collection_name] 
-      options[:actions_include] and options[:actions] = options[:actions_include] if options[:actions].nil?
-      options[:route_name]      and options[:route] ||= options[:route_name]
-      [:class_name, :collection_name, :actions_include, :route_name].each do |k|
-        if options.key?(k)
-          ActiveSupport::Deprecation.warn("option :#{k} has been deprecated for resources_controller_for and will be removed soon")
-          options.delete(k)
-        end
-      end
     end
     
     # Creates a resource specification mapping.  Use this to specify how to find an enclosing resource that
@@ -497,7 +482,6 @@ module Ardes#:nodoc:
       def nested_in(*names, &block)
         options = names.last.is_a?(Hash) ? names.pop : {}
         raise ArgumentError, "when giving more than one nesting, you may not specify options or a block" if names.length > 1 and (block_given? or options.length > 0)
-        deprecated_nested_in(options)
         
         # convert :polymorphic option to '?'
         if options.delete(:polymorphic)
@@ -512,18 +496,6 @@ module Ardes#:nodoc:
           ensure_sane_wildcard if name == '*'
           specifications << (name.to_s =~ /^(\*|\?(.*))$/ ? name.to_s : Specification.new(name, options, &block))
         end
-      end
-      
-      def deprecated_nested_in(options)
-        options[:class_name]      and options[:class]  ||= options[:class_name].constantize
-        options[:collection_name] and options[:source] ||= options[:collection_name]
-        options[:foreign_key]     and options[:key]    ||= options[:foreign_key]
-        [:class_name, :collection_name, :load_enclosing, :anonymous, :foreign_key].each do |k|
-          if options.key?(k)
-            ActiveSupport::Deprecation.warn("option :#{k} has been deprecated for nested_in and will be removed soon")
-            options.delete(k)
-          end
-        end      
       end
       
       # return the class resource_specification
@@ -662,9 +634,6 @@ module Ardes#:nodoc:
       # Also remove any route segments from the front which correspond to modules (namespaces)
       def enclosing_segments
         segments = remove_namespaces_from_segments(recognized_route.segments.dup)
-        if segments.select{|s| s.is_a?(ActionController::Routing::DynamicSegment)}.collect(&:key) == [:controller, :action, :id]
-          logger.warn "WARNING: resources_controller: #{controller_name} has recognized the default route: #{recognized_route}"
-        end
         while segments.size > 0
           segment = segments.pop
           return segments if segment.is_a?(::ActionController::Routing::StaticSegment) && segment.value == resource_specification.segment

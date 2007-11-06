@@ -1,3 +1,5 @@
+* Coverage back to 100%
+
 * you can alias an enclosing resource with :as
 
   This can be useful when you have a tree like domain:
