@@ -1,3 +1,5 @@
+* Removed deprecated options (in r492 - I forgot to say so)
+
 * Coverage back to 100%
 
 * you can alias an enclosing resource with :as
