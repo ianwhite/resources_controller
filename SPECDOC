@@ -377,6 +377,13 @@ resource_service in ForumsController
 - should find @forum with find(@forum.id)
 - should find all forums with find(:all)
 
+ForumsController requesting / (testing erp)
+- should generate params { :controller => 'forums', :action => 'index', :erp => '/forums' } from GET /
+- should be successful
+- should render index.rhtml
+- should find all forums
+- should assign the found forums for the view
+
 Requesting /forums using GET
 - should be successful
 - should render index.rhtml
@@ -845,6 +852,6 @@ A controller's resource_service
 #route_enclosing_names Admin::Superduper::ForumsController for named_route:
 - :admin_superduper_forums should be []
 
-Finished in 4.568625 seconds
+Finished in 3.98121 seconds
 
-578 examples, 0 failures
+583 examples, 0 failures

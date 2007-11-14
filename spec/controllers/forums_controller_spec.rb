@@ -178,6 +178,43 @@ describe "resource_service in ForumsController" do
   end
 end
 
+describe ForumsController, " requesting / (testing erp)" do
+  it "should generate params { :controller => 'forums', :action => 'index', :erp => '/forums' } from GET /" do
+    params_from(:get, "/").should == { :controller => 'forums', :action => 'index', :erp => '/forums' }
+  end
+  
+  before(:each) do
+    @mock_forums = mock('forums')
+    Forum.stub!(:find).and_return(@mock_forums)
+  end
+  
+  def do_get
+    get :index, :erp => '/forums'
+  end
+  
+  it "should be successful" do
+    do_get
+    response.should be_success
+  end
+
+  it "should render index.rhtml" do
+    do_get
+    response.should render_template(:index)
+  end
+  
+  it "should find all forums" do
+    Forum.should_receive(:find).with(:all).and_return(@mock_forums)
+    do_get
+  end
+  
+  it "should assign the found forums for the view" do
+    do_get
+    assigns[:forums].should == @mock_forums
+  end
+end
+
+
+
 describe "Requesting /forums using GET" do
   controller_name :forums
 

@@ -106,6 +106,17 @@ module Ardes#:nodoc:
   # When invoked with /users/3/image RC will find @user, and use @user.image to find the resource, and
   # @user.build_image, to create a new resource. 
   #
+  # ==== Example 6: :erp (equivalent resource path): aliasing a named route to a RESTful route
+  #
+  # You may have a named route that maps a url to a particular controller and action,
+  # this causes resources_controller problems as it relies on the route to load the
+  # resources.  You can get around this by specifying :erp as a param in routes.rb
+  #
+  #   map.home '', :controller => :forums, :action => :index, :erp => '/forums'
+  #
+  # When the controller is invoked via the '' url, rc will use :erp to recognize the
+  # route.
+  #
   # ==== Putting it all together
   #
   # An exmaple app
@@ -126,6 +137,8 @@ module Ardes#:nodoc:
   #    forum.resources :posts
   #    forum.resource :image
   #  end
+  #
+  #  map.home '', :controller => :forums, :action => :index, :erp => '/forums'
   #
   # app/controllers:
   #
@@ -623,10 +636,12 @@ module Ardes#:nodoc:
       end
       
     private
-      # returns the route that was used to invoke this controller and current action
+      # returns the route that was used to invoke this controller and current action.  The path is found first from params[:erp]
+      # if it exists, and then from the request.path
       def recognized_route
+        path = params[:erp] || request.path
         @recognized_route ||= ::ActionController::Routing::Routes.routes_for_controller_and_action(controller_path, action_name).find do |route|
-          route.recognize(request.path, ::ActionController::Routing::Routes.extract_request_environment(request))
+          route.recognize(path, ::ActionController::Routing::Routes.extract_request_environment(request))
         end or ResourcesController.raise_no_recognized_route(self)
       end
       

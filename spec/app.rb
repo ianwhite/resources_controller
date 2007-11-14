@@ -5,6 +5,9 @@
 ##########
 
 ActionController::Routing::Routes.draw do |map|
+  # this tests :erp (equivalent resource path), for named routes that map to resources
+  map.home '', :controller => 'forums', :action => 'index', :erp => '/forums'
+
   map.namespace :admin do |admin|
     admin.resources :forums do |forum|
       forum.resources :interests
