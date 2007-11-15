@@ -74,12 +74,18 @@ module Ardes#:nodoc:
         form_for(resource_name, resource, form_for_resource_options(resource, options), &block)
       end
 
+      # same API as form_for_resource
       def remote_form_for_resource(*args, &block)
         options = args.last.is_a?(Hash) ? args.pop : {}
         resource = args[0] || self.resource
         remote_form_for(resource_name, resource, form_for_resource_options(resource, options), &block)
       end
     
+      # print the error messages for the current resource
+      def error_messages_for_resource
+        error_messages_for resource_name
+      end
+      
       # Delegate named_route helper method to the controller.  Create the delegation
       # to short circuit the method_missing call for future invocations.
       def method_missing_with_named_route_helper(method, *args, &block)

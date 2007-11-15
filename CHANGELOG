@@ -1,3 +1,8 @@
+* added error_messages_for_resource to Helper
+
+* fixed form_for_resource when resource is new and controller is for singleton 
+  resource
+
 * added :erp patch, doc and specs [thanks Chris Hapgood for the initial patch]
 
   Use the :erp param when you are routing a non RESTful route to your rc controller

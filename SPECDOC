@@ -770,6 +770,7 @@ ActionView with resources_controller Helper
 - should forward #enclosing_resource to controller
 - should forward #enclosing_resource_name to controller
 - should not forward unknown url helper to controller
+- #error_messages_for_resource should call error_messages_for with resource_name
 
 Helper#form_for_resource (when resource is new record)
 - should call form_for with create form options
@@ -855,6 +856,6 @@ A controller's resource_service
 #route_enclosing_names Admin::Superduper::ForumsController for named_route:
 - :admin_superduper_forums should be []
 
-Finished in 4.148106 seconds
+Finished in 4.04071 seconds
 
-584 examples, 0 failures
+585 examples, 0 failures
