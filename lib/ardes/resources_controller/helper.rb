@@ -44,6 +44,7 @@ module Ardes#:nodoc:
         base.class_eval do
           alias_method_chain :method_missing, :named_route_helper
           alias_method_chain :respond_to?, :named_route_helper
+          delegate :resource_name, :resources_name, :resource, :resources, :enclosing_resource, :enclosing_resource_name, :to => :controller
         end
       end
 
@@ -70,43 +71,13 @@ module Ardes#:nodoc:
       def form_for_resource(*args, &block)
         options = args.last.is_a?(Hash) ? args.pop : {}
         resource = args[0] || self.resource
-        options[:html]          ||= {}
-        options[:html][:method] ||= resource.new_record? ? :post : :put
-        options[:url]           ||= resource.new_record? ? resources_path : resource_path(resource)
-        form_for(resource_name, resource, options, &block)
+        form_for(resource_name, resource, form_for_resource_options(resource, options), &block)
       end
 
       def remote_form_for_resource(*args, &block)
         options = args.last.is_a?(Hash) ? args.pop : {}
         resource = args[0] || self.resource
-        options[:html]          ||= {}
-        options[:html][:method] ||= resource.new_record? ? :post : :put
-        options[:url]           ||= resource.new_record? ? resources_path : resource_path(resource)
-        remote_form_for(resource_name, resource, options, &block)
-      end
-
-      def resource_name
-        controller.resource_name
-      end
-
-      def resources_name
-        controller.resources_name
-      end
-
-      def resource
-        controller.resource
-      end
-
-      def resources
-        controller.resources
-      end
-      
-      def enclosing_resource
-        controller.enclosing_resource
-      end
-
-      def enclosing_resource_name
-        controller.enclosing_resource_name
+        remote_form_for(resource_name, resource, form_for_resource_options(resource, options), &block)
       end
     
       # Delegate named_route helper method to the controller.  Create the delegation
@@ -123,6 +94,19 @@ module Ardes#:nodoc:
       # delegate url help method creation to the controller
       def respond_to_with_named_route_helper?(method)
         respond_to_without_named_route_helper?(method) || controller.resource_named_route_helper_method?(method)
+      end
+    
+    private
+      def form_for_resource_options(resource, options)
+        returning options.dup do |options|
+          options[:html] ||= {}
+          options[:html][:method] ||= resource.new_record? ? :post : :put
+          options[:url] ||= if resource.new_record?
+            controller.resource_specification.singleton? ? resource_path : resources_path
+          else
+            resource_path(resource)
+          end
+        end
       end
     end
   end

@@ -37,12 +37,15 @@ describe "Helper#form_for_resource (when resource is new record)" do
   before do
     @view = ViewWithResourcesControllerHelper.new
     @controller = mock('Controller')
+    @specification = mock('Specification')
+    @specification.stub!(:singleton?).and_return(false)
     @resource = mock('Forum')
     @resource = mock('Forum', :null_object => true)
     @resource.stub!(:new_record?).and_return(true)
     @controller.stub!(:resource).and_return(@resource)
     @controller.stub!(:resource_name).and_return('forum')
     @controller.stub!(:resources_path).and_return('/forums')
+    @controller.stub!(:resource_specification).and_return(@specification)
     @controller.stub!(:resource_named_route_helper_method?).and_return(true)
     @view.controller = @controller
   end
@@ -53,16 +56,42 @@ describe "Helper#form_for_resource (when resource is new record)" do
   end
 end
 
+describe "Helper#form_for_resource (when resource is new record) and resource is singleton" do
+  before do
+    @view = ViewWithResourcesControllerHelper.new
+    @controller = mock('Controller')
+    @specification = mock('Specification')
+    @specification.stub!(:singleton?).and_return(true)
+    @resource = mock('Account')
+    @resource = mock('Account', :null_object => true)
+    @resource.stub!(:new_record?).and_return(true)
+    @controller.stub!(:resource).and_return(@resource)
+    @controller.stub!(:resource_name).and_return('account')
+    @controller.stub!(:resource_path).and_return('/account')
+    @controller.stub!(:resource_specification).and_return(@specification)
+    @controller.stub!(:resource_named_route_helper_method?).and_return(true)
+    @view.controller = @controller
+  end
+  
+  it 'should call form_for with create form options' do
+    @view.should_receive(:form_for).with('account', @resource, {:html => {:method => :post}, :url => '/account'})
+    @view.form_for_resource{}
+  end
+end
+
 describe "Helper#form_for_resource (when resource is existing record)" do
   before do
     @view = ViewWithResourcesControllerHelper.new
     @controller = mock('Controller')
+    @specification = mock('Specification')
+    @specification.stub!(:singleton?).and_return(false)
     @resource = mock('Forum', :null_object => true)
     @resource.stub!(:new_record?).and_return(false)
     @resource.stub!(:to_param).and_return("1")
     @controller.stub!(:resource).and_return(@resource)
     @controller.stub!(:resource_name).and_return('forum')
     @controller.stub!(:resource_path).and_return('/forums/1')
+    @controller.stub!(:resource_specification).and_return(@specification)
     @controller.stub!(:resource_named_route_helper_method?).and_return(true)
     @view.controller = @controller
   end
@@ -77,12 +106,15 @@ describe "Helper#remote_form_for_resource (when resource is existing record)" do
   before do
     @view = ViewWithResourcesControllerHelper.new
     @controller = mock('Controller')
+    @specification = mock('Specification')
+    @specification.stub!(:singleton?).and_return(false)
     @resource = mock('Forum', :null_object => true)
     @resource.stub!(:new_record?).and_return(false)
     @resource.stub!(:to_param).and_return("1")
     @controller.stub!(:resource).and_return(@resource)
     @controller.stub!(:resource_name).and_return('forum')
     @controller.stub!(:resource_path).and_return('/forums/1')
+    @controller.stub!(:resource_specification).and_return(@specification)
     @controller.stub!(:resource_named_route_helper_method?).and_return(true)
     @view.controller = @controller
   end

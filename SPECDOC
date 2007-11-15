@@ -774,6 +774,9 @@ ActionView with resources_controller Helper
 Helper#form_for_resource (when resource is new record)
 - should call form_for with create form options
 
+Helper#form_for_resource (when resource is new record) and resource is singleton
+- should call form_for with create form options
+
 Helper#form_for_resource (when resource is existing record)
 - should call form_for with update form options
 
@@ -852,6 +855,6 @@ A controller's resource_service
 #route_enclosing_names Admin::Superduper::ForumsController for named_route:
 - :admin_superduper_forums should be []
 
-Finished in 3.98121 seconds
+Finished in 4.148106 seconds
 
-583 examples, 0 failures
+584 examples, 0 failures
