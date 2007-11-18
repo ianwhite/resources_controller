@@ -856,6 +856,6 @@ A controller's resource_service
 #route_enclosing_names Admin::Superduper::ForumsController for named_route:
 - :admin_superduper_forums should be []
 
-Finished in 4.043219 seconds
+Finished in 3.979205 seconds
 
 585 examples, 0 failures

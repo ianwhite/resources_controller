@@ -1,3 +1,7 @@
+* added Ardes::ResourcesController.actions and
+  Ardes::ResourcesController.singleton_actions accessors so you can set the
+  default actions module across your app
+
 * Added resource_saved? method to controller.  This is useful for sharing the
   result of a save outside action methods (for example in response_for blocks)
 

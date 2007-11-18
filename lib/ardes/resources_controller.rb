@@ -368,6 +368,10 @@ module Ardes#:nodoc:
   #   end
   #
   module ResourcesController
+    mattr_accessor :actions, :singleton_actions
+    self.actions = Ardes::ResourcesController::Actions
+    self.singleton_actions = Ardes::ResourcesController::SingletonActions
+    
     def self.extended(base)
       base.class_eval do
         class_inheritable_reader :resource_specification_map
@@ -395,7 +399,7 @@ module Ardes#:nodoc:
     # * <tt>:only:</tt> only include the specified actions.
     # * <tt>:except:</tt> include all actions except the specified actions.
     #
-    # =====Options for unconvential use
+    # ===== Options for unconvential use
     # (otherwise these are all inferred from the _name_)
     # * <tt>:route:</tt> the route name (without name_prefix) if it can't be inferred from _name_.
     #   For a collection resource this should be plural, for a singleton it should be singular.
@@ -407,7 +411,7 @@ module Ardes#:nodoc:
     # The default behavior is to set up before filters that load the enclosing resource, and to use associations on
     # that model to find and create the resources.  See ClassMethods#nested_in for more details on this, and
     # customising the default behaviour.
-    #
+    # 
     # === load_enclosing_resources
     # By default, a before_filter is added by resources_controller called :load_enclosing_resources - which
     # does all the work of loading the enclosing resources.  You can use ActionControllers standard filter
@@ -424,6 +428,17 @@ module Ardes#:nodoc:
     #   prepend_before_filter :load_enclosing_resources
     #   resources_controller_for :foos
     #   before_filter :do_something_else     # chain => [:load_enclosing_resources, :do_something, :do_something_else]
+    #
+    # === Default actions module
+    # If you have your own actions module you prefer to use other than the standard resources_controller ones
+    # you can set Ardes::ResourcesController.actions to that module to have this be included by default
+    #
+    #   Ardes::ResourcesController.actions = MyAwesomeActions
+    #   Ardes::ResourcesController.singleton_actions = MyAweseomeSingletonActions
+    #
+    #   class AwesomenessController < ApplicationController
+    #     resources_controller_for :awesomenesses # includes MyAwesomeActions by default
+    #   end
     def resources_controller_for(name, options = {}, &block)
       options.assert_valid_keys(:class, :source, :singleton, :actions, :in, :find, :load_enclosing, :route, :segment, :as, :only, :except)
       when_options = {:only => options.delete(:only), :except => options.delete(:except)}
@@ -442,7 +457,7 @@ module Ardes#:nodoc:
       specifications << '*' unless options.delete(:load_enclosing) == false
       
       unless (actions = options.delete(:actions)) == false
-        actions ||= options[:singleton] ? ResourcesController::SingletonActions : ResourcesController::Actions
+        actions ||= options[:singleton] ? Ardes::ResourcesController.singleton_actions : Ardes::ResourcesController.actions
         include_actions actions, when_options
       end
       

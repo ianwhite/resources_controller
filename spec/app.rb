@@ -165,6 +165,11 @@ end
 # Controllers
 ##############
 
+# explicitly set the actions to the default (in case another plugin has changed this)
+Ardes::ResourcesController.actions = Ardes::ResourcesController::Actions
+Ardes::ResourcesController.singleton_actions = Ardes::ResourcesController::SingletonActions
+
+
 class ApplicationController < ActionController::Base
   map_resource :account, :class => User, :singleton => true, :find => :current_user
 
