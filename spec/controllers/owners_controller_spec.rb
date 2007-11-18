@@ -221,7 +221,7 @@ describe "Requesting /forums/2/owner using PUT" do
   before(:each) do
     setup_mocks
     @owner.stub!(:save).and_return(true)
-    @owner.stub!(:update_attributes).and_return(true)
+    @owner.stub!(:attributes=)
   end
   
   def do_update
@@ -239,7 +239,7 @@ describe "Requesting /forums/2/owner using PUT" do
   end
 
   it "should update the owner" do
-    @owner.should_receive(:update_attributes).with('name' => 'Fred')
+    @owner.should_receive(:attributes=).with('name' => 'Fred')
     do_update
   end
 

@@ -95,7 +95,7 @@ module Ardes#:nodoc:
         self.resource = new_resource
 
         respond_to do |format|
-          if resource.save
+          if resource_saved?
             format.html do
               flash[:notice] = "#{resource_name.humanize} was successfully created."
               redirect_to resource_url
@@ -114,9 +114,10 @@ module Ardes#:nodoc:
       # PUT /events/1.xml
       def update
         self.resource = find_resource
+        resource.attributes = params[resource_name]
 
         respond_to do |format|
-          if resource.update_attributes(params[resource_name])
+          if resource_saved?
             format.html do
               flash[:notice] = "#{resource_name.humanize} was successfully updated."
               redirect_to resource_url

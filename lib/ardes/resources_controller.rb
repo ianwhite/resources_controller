@@ -106,13 +106,13 @@ module Ardes#:nodoc:
   # When invoked with /users/3/image RC will find @user, and use @user.image to find the resource, and
   # @user.build_image, to create a new resource. 
   #
-  # ==== Example 6: :erp (equivalent resource path): aliasing a named route to a RESTful route
+  # ==== Example 6: :resource_path (equivalent resource path): aliasing a named route to a RESTful route
   #
   # You may have a named route that maps a url to a particular controller and action,
   # this causes resources_controller problems as it relies on the route to load the
   # resources.  You can get around this by specifying :erp as a param in routes.rb
   #
-  #   map.home '', :controller => :forums, :action => :index, :erp => '/forums'
+  #   map.home '', :controller => :forums, :action => :index, :resource_route => '/forums'
   #
   # When the controller is invoked via the '' url, rc will use :erp to recognize the
   # route.
@@ -633,6 +633,15 @@ module Ardes#:nodoc:
       # returns an array of the collection (non singleton) enclosing resources, this is used for generating routes.
       def enclosing_collection_resources
         @enclosing_collection_resources ||= []
+      end
+      
+      # Returns self.resource.save and caches the result for future calls.
+      # This is useful when you want to know outside of an action whether the resource was saved.
+      #
+      # Pass true to ignore the cached value
+      def resource_saved?(reload = false)
+        @resource_saved = resource.save if reload || @resource_saved.nil?
+        @resource_saved
       end
       
     private

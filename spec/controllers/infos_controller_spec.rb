@@ -52,7 +52,8 @@ describe InfosController, " (its actions)" do
   end
   
   it "PUT /account/info should be successful" do
-    @info.stub!(:update_attributes)
+    @info.stub!(:attributes=)
+    @info.stub!(:save)
     put :update
     response.should be_success
   end

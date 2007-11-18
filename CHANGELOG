@@ -1,3 +1,6 @@
+* Added resource_saved? method to controller.  This is useful for sharing the
+  result of a save outside action methods (for example in response_for blocks)
+
 * added error_messages_for_resource to Helper
 
 * fixed form_for_resource when resource is new and controller is for singleton 

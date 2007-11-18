@@ -342,7 +342,7 @@ describe "Requesting /forums/3/posts/3/comments/1 using PUT" do
   end
 
   it "should update the found comment" do
-    @comment.should_receive(:update_attributes)
+    @comment.should_receive(:attributes=)
     do_update
   end
 
