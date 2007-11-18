@@ -166,8 +166,8 @@ end
 ##############
 
 # explicitly set the actions to the default (in case another plugin has changed this)
-#Ardes::ResourcesController.actions = Ardes::ResourcesController::Actions
-#Ardes::ResourcesController.singleton_actions = Ardes::ResourcesController::SingletonActions
+Ardes::ResourcesController.actions = Ardes::ResourcesController::Actions
+Ardes::ResourcesController.singleton_actions = Ardes::ResourcesController::SingletonActions
 
 
 class ApplicationController < ActionController::Base
