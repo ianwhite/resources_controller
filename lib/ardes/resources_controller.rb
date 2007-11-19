@@ -599,12 +599,13 @@ module Ardes#:nodoc:
         resource_specification.klass
       end
       
-      # returns the controller's current resource
+      # returns the controller's current resource.
       def resource
         instance_variable_get("@#{resource_name}")
       end
       
-      # sets the controller's current resource
+      # sets the controller's current resource, and
+      # decorates the object with a save hook, so we know if it's been saved
       def resource=(record)
         instance_variable_set("@#{resource_name}", record)
       end
@@ -655,8 +656,12 @@ module Ardes#:nodoc:
       #
       # Pass true to ignore the cached value
       def resource_saved?(reload = false)
-        @resource_saved = resource.save if reload || @resource_saved.nil?
+        save_resource if reload || @resource_saved.nil?
         @resource_saved
+      end
+      
+      def save_resource
+        @resource_saved = resource.save
       end
       
     private
