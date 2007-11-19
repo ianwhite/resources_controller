@@ -665,13 +665,20 @@ module Ardes#:nodoc:
       end
       
     private
-      # returns the route that was used to invoke this controller and current action.  The path is found first from params[:erp]
-      # if it exists, and then from the request.path
+      # returns the route that was used to invoke this controller and current action.  The path is found first from params[:resource_path]
+      # if it exists, and then from the request.path.  Likewise the method is found from params[:resource_method]
+      #
+      # params[:erp] == params[:resource_path] for BC
       def recognized_route
-        path = params[:erp] || request.path
-        @recognized_route ||= ::ActionController::Routing::Routes.routes_for_controller_and_action(controller_path, action_name).find do |route|
-          route.recognize(path, ::ActionController::Routing::Routes.extract_request_environment(request))
-        end or ResourcesController.raise_no_recognized_route(self)
+        unless @recognized_route
+          path = params[:resource_path] || params[:erp] || request.path
+          environment = ::ActionController::Routing::Routes.extract_request_environment(request)
+          environment.merge!(:method => params[:resource_method]) if params[:resource_method]
+          @recognized_route ||= ::ActionController::Routing::Routes.routes_for_controller_and_action(controller_path, action_name).find do |route|
+            route.recognize(path, environment)
+          end or ResourcesController.raise_no_recognized_route(self)
+        end
+        @recognized_route
       end
       
       # returns the all route segments except for the ones corresponding to the current resource and action.

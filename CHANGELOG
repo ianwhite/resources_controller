@@ -1,3 +1,28 @@
+* changed :erp to :resource_path, and added :resource_method.
+
+  This means you can connect a named route up with a REST action and also change the method
+  
+  map.activate_account '/activate/:code', :controller => 'activations', :action => 'create', :resource_path => '/activations', :resource_method => :post
+  
+  :erp retained for BC
+
+* save_resource and resource_saved? added.  These simply save the resource and cache
+  the result of that save.  This means you can use the result of the resource save in your
+  response_for blocks (if you're using response_for)
+  
+  response_for :create do |format|
+    if resource_saved?
+      format.html {}
+    else
+      format.html {}
+    end
+  end
+  
+  def create
+    self.resource = new_resource
+    save_resource
+  end
+
 * added Ardes::ResourcesController.actions and
   Ardes::ResourcesController.singleton_actions accessors so you can set the
   default actions module across your app

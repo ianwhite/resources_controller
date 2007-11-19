@@ -178,9 +178,9 @@ describe "resource_service in ForumsController" do
   end
 end
 
-describe ForumsController, " requesting / (testing erp)" do
-  it "should generate params { :controller => 'forums', :action => 'index', :erp => '/forums' } from GET /" do
-    params_from(:get, "/").should == { :controller => 'forums', :action => 'index', :erp => '/forums' }
+describe ForumsController, " requesting / (testing resource_path)" do
+  it "should generate params { :controller => 'forums', :action => 'index', :resource_path => '/forums' } from GET /" do
+    params_from(:get, "/").should == { :controller => 'forums', :action => 'index', :resource_path => '/forums' }
   end
   
   before(:each) do
@@ -189,7 +189,7 @@ describe ForumsController, " requesting / (testing erp)" do
   end
   
   def do_get
-    get :index, :erp => '/forums'
+    get :index, :resource_path => '/forums'
   end
   
   it "should be successful" do
@@ -213,7 +213,39 @@ describe ForumsController, " requesting / (testing erp)" do
   end
 end
 
+describe ForumsController, " requesting /create_forum (testing resource_method)" do
+  it "should generate params { :controller => 'forums', :action => 'create', :resource_path => '/forums', :resource_method => :post } from GET /create_forum" do
+    params_from(:get, "/create_forum").should == { :controller => 'forums', :action => 'create', :resource_path => '/forums', :resource_method => :post }
+  end
+  
+  before(:each) do
+    @mock_forum = mock('Forum')
+    @mock_forum.stub!(:save).and_return(true)
+    @mock_forum.stub!(:to_param).and_return("1")
+    Forum.stub!(:new).and_return(@mock_forum)
+  end
+  
+  def do_post
+    post :create, :forum => {:name => 'Forum'}, :resource_path => '/forums', :resource_method => :post
+    
+  end
+  
+  it "should create a new forum" do
+    Forum.should_receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
+    do_post
+  end
 
+  it "should set the flash notice" do
+    do_post
+    flash[:notice].should == "Forum was successfully created."
+  end
+
+  it "should redirect to the new forum" do
+    do_post
+    response.should be_redirect
+    response.redirect_url.should == "http://test.host/forums/1"
+  end
+end
 
 describe "Requesting /forums using GET" do
   controller_name :forums
