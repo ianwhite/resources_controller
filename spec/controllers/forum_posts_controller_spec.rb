@@ -357,7 +357,7 @@ describe "Requesting /forums/2/posts using POST" do
   end
 
   it "should attempt to save the new post" do
-    @post.should_receive(:save)
+    @post.should_receive(:save).and_return(true)
     do_post
   end
   
