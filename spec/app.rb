@@ -172,9 +172,9 @@ Ardes::ResourcesController.singleton_actions = Ardes::ResourcesController::Singl
 
 
 class ApplicationController < ActionController::Base
-  map_resource :account, :class => User, :singleton => true, :find => :current_user
+  map_enclosing_resource :account, :class => User, :singleton => true, :find => :current_user
 
-  map_resource :user do
+  map_enclosing_resource :user do
     User.find_by_login(params[:user_id])
   end
     

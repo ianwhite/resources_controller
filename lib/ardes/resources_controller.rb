@@ -84,7 +84,7 @@ module Ardes#:nodoc:
   #
   # (in PostsController)
   #
-  #   map_resource :account, :singleton => true, :class => User, :find => :current_user
+  #   map_enclosing_resource :account, :singleton => true, :class => User, :find => :current_user
   # 
   # Now, if :account apears in any part of a route (for PostsController) it will be mapped to
   # (in this case) the current_user method of teh PostsController.
@@ -93,8 +93,8 @@ module Ardes#:nodoc:
   # 
   # This will work for any resource which can't be inferred from its route segment name
   #
-  #   map_resource :peeps, :source => :users
-  #   map_resource :posts, :class => BadlyNamedPostClass
+  #   map_enclosing_resource :users, :segment => :peeps, :key => 'peep_id'
+  #   map_enclosing_resource :posts, :class => OddlyNamedPostClass
   #
   # ==== Example 5: Singleton association
   # Here's another singleton example - one where it corresponds to a has_one or belongs_to association
@@ -143,7 +143,7 @@ module Ardes#:nodoc:
   # app/controllers:
   #
   #  class ApplicationController < ActionController::Base
-  #    map_resource :account, :singleton => true, :find => :current_user
+  #    map_enclosing_resource :account, :singleton => true, :find => :current_user
   #
   #    def current_user # get it from session or whatnot
   #  end
@@ -263,7 +263,7 @@ module Ardes#:nodoc:
   #
   # ClassMethods#nested_in <name>, <options>, <&block>
   #
-  # map_resource <name>, <options>, <&block>
+  # map_enclosing_resource <name>, <options>, <&block>
   #
   # === Customising finding and creating
   # If you want to implement something like query params you can override *find_resources*.  If you want to change the 
@@ -349,14 +349,14 @@ module Ardes#:nodoc:
   # If you know that user is never nested (i.e. /users/dave/addresses), then do this:
   #
   #   class ApplicationController < ActionController::Base
-  #     map_resource :user do
+  #     map_enclosing_resource :user do
   #       User.find(params[:user_id])
   #     end
   #   end
   #
   # or, if user is sometimes nested (i.e. /forums/1/users/dave/addresses), do this:
   #
-  #     map_resource :user do
+  #     map_enclosing_resource :user do
   #       ((enclosing_resource && enclosing_resource.users) || User).find(params[:user_id])
   #     end
   #
@@ -474,9 +474,14 @@ module Ardes#:nodoc:
     # does not obey usual rails conventions.  Most commonly this would be a singleton resource.
     #
     # See Specification#new for details of how to call this
-    def map_resource(name, options = {}, &block)
+    def map_enclosing_resource(name, options = {}, &block)
       spec = Specification.new(name, options, &block)
       resource_specification_map[spec.segment] = spec
+    end
+    
+    # this will be deprecated soon as it's badly named - use map_enclosing_resource
+    def map_resource(*args, &block)
+      map_enclosing_resource(*args, &block)
     end
     
     # Include the specified module, optionally specifying which public methods to include
@@ -865,7 +870,7 @@ Or:
 Or, you may be relying on the route to load the resource, in which case you need to give RC some
 help.  Do this by mapping the route segment to a resource in the controller, or a parent or mixin
 
-  map_resource :#{name}, :singleton => true <.. as above ..>
+  map_enclosing_resource :#{name}, :segment => ..., :singleton => true <.. as above ..>
 end_str
       end
 
