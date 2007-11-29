@@ -110,7 +110,7 @@ module Ardes#:nodoc:
           options[:url] ||= if resource.new_record?
             controller.resource_specification.singleton? ? resource_path : resources_path
           else
-            resource_path(resource)
+            controller.resource_specification.singleton? ? resource_path : resource_path(resource)
           end
         end
       end
