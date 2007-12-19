@@ -496,10 +496,10 @@ module Ardes#:nodoc:
       
       mixin = mixin.dup
       if only = options[:only]
-        only = (only.is_a?(Array) ? only : [only]).collect(&:to_s)
+        only = Array(options[:only]).collect(&:to_s)
         mixin.instance_methods.each {|m| mixin.send(:undef_method, m) unless only.include?(m)}
       elsif except = options[:except]
-        except = (except.is_a?(Array) ? except : [except]).collect(&:to_s)
+        except = Array(options[:except]).collect(&:to_s)
         mixin.instance_methods.each {|m| mixin.send(:undef_method, m) if except.include?(m)}
       end
       include mixin
@@ -513,7 +513,7 @@ module Ardes#:nodoc:
       #
       # See Specification#new for details of how to call this.
       def nested_in(*names, &block)
-        options = names.last.is_a?(Hash) ? names.pop : {}
+        options = names.extract_options!
         raise ArgumentError, "when giving more than one nesting, you may not specify options or a block" if names.length > 1 and (block_given? or options.length > 0)
         
         # convert :polymorphic option to '?'

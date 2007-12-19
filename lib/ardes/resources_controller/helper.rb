@@ -69,14 +69,14 @@ module Ardes#:nodoc:
       #   <% end %>
       #
       def form_for_resource(*args, &block)
-        options = args.last.is_a?(Hash) ? args.pop : {}
+        options = args.extract_options!
         resource = args[0] || self.resource
         form_for(resource_name, resource, form_for_resource_options(resource, options), &block)
       end
 
       # same API as form_for_resource
       def remote_form_for_resource(*args, &block)
-        options = args.last.is_a?(Hash) ? args.pop : {}
+        options = args.extract_options!
         resource = args[0] || self.resource
         remote_form_for(resource_name, resource, form_for_resource_options(resource, options), &block)
       end

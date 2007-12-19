@@ -128,7 +128,7 @@ Currently:
         
           self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
             def #{method}(*args)
-              options = args.last.is_a?(Hash) ? args.pop : {}
+              options = args.extract_options!
               args = args.size < #{required_args} ? enclosing_collection_resources + args : enclosing_collection_resources - [enclosing_resource] + args
               args = args + [options] if options.size > 0
               send :#{route_method}, *args
@@ -141,7 +141,7 @@ Currently:
 
           self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
             def #{method}(*args)
-              options = args.last.is_a?(Hash) ? args.pop : {}
+              options = args.extract_options!
               #{"args = [resource] + args if enclosing_collection_resources.size + args.size < #{required_args}" if required_args > 0}
               args = args + [options] if options.size > 0
               send :#{route_method}, *(enclosing_collection_resources + args)
