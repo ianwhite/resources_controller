@@ -7,11 +7,11 @@ See Ardes::ResourcesController for details
 
 See the {CHANGLELOG}[link:files/CHANGELOG.html] for recent changes and contributors
 
-= works with rails edge
+= works with rails 2 (and edge)
 
-resources_controller works with rails edge.
+resources_controller works with rails 2 and edge.
 
-It probably works with 1.2.5.  Hold fire, and check back for details of 1.2.5 and 1.2.3 testing
+It probably works with 1.2.6.  Hold fire, and check back for details of 1.2.x testing
 
 === Specs and Coverage
 * {SPECDOC}[link:files/SPECDOC.html] lists the specifications
