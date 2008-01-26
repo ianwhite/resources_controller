@@ -54,6 +54,9 @@ module Ardes#:nodoc:
       #
       # You can optionally pass a resource object, default is to use self.resource
       #
+      # You may also override the url by passing <tt>:url</tt>, or pass extra options
+      # to resource path url with <tt>:url_options</tt>
+      #
       # === Example
       # 
       #   <% form_for_resource do |f| %>
@@ -107,10 +110,11 @@ module Ardes#:nodoc:
         returning options.dup do |options|
           options[:html] ||= {}
           options[:html][:method] ||= resource.new_record? ? :post : :put
+          args = options[:url_options] ? [options.delete(:url_options)] : []
           options[:url] ||= if resource.new_record?
-            controller.resource_specification.singleton? ? resource_path : resources_path
+            controller.resource_specification.singleton? ? resource_path(*args) : resources_path(*args)
           else
-            controller.resource_specification.singleton? ? resource_path : resource_path(resource)
+            controller.resource_specification.singleton? ? resource_path(*args) : resource_path(*([resource] + args))
           end
         end
       end

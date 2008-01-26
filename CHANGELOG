@@ -1,3 +1,10 @@
+* Added ability to pass options to named route in form_for_resource
+
+   form_for_resource :url_options => {:gday => 'mate'}
+   
+   # => action="/products/1?gday=mate"  (for update)
+   # => action="/products?gday=mate"    (for create)
+
 * changed :erp to :resource_path, and added :resource_method.
 
   This means you can connect a named route up with a REST action and also change the method

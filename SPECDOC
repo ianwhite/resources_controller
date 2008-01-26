@@ -730,7 +730,7 @@ UsersController handling GET /users
 - should find all users
 - should assign the found users for the view
 
-UsersControllerhandling GET /users.xml
+UsersController handling GET /users.xml
 - should be successful
 - should find all users
 - should render the found users as xml
@@ -741,7 +741,7 @@ UsersController handling GET /users/dave
 - should find the user requested
 - should assign the found user for the view
 
-UsersControllerhandling GET /users/dave.xml
+UsersController handling GET /users/dave.xml
 - should be successful
 - should find the user requested
 - should render the found user as xml
@@ -780,6 +780,8 @@ ActionView with resources_controller Helper
 
 Helper#form_for_resource (when resource is new record)
 - should call form_for with create form options
+- when passed :url_options, they should be passed to the path generation
+- when not passed :url_options, they should not be passed to the path generation
 
 Helper#form_for_resource (when resource is new record) and resource is singleton
 - should call form_for with create form options
@@ -862,6 +864,6 @@ A controller's resource_service
 #route_enclosing_names Admin::Superduper::ForumsController for named_route:
 - :admin_superduper_forums should be []
 
-Finished in 4.026155 seconds
+Finished in 4.952862 seconds
 
-589 examples, 0 failures
+591 examples, 0 failures

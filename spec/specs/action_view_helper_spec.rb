@@ -60,6 +60,18 @@ describe "Helper#form_for_resource (when resource is new record)" do
     @view.should_receive(:form_for).with('forum', @resource, {:html => {:method => :post}, :url => '/forums'})
     @view.form_for_resource{}
   end
+  
+  it 'when passed :url_options, they should be passed to the path generation' do
+    @view.should_receive(:resources_path).with({:foo => 'bar'}).and_return('/forums?foo=bar')
+    @view.should_receive(:form_for).with('forum', @resource, {:html => {:method => :post}, :url => '/forums?foo=bar'})
+    @view.form_for_resource(:url_options => {:foo => 'bar'}) {}
+  end
+
+  it 'when not passed :url_options, they should not be passed to the path generation' do
+    @view.should_receive(:resources_path).with().and_return('/forums')
+    @view.should_receive(:form_for).with('forum', @resource, {:html => {:method => :post}, :url => '/forums'})
+    @view.form_for_resource{}
+  end
 end
 
 describe "Helper#form_for_resource (when resource is new record) and resource is singleton" do
