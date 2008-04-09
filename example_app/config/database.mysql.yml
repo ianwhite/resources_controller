@@ -1,0 +1,8 @@
+development:
+  adapter: mysql
+  database: resources_controller_dev
+  username: root
+test:
+  adapter: mysql
+  database: resources_controller_test
+  username: root
