@@ -1,0 +1,25 @@
+http://plugins.ardes.com > resources_controller
+
+= resources_controller
+
+plugin to facilitate inheritance and DRYness in your resources controllers.
+See Ardes::ResourcesController for details
+
+See the {CHANGLELOG}[link:files/CHANGELOG.html] for recent changes and contributors
+
+= works with rails 2 (and edge)
+
+resources_controller works with rails 2 and edge.
+
+It probably works with 1.2.6.  Hold fire, and check back for details of 1.2.x testing
+
+=== Specs and Coverage
+* {SPECDOC}[link:files/SPECDOC.html] lists the specifications
+* {RSpec Report}[link:rspec_report.html] is a report of spec pass/fails
+* {RCov Report}[link:coverage/index.html] is the rcov report
+
+=== Testing
+
+RSpec is used for testing, so the tests are in <tt>spec/</tt> rather than
+<tt>test/</tt> Do rake --tasks for more details.
+
