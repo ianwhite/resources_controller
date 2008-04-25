@@ -1,0 +1,3 @@
+[submodule "garlic"]
+	path = garlic
+	url = git://github.com/ianwhite/garlic
