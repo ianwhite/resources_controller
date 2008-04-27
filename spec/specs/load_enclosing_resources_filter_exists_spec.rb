@@ -24,7 +24,7 @@ describe "ResourcesController.load_enclosing_resources_filter_exists?" do
   describe "when :find_filter not defined" do
     before do
       class<<@klass
-        undef_method :find_filter
+        undef_method(:find_filter) rescue nil
       end
     end
         
@@ -33,4 +33,4 @@ describe "ResourcesController.load_enclosing_resources_filter_exists?" do
       @klass.send(:load_enclosing_resources_filter_exists?)
     end
   end
-end  
+end
