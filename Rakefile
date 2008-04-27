@@ -10,7 +10,7 @@ plugin_name = File.basename(File.dirname(__FILE__))
 
 task :default => :spec
 
-task :cruise => "spec:rcov:verify"
+task :cruise => "garlic:all"
 
 desc "Run the specs for #{plugin_name}"
 Spec::Rake::SpecTask.new(:spec) do |t|
@@ -67,4 +67,15 @@ end
 namespace :doc do 
   desc "Generate all documentation (rdoc, specdoc, specdoc html and rcov) for #{plugin_name}"
   task :all => ["spec:doc:html", "spec:doc", "spec:rcov", "doc"]
+end
+
+# load up garlic if it's here
+if File.directory?(File.join(File.dirname(__FILE__), 'garlic'))
+  require File.join(File.dirname(__FILE__), 'garlic/lib/garlic_tasks')
+  require File.join(File.dirname(__FILE__), 'garlic')
+end
+
+desc "clone the garlic repo (for running ci tasks)"
+task :get_garlic do
+  sh "git clone git://github.com/ianwhite/garlic.git garlic"
 end

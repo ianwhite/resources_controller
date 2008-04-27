@@ -792,6 +792,12 @@ Helper#form_for_resource (when resource is existing record)
 Helper#remote_form_for_resource (when resource is existing record)
 - should call remote_form_for with update form options
 
+ResourcesController.load_enclosing_resources_filter_exists? when :find_filter defined
+- should call :find_filter with :load_enclosing_resources
+
+ResourcesController.load_enclosing_resources_filter_exists? when :find_filter not defined
+- should call :filter_chain
+
 #load_enclosing_resources for resources_controller_for :tags (when route_enclosing_names is [['users', false]])
 - should call load_wildcard once
 - should call Specification.new('user', :singleton => false, :as => nil)
@@ -864,6 +870,6 @@ A controller's resource_service
 #route_enclosing_names Admin::Superduper::ForumsController for named_route:
 - :admin_superduper_forums should be []
 
-Finished in 4.952862 seconds
+Finished in 5.097926 seconds
 
-591 examples, 0 failures
+593 examples, 0 failures

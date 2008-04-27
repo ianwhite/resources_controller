@@ -451,7 +451,7 @@ module Ardes#:nodoc:
         include ResourcesController::InstanceMethods, ResourcesController::NamedRouteHelper
       end
 
-      before_filter(:load_enclosing_resources, when_options) unless find_filter(:load_enclosing_resources)
+      before_filter(:load_enclosing_resources, when_options) unless load_enclosing_resources_filter_exists?
       
       write_inheritable_attribute(:specifications, [])
       specifications << '*' unless options.delete(:load_enclosing) == false
@@ -504,7 +504,16 @@ module Ardes#:nodoc:
       end
       include mixin
     end
-    
+  
+  private
+    def load_enclosing_resources_filter_exists?
+      if respond_to?(:find_filter) # BC 2.0-stable branch
+        find_filter(:load_enclosing_resources)
+      else
+        filter_chain.detect {|c| c.method == :load_enclosing_resources}
+      end
+    end
+  
     module ClassMethods
       # Specifies that this controller has a particular enclosing resource.
       #

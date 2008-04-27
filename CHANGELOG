@@ -1,3 +1,7 @@
+* Added BC for 2-0-stable branch re: find_filter, and regression specs
+
+* find_filter no longer exists in edge - updated accordingly [Jason Lee http://github.com/jlsync]
+
 * Added ability to pass options to named route in form_for_resource
 
    form_for_resource :url_options => {:gday => 'mate'}
