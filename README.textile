@@ -12,6 +12,7 @@ h2. works with rails 2.0-stable and edge
 resources_controller works with rails 2 and edge.
 
 h3. Specs and Coverage
+
 * "SPECDOC":http://github.com/ianwhite/resources_controller/tree/master/SPECDOC lists the specifications
 * Coverage is 100% (C2), and the spec suite is quite comprehensive
 
