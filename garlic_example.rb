@@ -1,6 +1,7 @@
 # This is for running specs against target versions of rails
 #
-# To do so
+# To use do
+#   - cp garlic_example.rb garlic.rb
 #   - rake get_garlic
 #   - [optional] edit this file to point the repos at your local clones of
 #     rails, rspec, and rspec-rails

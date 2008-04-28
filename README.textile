@@ -1,0 +1,28 @@
+"Ardes plugins":http://plugins.ardes.com > resources_controller
+
+h1. resources_controller
+
+plugin to facilitate inheritance and DRYness in your resources controllers.
+See the "docs":http://plugins.ardes.com/doc/resources_controller for details
+
+See the "CHANGLELOG":http://github.com/ianwhite/resources_controller/tree/master/CHANGELOG for recent changes and contributors
+
+h2. works with rails 2.0-stable and edge
+
+resources_controller works with rails 2 and edge.
+
+h3. Specs and Coverage
+
+* "SPECDOC":http://github.com/ianwhite/resources_controller/tree/master/SPECDOC lists the specifications
+* Coverage is 100% (C2), and the spec suite is quite comprehensive
+
+h3. Testing
+
+RSpec is used for testing, so the tests are in <tt>spec/</tt> rather than
+<tt>test/</tt> Do rake --tasks for more details.
+
+h4. Continuous Integration
+
+"garlic":http://github.com/ianwhite/garlic is used for CI.  To run the CI suite have a look at
+"garlic_example.rb":http://github.com/ianwhite/resources_controller/tree/master/garlic_example.rb
+
