@@ -38,7 +38,9 @@ describe InfosController, " (its actions)" do
   end
   
   it "should have only ['show', 'edit', 'update'] in action_methods" do
-    @controller.class.send(:action_methods).should == Set.new(['show', 'edit', 'update'])
+    pending "waiting for #469 on rspec" do
+      @controller.class.send(:action_methods).should == Set.new(['show', 'edit', 'update'])
+    end
   end
   
   it "GET /account/info should be successful" do
