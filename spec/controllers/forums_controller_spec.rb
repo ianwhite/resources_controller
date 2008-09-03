@@ -146,11 +146,9 @@ end
 
 describe ForumsController, " (checking that non actions are hidden)" do
   it "should only have CRUD actions as action_methods" do
-    pending "waiting for #469 on rspec to be accepted" do
-      @controller.class.send(:action_methods).should == Set.new([
-        'index', 'show', 'edit', 'new', 'update', 'create', 'destroy'
-      ])
-    end
+    @controller.class.send(:action_methods).should == Set.new([
+      'index', 'show', 'edit', 'new', 'update', 'create', 'destroy'
+    ])
   end
 end
 
