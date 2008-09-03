@@ -12,9 +12,11 @@
 
 garlic do
   repo 'rails', :url => 'git://github.com/rails/rails'#, :local => "~/dev/vendor/rails"
-  # targeting ianwhite/rspec as it has some outstanding patches applied
-  repo 'rspec', :url => 'git://github.com/ianwhite/rspec'#, :local => "~/dev/vendor/rspec"
-  repo 'rspec-rails', :url => 'git://github.com/ianhwite/rspec-rails'#, :local => "~/dev/vendor/rspec-rails"
+
+  # using ianwhite/rspec-rails as it has some patches that are not yet applied in dchelimsky/rspec-rails
+  repo 'rspec', :url => 'git://github.com/ianwhite/rspec'
+  repo 'rspec-rails', :url => 'git://github.com/ianwhite/rspec-rails'
+
   repo 'resources_controller', :path => '.'
 
   target 'edge'
