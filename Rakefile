@@ -79,3 +79,6 @@ desc "clone the garlic repo (for running ci tasks)"
 task :get_garlic do
   sh "git clone git://github.com/ianwhite/garlic.git garlic"
 end
+
+# load up the tasks for testing rspec generators against RC
+require File.join(File.dirname(__FILE__), 'spec/generate_rake_task')
