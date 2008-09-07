@@ -29,11 +29,16 @@ garlic do
     prepare do
       plugin 'resources_controller', :clone => true
       plugin 'rspec'
-      plugin('rspec-rails') { sh "script/generate rspec -f" }
+      plugin 'rspec-rails' do
+        sh "script/generate rspec -f"
+      end
     end
   
     run do
-      cd("vendor/plugins/resources_controller") { sh "rake spec:rcov:verify" }
+      cd "vendor/plugins/resources_controller" do
+        sh "rake spec:rcov:verify"
+        sh "rake spec:generate"
+      end
     end
   end
 end
