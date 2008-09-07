@@ -7,11 +7,12 @@ namespace :spec do
     cd RAILS_ROOT do
       begin
         generate_resource :author
-        sh "rake db:migrate"
+        migrate_up
         make_resources_controller :author
+        puts "** Running generated controller specs"
         sh "rake spec:controllers"
       ensure
-        sh "rake db:migrate VERSION=0"
+        migrate_down
         cleanup_resource :author
       end
     end
@@ -25,24 +26,36 @@ namespace :spec do
     end
   end
   
+  def migrate_up
+    puts "** Migrating up"
+    `rake db:migrate`
+  end
+  
+  def migrate_down
+    puts "** Migrating down"
+    `rake db:migrate VERSION=0`
+  end
+  
   def generate_resource(name)
-    sh "script/generate rspec_scaffold #{name.to_s.classify}"
+    puts "** Generating rspec_scaffold for resource: #{name}"
+    `script/generate rspec_scaffold #{name.to_s.classify}`
   end
   
   def make_resources_controller(name)
     plural = name.to_s.pluralize
-    File.open("app/controllers/#{plural}_controller.rb", "w+") do |f|
-      f << <<-end_eval
+    
+    controller = <<-end_eval
 class #{plural.classify.pluralize}Controller < ApplicationController
   resources_controller_for :#{plural}
 end
-      end_eval
-    end
-    puts File.read("app/controllers/#{plural}_controller.rb")
+    end_eval
+    
+    puts "** Replacing app/controllers/#{plural}_controller.rb with:\n\n#{controller}\n"
+    File.open("app/controllers/#{plural}_controller.rb", "w+") {|f| f << controller }
   end
   
   def cleanup_resource(name)
-    puts "Cleaning up files for resource: #{name}"
+    puts "** Cleaning up generated files for resource: #{name}"
     plural = name.to_s.pluralize
 
     # remove app files
