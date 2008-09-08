@@ -1,9 +1,10 @@
 = resources_controller
 
 plugin to facilitate inheritance and DRYness in your resources controllers.
-See the docs at http://plugins.ardes.com/doc/resources_controller for details
+See the docs at http://plugins.ardes.com/doc/resources_controller for details.
+Also see http://blog.ardes.com/resources_controller
 
-See the CHANGLELOG for recent changes and contributors
+See the CHANGLELOG for recent changes.
 
 == works with rails 2.0-stable and edge
 
@@ -23,3 +24,17 @@ RSpec is used for testing, so the tests are in <tt>spec/</tt> rather than
 garlic (at http://github.com/ianwhite/garlic) is used for CI.  To run the CI suite have a look at
 garlic_example.rb
 
+== Contributors
+
+The following people have made contributions to resources_controller.  Please let me know if I've missed you out.
+
+* Chris Hapgood
+* Jason Lee
+* Richard Hooker
+* Matt Mower
+* Inviz
+* Dan Kubb
+
+== License
+
+Copyright (c) 2008 Ian White, MIT License
