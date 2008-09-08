@@ -34,6 +34,7 @@ The following people have made contributions to resources_controller.  Please le
 * Matt Mower
 * Inviz
 * Dan Kubb
+* Rein Henrichs
 
 == License
 
