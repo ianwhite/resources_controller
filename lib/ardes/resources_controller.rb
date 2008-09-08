@@ -110,11 +110,11 @@ module Ardes#:nodoc:
   #
   # You may have a named route that maps a url to a particular controller and action,
   # this causes resources_controller problems as it relies on the route to load the
-  # resources.  You can get around this by specifying :erp as a param in routes.rb
+  # resources.  You can get around this by specifying :resource_path as a param in routes.rb
   #
-  #   map.home '', :controller => :forums, :action => :index, :resource_route => '/forums'
+  #   map.root :controller => :forums, :action => :index, :resource_path => '/forums'
   #
-  # When the controller is invoked via the '' url, rc will use :erp to recognize the
+  # When the controller is invoked via the '' url, rc will use :resource_path to recognize the
   # route.
   #
   # ==== Putting it all together
@@ -138,7 +138,7 @@ module Ardes#:nodoc:
   #    forum.resource :image
   #  end
   #
-  #  map.home '', :controller => :forums, :action => :index, :erp => '/forums'
+  #  map.root :controller => :forums, :action => :index, :resource_path => '/forums'
   #
   # app/controllers:
   #
