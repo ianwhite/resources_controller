@@ -138,7 +138,7 @@ module Ardes#:nodoc:
   #    forum.resource :image
   #  end
   #
-  #  map.home '', :controller => :forums, :action => :index, :resource_path => '/forums'
+  #  map.root :controller => :forums, :action => :index, :resource_path => '/forums'
   #
   # app/controllers:
   #
