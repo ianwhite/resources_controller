@@ -41,3 +41,24 @@ describe "A controller's resource_service" do
     @controller.resource_service.should == 'foo'
   end
 end
+
+describe "deprecated methods" do
+  before do 
+    @controller = ForumsController.new
+    @controller.resource = Forum.new
+  end
+  
+  it "#save_resource should send resource.save" do
+    ActiveSupport::Deprecation.silence do
+      @controller.resource.should_receive :save
+      @controller.save_resource
+    end
+  end
+  
+  it "#resource_saved? should send resource.saved?" do
+    ActiveSupport::Deprecation.silence do
+      @controller.resource.should_receive(:saved?)
+      @controller.resource_saved?
+    end
+  end
+end

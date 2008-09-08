@@ -768,6 +768,26 @@ UsersController handling PUT /users/dave
 UsersController handling DELETE /users/dave
 - should be unknown action
 
+(re: saved?) Comment.new(<invalid attrs>)
+- should not be attempted save
+- should not be saved
+
+(re: saved?) Comment.new(<invalid attrs>).save
+- should be attempted save
+- should not be saved
+
+(re: saved?) Comment.new(<invalid attrs>).save then update_attributes(<valid attrs>)
+- should be attempted save
+- should be saved
+
+(re: saved?) Comment.new(<invalid attrs>).save then update_attributes(<valid attrs>).reload
+- should not be attempted save
+- should not be saved
+
+(re: saved?) Comment.new(<invalid attrs>).save then update_attributes(<valid attrs>).reload.save
+- should be attempted save
+- should be saved
+
 ActionView with resources_controller Helper
 - should forward #resource_name to controller
 - should forward #resources_name to controller
@@ -791,12 +811,6 @@ Helper#form_for_resource (when resource is existing record)
 
 Helper#remote_form_for_resource (when resource is existing record)
 - should call remote_form_for with update form options
-
-ResourcesController.load_enclosing_resources_filter_exists? when :find_filter defined
-- should call :find_filter with :load_enclosing_resources
-
-ResourcesController.load_enclosing_resources_filter_exists? when :find_filter not defined
-- should call :filter_chain
 
 #load_enclosing_resources for resources_controller_for :tags (when route_enclosing_names is [['users', false]])
 - should call load_wildcard once
@@ -839,6 +853,12 @@ ResourcesController.load_enclosing_resources_filter_exists? when :find_filter no
 - should call load_enclosing_resource_from_specification with user spec, then load_wildcard once with 'taggable'
 - should call Specification.new with ('comment', :singleton => false, :as => 'taggable')
 
+ResourcesController.load_enclosing_resources_filter_exists? when :find_filter defined
+- should call :find_filter with :load_enclosing_resources
+
+ResourcesController.load_enclosing_resources_filter_exists? when :find_filter not defined
+- should call :filter_chain
+
 ResourcesController (in general)
 - nested_in :foo, :polymorphic => true, :class => User should raise argument error (no options or block with polymorphic)
 - resources_controller_for :forums, :in => [:user, '*', '*', :comment] should raise argument error (no multiple wildcards in a row)
@@ -848,6 +868,10 @@ ResourcesController#enclosing_resource_name
 
 A controller's resource_service
 - may be explicitly set with #resource_service=
+
+deprecated methods
+- #save_resource should send resource.save
+- #resource_saved? should send resource.saved?
 
 #route_enclosing_names TagsController for named_route:
 - :tags should be []
@@ -870,6 +894,6 @@ A controller's resource_service
 #route_enclosing_names Admin::Superduper::ForumsController for named_route:
 - :admin_superduper_forums should be []
 
-Finished in 5.097926 seconds
+Finished in 8.867688 seconds
 
-593 examples, 0 failures
+605 examples, 0 failures
