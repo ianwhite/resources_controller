@@ -665,17 +665,12 @@ module Ardes#:nodoc:
         @enclosing_collection_resources ||= []
       end
       
-      # DEPRECATED: just use resource.saved?
+      # Has the resource been saved?
       #
-      # Returns self.resource.save and caches the result for future calls.
-      # This is useful when you want to know outside of an action whether the resource was saved.
-      #
-      # Pass true to ignore the cached value
-      def resource_saved?(reload = false)
-        resource.save unless resource.attempted_save?
-        resource.saved?
+      # Returns true if the record is not new, and there are no errors
+      def resource_saved?
+        !resource.new_record? && resource.errors.empty?
       end
-      deprecate :resource_saved? => 'Use resource.saved?'
       
       # DEPRECATED: just use resource.save
       def save_resource

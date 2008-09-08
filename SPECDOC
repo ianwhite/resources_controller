@@ -575,6 +575,25 @@ Requesting /forums/2/owner using DELETE
 - should set the flash notice
 - should redirect to forums/2
 
+CommentsController#resource_saved Comment.new(<invalid attrs>)
+- should not be resource saved
+
+CommentsController#resource_saved Comment.new(<invalid attrs>).save
+- should not be resource saved
+
+CommentsController#resource_saved Comment.new(<invalid attrs>).save then update_attributes(<valid attrs>)
+- should be resource saved
+
+CommentsController#resource_saved Comment.find(<id>)
+- should be resource saved
+- .save should be saved
+
+CommentsController#resource_saved Comment.find(<id>) then update_attributes(<invalid attrs>)
+- should not be resource saved
+
+CommentsController#resource_saved Comment.find(<id>) then update_attributes(<new valid attrs>)
+- should be resource saved
+
 Routing shortcuts for Tags should map
 - resources_path to /tags
 - resource_path to /tags/2
@@ -768,26 +787,6 @@ UsersController handling PUT /users/dave
 UsersController handling DELETE /users/dave
 - should be unknown action
 
-(re: saved?) Comment.new(<invalid attrs>)
-- should not be attempted save
-- should not be saved
-
-(re: saved?) Comment.new(<invalid attrs>).save
-- should be attempted save
-- should not be saved
-
-(re: saved?) Comment.new(<invalid attrs>).save then update_attributes(<valid attrs>)
-- should be attempted save
-- should be saved
-
-(re: saved?) Comment.new(<invalid attrs>).save then update_attributes(<valid attrs>).reload
-- should not be attempted save
-- should not be saved
-
-(re: saved?) Comment.new(<invalid attrs>).save then update_attributes(<valid attrs>).reload.save
-- should be attempted save
-- should be saved
-
 ActionView with resources_controller Helper
 - should forward #resource_name to controller
 - should forward #resources_name to controller
@@ -871,7 +870,6 @@ A controller's resource_service
 
 deprecated methods
 - #save_resource should send resource.save
-- #resource_saved? should send resource.saved?
 
 #route_enclosing_names TagsController for named_route:
 - :tags should be []
@@ -894,6 +892,6 @@ deprecated methods
 #route_enclosing_names Admin::Superduper::ForumsController for named_route:
 - :admin_superduper_forums should be []
 
-Finished in 8.867688 seconds
+Finished in 8.299069 seconds
 
-605 examples, 0 failures
+601 examples, 0 failures

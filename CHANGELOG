@@ -1,10 +1,11 @@
-* API change: save_resource and resource_saved? deprecated
+* API change: save_resource deprecated
 
-  ActiveRecord::Base now has a saved? and attempted_save? method, which makes response_for much easier
-  to write, and leaves less artefacts in the controller instance.
+  So save_resource is now deprecated, just use resource.save
   
-  So save_resource, and resource_saved? are now deprecated, just use resource.save, and resource.saved?
-  instead.  See response_for_resources_controller if you're into response_for.
+  resource_saved? has slightly different semantics - it returns true if the record is not new and has no errors
+  
+  WTF?: save_resource used to set an instance var to track whether the resource was saved.  This is so that
+        controller can make decisions based on this outside the scope of an action (in response_for, and after_filters)
   
 * rspec compat:  Added new rake task to test that an RC controller passes the default rspec_scaffold
   controller specs.
