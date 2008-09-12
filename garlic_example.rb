@@ -36,7 +36,8 @@ garlic do
   
     run do
       cd "vendor/plugins/resources_controller" do
-        sh "rake spec:rcov:verify && rake spec:generate"
+        sh "rake spec:rcov:verify"
+        sh "rake spec:generate"
       end
     end
   end

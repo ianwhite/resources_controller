@@ -52,9 +52,10 @@ describe InfosController, " (its actions)" do
   end
   
   it "PUT /account/info should be successful" do
-    @info.stub!(:update_attributes).and_return(true)
+    @info.stub!(:attributes=)
+    @info.stub!(:save)
     put :update
-    response.should be_redirect
+    response.should be_success
   end
   
   it "GET /account/info/new should raise UnknownAction" do

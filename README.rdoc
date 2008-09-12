@@ -14,7 +14,6 @@ resources_controller works with rails 2.x and edge.
 
 * The SPECDOC lists the specifications
 * Coverage is 100% (C0), and the spec suite is quite comprehensive
-* Rspec's generated rspec_scaffold controller specs are tested against a simple rc controller (see rake spec:generate)
 
 RSpec is used for testing, so the tests are in <tt>spec/</tt> rather than
 <tt>test/</tt> Do rake --tasks for more details.

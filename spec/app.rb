@@ -156,12 +156,11 @@ class Post < ActiveRecord::Base
 end
 
 class Comment < ActiveRecord::Base
-  validates_presence_of :user, :post
-  
   belongs_to :user
   belongs_to :post
   has_many :tags, :as => :taggable
 end
+
 
 ##############
 # Controllers

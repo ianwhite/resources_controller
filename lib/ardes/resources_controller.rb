@@ -665,18 +665,18 @@ module Ardes#:nodoc:
         @enclosing_collection_resources ||= []
       end
       
-      # Has the resource been saved?
+      # Returns self.resource.save and caches the result for future calls.
+      # This is useful when you want to know outside of an action whether the resource was saved.
       #
-      # Returns true if the record is not new, and there are no errors
-      def resource_saved?
-        !resource.new_record? && resource.errors.empty?
+      # Pass true to ignore the cached value
+      def resource_saved?(reload = false)
+        save_resource if reload || @resource_saved.nil?
+        @resource_saved
       end
       
-      # DEPRECATED: just use resource.save
       def save_resource
-        resource.save
+        @resource_saved = resource.save
       end
-      deprecate :save_resource => 'Use resource.save'
       
     private
       # returns the route that was used to invoke this controller and current action.  The path is found first from params[:resource_path]
