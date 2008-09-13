@@ -23,7 +23,7 @@ garlic do
   target '2.0-stable', :branch => 'origin/2-0-stable'
   target '2.1-stable', :branch => 'origin/2-1-stable'
   target '2.0.3', :tag => 'v2.0.3'
-  target '2.1.0', :tag => 'v2.1.0'
+  target '2.1.1', :tag => 'v2.1.1'
 
   all_targets do
     prepare do
@@ -36,8 +36,7 @@ garlic do
   
     run do
       cd "vendor/plugins/resources_controller" do
-        sh "rake spec:rcov:verify"
-        sh "rake spec:generate"
+        sh "rake spec:rcov:verify && rake spec:generate"
       end
     end
   end

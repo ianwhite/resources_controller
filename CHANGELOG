@@ -1,3 +1,8 @@
+* API change: save_resource deprecated
+
+  So save_resource is now deprecated, just use resource.save
+  ActiveRecords can now be asked if they are saved?
+  
 * rspec compat:  Added new rake task to test that an RC controller passes the default rspec_scaffold
   controller specs.
 
