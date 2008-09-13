@@ -1,8 +1,20 @@
+* The reason for the reversion in c21f35c has been fixed.  Thanks Jason Lee for the bug report.
+
+  The problem was that I had changed resource_saved?'s behaviour to *not* saving the model if it had
+  already been saved.  In the future resource_saved? will be deprecated, but not yet.
+
+  BTW.  All of these changes to resource_saved? behaviour is aimed at making RC drop in compatible with
+  rspec's generated controller specs (try rake spec:generate).
+  
+  To do that I need the default update action to use :update_attributes. This meant that the old strategy
+  of keeping track of saves by using save_resource wont work.  Instead, we keep track by looking at the
+  AR's state (see lib/ardes/active_record/saved.rb) which is a far better solution anyway.
+
 * API change: save_resource deprecated
 
   So save_resource is now deprecated, just use resource.save
   ActiveRecords can now be asked if they are saved?
-  
+    
 * rspec compat:  Added new rake task to test that an RC controller passes the default rspec_scaffold
   controller specs.
 
