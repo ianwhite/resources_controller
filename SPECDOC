@@ -951,6 +951,6 @@ deprecated methods
 #route_enclosing_names Admin::Superduper::ForumsController for named_route:
 - :admin_superduper_forums should be []
 
-Finished in 8.293483 seconds
+Finished in 8.455269 seconds
 
 632 examples, 0 failures
