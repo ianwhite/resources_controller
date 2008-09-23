@@ -24,7 +24,7 @@ task :cruise do
     # build doc and send that
     cd "garlic/work/edge/vendor/plugins/#{plugin_name}" do
       sh "rake doc:all"
-      sh "scp -i ~/.ssh/ardes -r doc ardes@ardes.com:~/subdomains/plugins/httpdocs/doc/inherit_views"
+      sh "scp -i ~/.ssh/ardes -r doc ardes@ardes.com:~/subdomains/plugins/httpdocs/doc/#{plugin_name}"
     end
     
   ensure
