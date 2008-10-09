@@ -1,3 +1,5 @@
+* use add_enclosing_resource to add your own enclosing resources if you're skipping load_enclosing_resources
+
 * The reason for the reversion in c21f35c has been fixed.  Thanks Jason Lee for the bug report.
 
   The problem was that I had changed resource_saved?'s behaviour to *not* saving the model if it had

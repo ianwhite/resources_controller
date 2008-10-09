@@ -35,6 +35,8 @@ The following people have made contributions to resources_controller.  Please le
 * Inviz
 * Dan Kubb
 * Rein Henrichs
+* Tom Stuart
+* Joel Chippindale
 
 == License
 
