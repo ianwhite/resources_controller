@@ -785,14 +785,18 @@ module Ardes#:nodoc:
       def load_enclosing_resource_from_specification(spec)
         spec.segment == route_enclosing_names[enclosing_resources.size].first or ResourcesController.raise_resource_mismatch(self)
         returning spec.find_from(self) do |resource|
-          update_name_prefix(spec.name_prefix)
-          enclosing_resources << resource
-          enclosing_collection_resources << resource unless spec.singleton?
-          instance_variable_set("@#{spec.name}", resource)
-          instance_variable_set("@#{spec.as}", resource) if spec.as
+          add_enclosing_resource(resource, spec.name, :name_prefix => spec.name_prefix, :is_singleton => spec.singleton?, :as => spec.as )
         end
       end
-        
+      
+      def add_enclosing_resource(resource, name, options = {})
+        update_name_prefix(options[:name_prefix] || (options[:name_prefix] == false ? '' : "#{name}_"))
+        enclosing_resources << resource
+        enclosing_collection_resources << resource unless options[:is_singleton]
+        instance_variable_set("@#{name}", resource)
+        instance_variable_set("@#{options[:as]}", resource) if options[:as]
+      end
+      
       # The name prefix is used for forwarding urls and will be different depending on
       # which route the controller was invoked by.  The resource specifications build
       # up the name prefix as the resources are loaded.
