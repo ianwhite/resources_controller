@@ -785,11 +785,12 @@ module Ardes#:nodoc:
       def load_enclosing_resource_from_specification(spec)
         spec.segment == route_enclosing_names[enclosing_resources.size].first or ResourcesController.raise_resource_mismatch(self)
         returning spec.find_from(self) do |resource|
-          add_enclosing_resource(resource, spec.name, :name_prefix => spec.name_prefix, :is_singleton => spec.singleton?, :as => spec.as )
+          add_enclosing_resource(resource, :name => spec.name, :name_prefix => spec.name_prefix, :is_singleton => spec.singleton?, :as => spec.as)
         end
       end
       
-      def add_enclosing_resource(resource, name, options = {})
+      def add_enclosing_resource(resource, options = {})
+        name = options[:name] || resource.class.name.underscore
         update_name_prefix(options[:name_prefix] || (options[:name_prefix] == false ? '' : "#{name}_"))
         enclosing_resources << resource
         enclosing_collection_resources << resource unless options[:is_singleton]
