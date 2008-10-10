@@ -484,25 +484,12 @@ module Ardes#:nodoc:
       map_enclosing_resource(*args, &block)
     end
     
-    # Include the specified module, optionally specifying which public methods to include
-    #
-    # eg
-    # 
-    #   include_actions ActionMixin, :only => :index
-    #   include_actions ActionMixin, :except => [:create, :new]
+    # Include the specified module, optionally specifying which public methods to include, for example:
+    #  include_actions ActionMixin, :only => :index
+    #  include_actions ActionMixin, :except => [:create, :new]
     def include_actions(mixin, options = {})
-      options.assert_valid_keys(:only, :except)
-      raise ArgumentError, "you can only specify either :except or :only, not both" if options[:only] && options[:except]
-      
-      mixin = mixin.dup
-      if only = options[:only]
-        only = Array(options[:only]).collect(&:to_s)
-        mixin.instance_methods.each {|m| mixin.send(:undef_method, m) unless only.include?(m)}
-      elsif except = options[:except]
-        except = Array(options[:except]).collect(&:to_s)
-        mixin.instance_methods.each {|m| mixin.send(:undef_method, m) if except.include?(m)}
-      end
-      include mixin
+      mixin.extend(IncludeActions) unless mixin.respond_to?(:include_actions)
+      mixin.include_actions(self, options)
     end
   
   private

@@ -1,3 +1,7 @@
+* If you use your own Action modules, you can now define a module method #include_actions to do the :only / :except 
+  handling yourself.  See Ardes::ResourcesController::IncludeActions.  This change is completely BC, you don't need 
+  to do anything to any of your existing action modules. 
+
 * use add_enclosing_resource to add your own enclosing resources if you're skipping load_enclosing_resources [Tom Stuart, Joel Chippindale]
 
 * The reason for the reversion in c21f35c has been fixed.  Thanks Jason Lee for the bug report.
