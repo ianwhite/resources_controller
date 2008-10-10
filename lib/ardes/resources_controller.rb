@@ -628,7 +628,7 @@ module Ardes#:nodoc:
       
       # returns the name of the immediately enclosing resource
       def enclosing_resource_name
-        enclosing_resource.class.name.underscore
+        @enclosing_resource_name
       end
       
       # returns the resource service for the controller - this will be lazilly created
@@ -781,6 +781,7 @@ module Ardes#:nodoc:
         update_name_prefix(options[:name_prefix] || (options[:name_prefix] == false ? '' : "#{name}_"))
         enclosing_resources << resource
         enclosing_collection_resources << resource unless options[:is_singleton]
+        instance_variable_set("@enclosing_resource_name", options[:name])
         instance_variable_set("@#{name}", resource)
         instance_variable_set("@#{options[:as]}", resource) if options[:as]
       end
