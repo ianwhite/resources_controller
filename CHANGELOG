@@ -1,4 +1,4 @@
-* use add_enclosing_resource to add your own enclosing resources if you're skipping load_enclosing_resources
+* use add_enclosing_resource to add your own enclosing resources if you're skipping load_enclosing_resources [Tom Stuart, Joel Chippindale]
 
 * The reason for the reversion in c21f35c has been fixed.  Thanks Jason Lee for the bug report.
 
