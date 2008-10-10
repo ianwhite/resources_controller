@@ -17,15 +17,15 @@ module Ardes
         options.assert_valid_keys(:only, :except)
         raise ArgumentError, "you can only specify either :except or :only, not both" if options[:only] && options[:except]
         mixin = self.dup
-        actions_to_remove(options).each {|a| mixin.remove_action(a) }
+        action_methods_to_remove(options).each {|a| mixin.remove_action_method(a) }
         controller.send :include, mixin
       end
       
-      def remove_action(action)
+      def remove_action_method(action)
         undef_method action
       end
       
-      def actions_to_remove(options = {})
+      def action_methods_to_remove(options = {})
         if options[:only]
           instance_methods - options[:only].map(&:to_s)
         elsif options[:except]
