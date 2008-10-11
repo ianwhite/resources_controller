@@ -652,19 +652,31 @@ module Ardes#:nodoc:
         @enclosing_collection_resources ||= []
       end
       
-      # Has the resource been saved successfully?
-      # If the record has not had validation attempted, it is saved.
-      # Returns true if the record is not new, and there are no errors
+      # NOTE: This method is overly complicated and unecessary.  It's much clearer just to keep
+      # track of record saves yourself, this is here for BC.  For an example of how it should be
+      # done look at the actions module in http://github.com/ianwhite/response_for_rc
+      #
+      # Has the resource been saved successfully?, if no save has been attempted, save the
+      # record and return the result
+      #
+      # This method uses the @resource_saved tracking var, or the model's state itself if
+      # that is not available (which means if you do resource.update_attributes, then this
+      # method will return the correct result)
       def resource_saved?
-        resource.save unless resource.validation_attempted?
-        resource.saved?
+        save_resource if @resource_saved.nil? && !resource.validation_attempted?
+        @resource_saved = resource.saved? if @resource_saved.nil?
+        @resource_saved
       end
       
-      # DEPRECATED: just use resource.save
+      # NOTE: it's clearer to just keep track of record saves yourself, this is here for BC
+      # See the comment on #resource_saved?
+      #
+      # @resource_saved = resource.update_attributes(params[resource_name])
+      #
+      # Save the resource, and keep track of the result
       def save_resource
-        resource.save
+        @resource_saved = resource.save
       end
-      deprecate :save_resource => 'Use resource.save'
       
     private
       # returns the route that was used to invoke this controller and current action.  The path is found first from params[:resource_path]
