@@ -1,3 +1,5 @@
+* Removed deprecation warning from save_resource, and added cautionary notes to the comments instead
+
 * If you use your own Action modules, you can now define a module method #include_actions to do the :only / :except 
   handling yourself.  See Ardes::ResourcesController::IncludeActions.  This change is completely BC, you don't need 
   to do anything to any of your existing action modules. 
