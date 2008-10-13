@@ -824,6 +824,10 @@ module Ardes#:nodoc:
         resource_specification.find ? resource_specification.find_custom(controller) : super
       end
       
+      def new(*args, &block)
+        service.new(*args, &block)
+      end
+      
       def respond_to?(method)
         super || service.respond_to?(method)
       end
