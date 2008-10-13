@@ -27,9 +27,9 @@ module Ardes
       
       def action_methods_to_remove(options = {})
         if options[:only]
-          instance_methods - options[:only].map(&:to_s)
+          instance_methods - Array(options[:only]).map(&:to_s)
         elsif options[:except]
-          options[:except].map(&:to_s) & instance_methods
+          Array(options[:except]).map(&:to_s) & instance_methods
         else
           []
         end
