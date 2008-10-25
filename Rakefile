@@ -89,18 +89,21 @@ task :cruise do
     `cd garlic; git pull`
     `rake garlic:clean`
     sh "rake garlic:all"
-    sh "rake garlic:run_targets > garlic_report.txt"
+
+    # the following can fail
+    `rake garlic:clean`
+    `rake garlic:run_targets > garlic_report.txt`
     
     # send abridged report
     report = File.read('garlic_report.txt').sub(/^.*?==========/m, '==========')
     report = "garlic report for #{plugin_name}\n#{`git log -n 1 --pretty=oneline --no-color`}\n" + report
     File.open('garlic_report.txt', 'w+') {|f| f << report }
-    sh "scp -i ~/.ssh/ardes garlic_report.txt ardes@ardes.com:~/subdomains/plugins/httpdocs/doc/#{plugin_name}_garlic_report.txt"
+    `scp -i ~/.ssh/ardes garlic_report.txt ardes@ardes.com:~/subdomains/plugins/httpdocs/doc/#{plugin_name}_garlic_report.txt`
 
     # build doc and send that
     cd "garlic/work/edge/vendor/plugins/#{plugin_name}" do
-      sh "rake doc:all"
-      sh "scp -i ~/.ssh/ardes -r doc ardes@ardes.com:~/subdomains/plugins/httpdocs/doc/#{plugin_name}"
+      `rake doc:all`
+      `scp -i ~/.ssh/ardes -r doc ardes@ardes.com:~/subdomains/plugins/httpdocs/doc/#{plugin_name}`
     end
   end
 end
