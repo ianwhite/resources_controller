@@ -54,10 +54,8 @@ module Ardes#:nodoc:
         end
       end
 
-      def respond_to_with_named_route_helper?(method, include_private = false)
-        # only pass include_private when it's set, to stop older software blowing up
-        normally_responds_to = include_private ? respond_to_without_named_route_helper?(method, include_private) : respond_to_without_named_route_helper?(method)
-        normally_responds_to || resource_named_route_helper_method?(method)
+      def respond_to_with_named_route_helper?(*args)
+        respond_to_without_named_route_helper?(*args) || resource_named_route_helper_method?(args.first)
       end
 
       # return true if the passed method (e.g. 'resources_path') corresponds to a defined
