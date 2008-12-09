@@ -124,7 +124,7 @@ Currently:
         name_prefix = method.to_s.sub(/^.*_for_/,'')
         if resource_method =~ /enclosing_resource/
           route, route_method = *route_and_method_from_enclosing_resource_method_and_name_prefix(resource_method, name_prefix)
-          required_args = route.significant_keys.reject{|k| [:controller, :action].include?(k)}.size
+          required_args = (route.significant_keys - [:controller, :action, :format]).size
         
           self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
             def #{method}(*args)
@@ -137,7 +137,7 @@ Currently:
                   
         else
           route, route_method = *route_and_method_from_resource_method_and_name_prefix(resource_method, name_prefix)
-          required_args = route.significant_keys.reject{|k| [:controller, :action].include?(k)}.size
+          required_args = (route.significant_keys - [:controller, :action, :format]).size
 
           self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
             def #{method}(*args)
