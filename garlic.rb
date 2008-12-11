@@ -6,7 +6,7 @@ garlic do
   repo 'ianwhite-rspec', :url => 'git://github.com/ianwhite/rspec'
   repo 'ianwhite-rspec-rails', :url => 'git://github.com/ianwhite/rspec-rails'
 
-  ['origin/2-0-stable', 'origin/2-1-stable', 'origin/2-2-stable'].each do |rails|
+  ['origin/master', 'origin/2-0-stable', 'origin/2-1-stable', 'origin/2-2-stable'].each do |rails|
 
     target "Rails: #{rails}", :tree_ish => rails do
       prepare do
