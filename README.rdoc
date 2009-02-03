@@ -6,9 +6,9 @@ Also see http://blog.ardes.com/resources_controller
 
 See the CHANGLELOG for recent changes.
 
-== works with rails 2.0-stable, 2.1-stable, and edge
+== works with rails 2.1-stable, and 2.2-stable, 
 
-resources_controller works with rails 2.x and edge.
+resources_controller works with rails >= 2.1.
 
 == Specs and Coverage
 
