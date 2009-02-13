@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Module: Ardes::ResourcesController::Actions [resources_controller API Docs (cca4373)]</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../.././rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Module</span>
+          Ardes::ResourcesController::Actions
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../../files/lib/ardes/resources_controller/actions_rb.html">lib/ardes/resources_controller/actions.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            standard CRUD actions, with html, js and xml responses, re-written to mnake
+            best use of resources_cotroller. This helps if you&#8217;re writing
+            controllers that you want to share via mixin or inheritance.
+            </p>
+            <p>
+            This module is used as the actions for the controller by default, but you
+            can change this behaviour:
+            </p>
+            <pre>resources_controller_for :foos, :actions_include =&gt; false               # don't include any actions&#x000A;resources_controller_for :foos, :actions_include =&gt; Some::Other::Module # use this module instead</pre>
+            <h2>Why?</h2>
+            <p>
+            The idea is to decouple the <b>model name</b> from the action code.
+            </p>
+            <p>
+            Here&#8217;s how:
+            </p>
+            <h3>finding and making new resources</h3>
+            <p>
+            Instead of this:
+            </p>
+            <pre>@post = Post.find(params[:id])&#x000A;@post = Post.new&#x000A;@posts = Post.find(:all)</pre>
+            <p>
+            do this:
+            </p>
+            <pre>self.resource = find_resource&#x000A;self.resource = new_resource&#x000A;self.resources = find_resources</pre>
+            <h3>referring to resources</h3>
+            <p>
+            Instead of this:
+            </p>
+            <pre>format.xml { render :xml =&gt; @post }&#x000A;format.xml { render :xml =&gt; @posts }</pre>
+            <p>
+            do this:
+            </p>
+            <pre>format.xml { render :xml =&gt; resource }&#x000A;format.xml { render :xml =&gt; resources }</pre>
+            <h3>urls</h3>
+            <p>
+            Instead of this:
+            </p>
+            <pre>redirect_to posts_url&#x000A;redirect_to new_post_url</pre>
+            <p>
+            do this:
+            </p>
+            <pre>redirect_to resources_url&#x000A;redirect_to new_resource_url</pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000047">create</a></li>
+              <li><a href="#M000049">destroy</a></li>
+              <li><a href="#M000046">edit</a></li>
+              <li><a href="#M000043">index</a></li>
+              <li><a href="#M000045">new</a></li>
+              <li><a href="#M000044">show</a></li>
+              <li><a href="#M000048">update</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public instance methods</h2>
+              <div class='public-instance method' id='method-M000047'>
+                <a name='M000047'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>create</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  POST /events POST /events.xml
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000047-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000047-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/actions.rb, line 94</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create</span>&#x000A;        <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">resource</span> = <span class="ruby-identifier">new_resource</span>&#x000A;        &#x000A;        <span class="ruby-identifier">respond_to</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">format</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">resource</span>.<span class="ruby-identifier">save</span>&#x000A;            <span class="ruby-identifier">format</span>.<span class="ruby-identifier">html</span> <span class="ruby-keyword kw">do</span>&#x000A;              <span class="ruby-identifier">flash</span>[<span class="ruby-identifier">:notice</span>] = <span class="ruby-node">&quot;#{resource_name.humanize} was successfully created.&quot;</span>&#x000A;              <span class="ruby-identifier">redirect_to</span> <span class="ruby-identifier">resource_url</span>&#x000A;            <span class="ruby-keyword kw">end</span>&#x000A;            <span class="ruby-identifier">format</span>.<span class="ruby-identifier">js</span>&#x000A;            <span class="ruby-identifier">format</span>.<span class="ruby-identifier">xml</span>  { <span class="ruby-identifier">render</span> <span class="ruby-identifier">:xml</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">resource</span>, <span class="ruby-identifier">:status</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">:created</span>, <span class="ruby-identifier">:location</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">resource_url</span> }&#x000A;          <span class="ruby-keyword kw">else</span>&#x000A;            <span class="ruby-identifier">format</span>.<span class="ruby-identifier">html</span> { <span class="ruby-identifier">render</span> <span class="ruby-identifier">:action</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;new&quot;</span> }&#x000A;            <span class="ruby-identifier">format</span>.<span class="ruby-identifier">js</span>   { <span class="ruby-identifier">render</span> <span class="ruby-identifier">:action</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;new&quot;</span> }&#x000A;            <span class="ruby-identifier">format</span>.<span class="ruby-identifier">xml</span>  { <span class="ruby-identifier">render</span> <span class="ruby-identifier">:xml</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">resource</span>.<span class="ruby-identifier">errors</span>, <span class="ruby-identifier">:status</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">:unprocessable_entity</span> }&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000049'>
+                <a name='M000049'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>destroy</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  DELETE /events/1 DELETE /events/1.xml
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000049-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000049-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/actions.rb, line 136</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">destroy</span>&#x000A;        <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">resource</span> = <span class="ruby-identifier">find_resource</span>&#x000A;        <span class="ruby-identifier">resource</span>.<span class="ruby-identifier">destroy</span>&#x000A;        <span class="ruby-identifier">respond_to</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">format</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">html</span> <span class="ruby-keyword kw">do</span>&#x000A;            <span class="ruby-identifier">flash</span>[<span class="ruby-identifier">:notice</span>] = <span class="ruby-node">&quot;#{resource_name.humanize} was successfully destroyed.&quot;</span>&#x000A;            <span class="ruby-identifier">redirect_to</span> <span class="ruby-identifier">resources_url</span>&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">js</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">xml</span>  { <span class="ruby-identifier">head</span> <span class="ruby-identifier">:ok</span> }&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000046'>
+                <a name='M000046'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>edit</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  GET /events/1/edit
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000046-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000046-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/actions.rb, line 83</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">edit</span>&#x000A;        <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">resource</span> = <span class="ruby-identifier">find_resource</span>&#x000A;        <span class="ruby-identifier">respond_to</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">format</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">html</span> <span class="ruby-comment cmt"># edit.html.erb</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">js</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">xml</span>  { <span class="ruby-identifier">render</span> <span class="ruby-identifier">:xml</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">resource</span> }&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000043'>
+                <a name='M000043'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>index</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  GET /events GET /events.xml
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000043-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000043-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/actions.rb, line 49</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">index</span>&#x000A;        <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">resources</span> = <span class="ruby-identifier">find_resources</span>&#x000A;&#x000A;        <span class="ruby-identifier">respond_to</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">format</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">html</span> <span class="ruby-comment cmt"># index.rhtml</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">js</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">xml</span>  { <span class="ruby-identifier">render</span> <span class="ruby-identifier">:xml</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">resources</span> }&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000045'>
+                <a name='M000045'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  GET /events/new
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000045-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000045-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/actions.rb, line 72</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">new</span>&#x000A;        <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">resource</span> = <span class="ruby-identifier">new_resource</span>&#x000A;&#x000A;        <span class="ruby-identifier">respond_to</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">format</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">html</span> <span class="ruby-comment cmt"># new.html.erb</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">js</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">xml</span>  { <span class="ruby-identifier">render</span> <span class="ruby-identifier">:xml</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">resource</span> }&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000044'>
+                <a name='M000044'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>show</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  GET /events/1 GET /events/1.xml
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000044-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000044-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/actions.rb, line 61</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">show</span>&#x000A;        <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">resource</span> = <span class="ruby-identifier">find_resource</span>&#x000A;&#x000A;        <span class="ruby-identifier">respond_to</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">format</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">html</span> <span class="ruby-comment cmt"># show.erb.html</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">js</span>&#x000A;          <span class="ruby-identifier">format</span>.<span class="ruby-identifier">xml</span>  { <span class="ruby-identifier">render</span> <span class="ruby-identifier">:xml</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">resource</span> }&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000048'>
+                <a name='M000048'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>update</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  PUT /events/1 PUT /events/1.xml
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000048-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000048-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/actions.rb, line 115</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">update</span>&#x000A;        <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">resource</span> = <span class="ruby-identifier">find_resource</span>&#x000A;        &#x000A;        <span class="ruby-identifier">respond_to</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">format</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">resource</span>.<span class="ruby-identifier">update_attributes</span>(<span class="ruby-identifier">params</span>[<span class="ruby-identifier">resource_name</span>])&#x000A;            <span class="ruby-identifier">format</span>.<span class="ruby-identifier">html</span> <span class="ruby-keyword kw">do</span>&#x000A;              <span class="ruby-identifier">flash</span>[<span class="ruby-identifier">:notice</span>] = <span class="ruby-node">&quot;#{resource_name.humanize} was successfully updated.&quot;</span>&#x000A;              <span class="ruby-identifier">redirect_to</span> <span class="ruby-identifier">resource_url</span>&#x000A;            <span class="ruby-keyword kw">end</span>&#x000A;            <span class="ruby-identifier">format</span>.<span class="ruby-identifier">js</span>&#x000A;            <span class="ruby-identifier">format</span>.<span class="ruby-identifier">xml</span>  { <span class="ruby-identifier">head</span> <span class="ruby-identifier">:ok</span> }&#x000A;          <span class="ruby-keyword kw">else</span>&#x000A;            <span class="ruby-identifier">format</span>.<span class="ruby-identifier">html</span> { <span class="ruby-identifier">render</span> <span class="ruby-identifier">:action</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;edit&quot;</span> }&#x000A;            <span class="ruby-identifier">format</span>.<span class="ruby-identifier">js</span>   { <span class="ruby-identifier">render</span> <span class="ruby-identifier">:action</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;edit&quot;</span> }&#x000A;            <span class="ruby-identifier">format</span>.<span class="ruby-identifier">xml</span>  { <span class="ruby-identifier">render</span> <span class="ruby-identifier">:xml</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">resource</span>.<span class="ruby-identifier">errors</span>, <span class="ruby-identifier">:status</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">:unprocessable_entity</span> }&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

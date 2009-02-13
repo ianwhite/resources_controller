@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Module: Ardes::ActiveRecord::Saved [resources_controller API Docs (cca4373)]</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../.././rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Module</span>
+          Ardes::ActiveRecord::Saved
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../../files/lib/ardes/active_record/saved_rb.html">lib/ardes/active_record/saved.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000067">saved?</a></li>
+              <li><a href="#M000068">validation_attempted?</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public instance methods</h2>
+              <div class='public-instance method' id='method-M000067'>
+                <a name='M000067'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>saved?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  returns true if this record is not new, and has no errors
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000067-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000067-source'><span class="ruby-comment cmt"># File lib/ardes/active_record/saved.rb, line 5</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">saved?</span>&#x000A;        <span class="ruby-operator">!</span><span class="ruby-identifier">new_record?</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-ivar">@errors</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">empty?</span>)&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000068'>
+                <a name='M000068'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>validation_attempted?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  returns true if this instance has had validation (maybe via save) attempted
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000068-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000068-source'><span class="ruby-comment cmt"># File lib/ardes/active_record/saved.rb, line 10</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">validation_attempted?</span>&#x000A;        <span class="ruby-operator">!</span><span class="ruby-ivar">@errors</span>.<span class="ruby-identifier">nil?</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Module: Ardes::ResourcesController::Helper [resources_controller API Docs (cca4373)]</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../.././rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Module</span>
+          Ardes::ResourcesController::Helper
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../../files/lib/ardes/resources_controller/helper_rb.html">lib/ardes/resources_controller/helper.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            Often it won&#8217;t be appropriate to re-use views, but sometimes it is.
+            These helper methods enable reuse by referencing whatever resource the
+            controller is for.
+            </p>
+            <h4>Example:</h4>
+            <p>
+            instead of writing:
+            </p>
+            <pre>&lt;% for event in @events %&gt;&#x000A;  &lt;%= link_to 'edit', edit_event_path(event) %&gt;</pre>
+            <p>
+            you may write:
+            </p>
+            <pre>&lt;% for event in resources %&gt;&#x000A;  &lt;%= link_to 'edit', edit_resource_path(event) %&gt;</pre>
+            <h2>Enclosing resource</h2>
+            <p>
+            For controllers with enclosing resources instead of writing:
+            </p>
+            <pre>&lt;%= link_to 'back to Forum', forum_path(@forum) %&gt;</pre>
+            <p>
+            you may write: (which will work for any enclosing path)
+            </p>
+            <pre>&lt;%= link_to &quot;back to #{enclosing_resource.class.name.titleize}&quot;, enclosing_resource_path %&gt;</pre>
+            <h2>Enclosing named routes:</h2>
+            <p>
+            In addition you can reference named routes that are &#8216;below&#8217; the
+            current resource by appending resource_ to that named route.
+            </p>
+            <h4>Example: shared polymorphic view</h4>
+            <p>
+            Let&#8217;s say you have a resource controller for tags, and you&#8217;re
+            writing the taggable views. In a view shared amongst taggables you can
+            write
+            </p>
+            <pre>&lt;%= link_to 'tags', resource_tags_path %&gt;&#x000A;&lt;%= link_to 'edit tag', edit_resource_tag_path(@tag) %&gt;</pre>
+            <p>
+            or:
+            </p>
+            <pre>&lt;% for taggable in resources %&gt;&#x000A;  &lt;%= link_to 'tags', resource_tags_path(taggable) %&gt;</pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public class</h3>
+            <ol>
+              <li><a href="#M000037">included</a></li>
+            </ol>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000040">error_messages_for_resource</a></li>
+              <li><a href="#M000038">form_for_resource</a></li>
+              <li><a href="#M000041">method_missing_with_named_route_helper</a></li>
+              <li><a href="#M000039">remote_form_for_resource</a></li>
+              <li><a href="#M000042">respond_to_with_named_route_helper?</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public class methods</h2>
+              <div class='public-class method' id='method-M000037'>
+                <a name='M000037'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>included</span>
+                  <span class='arguments'>(base)</span>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000037-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000037-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/helper.rb, line 43</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">included</span>(<span class="ruby-identifier">base</span>)&#x000A;        <span class="ruby-identifier">base</span>.<span class="ruby-identifier">class_eval</span> <span class="ruby-keyword kw">do</span>&#x000A;          <span class="ruby-identifier">alias_method_chain</span> <span class="ruby-identifier">:method_missing</span>, <span class="ruby-identifier">:named_route_helper</span>&#x000A;          <span class="ruby-identifier">alias_method_chain</span> <span class="ruby-identifier">:respond_to?</span>, <span class="ruby-identifier">:named_route_helper</span>&#x000A;          <span class="ruby-identifier">delegate</span> <span class="ruby-identifier">:resource_name</span>, <span class="ruby-identifier">:resources_name</span>, <span class="ruby-identifier">:resource</span>, <span class="ruby-identifier">:resources</span>, <span class="ruby-identifier">:enclosing_resource</span>, <span class="ruby-identifier">:enclosing_resource_name</span>, <span class="ruby-identifier">:to</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">:controller</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <h2>Public instance methods</h2>
+              <div class='public-instance method' id='method-M000040'>
+                <a name='M000040'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>error_messages_for_resource</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  print the error messages for the current resource
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000040-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000040-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/helper.rb, line 88</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">error_messages_for_resource</span>&#x000A;        <span class="ruby-identifier">error_messages_for</span> <span class="ruby-identifier">resource_name</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000038'>
+                <a name='M000038'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>form_for_resource</span>
+                  <span class='arguments'>(*args, &amp;block)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Calls form_for with the apropriate action and method for the resource
+                  </p>
+                  <p>
+                  resource.new_record? is used to decide between a create or update action
+                  </p>
+                  <p>
+                  You can optionally pass a resource object, default is to use self.resource
+                  </p>
+                  <p>
+                  You may also override the url by passing <tt>:url</tt>, or pass extra
+                  options to resource path url with <tt>:url_options</tt>
+                  </p>
+                  <h3>Example</h3>
+                  <pre>&lt;% form_for_resource do |f| %&gt;&#x000A;  &lt;%= f.text_field :name %&gt;&#x000A;  &lt;%= f.submit resource.new_record? ? 'Create' : 'Update'&#x000A;&lt;% end %&gt;&#x000A;&#x000A;&lt;% for attachment in resources %&gt;&#x000A;  &lt;% form_for_resource attachment, :html =&gt; {:multipart =&gt; true} %&gt;&#x000A;    &lt;%= f.file_field :uploaded_data %&gt;&#x000A;    &lt;%= f.submit 'Update' %&gt;&#x000A;  &lt;% end %&gt;&#x000A;&lt;% end %&gt;</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000038-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000038-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/helper.rb, line 74</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">form_for_resource</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;        <span class="ruby-identifier">options</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">extract_options!</span>&#x000A;        <span class="ruby-identifier">resource</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">resource</span>&#x000A;        <span class="ruby-identifier">form_for</span>(<span class="ruby-identifier">resource_name</span>, <span class="ruby-identifier">resource</span>, <span class="ruby-identifier">form_for_resource_options</span>(<span class="ruby-identifier">resource</span>, <span class="ruby-identifier">options</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000041'>
+                <a name='M000041'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>method_missing_with_named_route_helper</span>
+                  <span class='arguments'>(method, *args, &amp;block)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Delegate named_route helper method to the controller. Create the delegation
+                  to short circuit the method_missing call for future invocations.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000041-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000041-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/helper.rb, line 94</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">method_missing_with_named_route_helper</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">controller</span>.<span class="ruby-identifier">resource_named_route_helper_method?</span>(<span class="ruby-identifier">method</span>)&#x000A;          <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">:delegate</span>, <span class="ruby-identifier">method</span>, <span class="ruby-identifier">:to</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">:controller</span>)&#x000A;          <span class="ruby-identifier">controller</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-identifier">method_missing_without_named_route_helper</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000039'>
+                <a name='M000039'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>remote_form_for_resource</span>
+                  <span class='arguments'>(*args, &amp;block)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  same API as <a href="Helper.html#M000038">form_for_resource</a>
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000039-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000039-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/helper.rb, line 81</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">remote_form_for_resource</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;        <span class="ruby-identifier">options</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">extract_options!</span>&#x000A;        <span class="ruby-identifier">resource</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">resource</span>&#x000A;        <span class="ruby-identifier">remote_form_for</span>(<span class="ruby-identifier">resource_name</span>, <span class="ruby-identifier">resource</span>, <span class="ruby-identifier">form_for_resource_options</span>(<span class="ruby-identifier">resource</span>, <span class="ruby-identifier">options</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000042'>
+                <a name='M000042'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>respond_to_with_named_route_helper?</span>
+                  <span class='arguments'>(*args)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  delegate url help method creation to the controller
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000042-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000042-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/helper.rb, line 104</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">respond_to_with_named_route_helper?</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;        <span class="ruby-identifier">respond_to_without_named_route_helper?</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">controller</span>.<span class="ruby-identifier">resource_named_route_helper_method?</span>(<span class="ruby-identifier">args</span>.<span class="ruby-identifier">first</span>)&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>
