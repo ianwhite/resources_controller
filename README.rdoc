@@ -8,7 +8,7 @@ See the CHANGLELOG for recent changes.
 
 == works with rails 2.x
 
-resources_controller works with rails 2.x, and is currently tested against 2.1, and 2.2 stable (currently spec has a problem with 2.0)
+resources_controller works with rails 2.x, and is currently tested against 2.0, 2.1, and 2.2 stable branches
 
 == Specs and Coverage
 
