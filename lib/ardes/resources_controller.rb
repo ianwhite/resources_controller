@@ -733,6 +733,9 @@ module Ardes#:nodoc:
             end
           end
         end
+      rescue MissingSegment
+        # fallback: construct enclosing names from param ids
+        @route_enclosing_names = params.keys.select{|k| k.to_s =~ /_id$/}.map{|id| [id.sub('_id','').pluralize, false]}
       end
       
       # this is the before_filter that loads all specified and wildcard resources
