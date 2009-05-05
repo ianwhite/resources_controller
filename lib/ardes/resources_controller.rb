@@ -725,11 +725,22 @@ module Ardes#:nodoc:
       #
       # This is used to map resources and automatically load resources.
       def route_enclosing_names
+        last_segment_type = nil
         @route_enclosing_names ||= returning(Array.new) do |req|
           enclosing_segments.each do |segment|
             unless segment.is_optional or segment.is_a?(::ActionController::Routing::DividerSegment)
-              req << [segment.value, true] if segment.is_a?(::ActionController::Routing::StaticSegment)
-              req.last[1] = false if segment.is_a?(::ActionController::Routing::DynamicSegment)
+              if segment.is_a?(::ActionController::Routing::StaticSegment)
+                req << [segment.value, true]
+                last_segment_type = :static
+              end
+              if segment.is_a?(::ActionController::Routing::DynamicSegment)
+                if last_segment_type == :static
+                  req.last[1] = false
+                else
+                  req << [segment.key.to_s.sub('_id','').pluralize, false]
+                end
+                last_segment_type = :dynamic
+              end
             end
           end
         end

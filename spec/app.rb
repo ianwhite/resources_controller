@@ -51,6 +51,10 @@ ActionController::Routing::Routes.draw do |map|
   end
   
   map.resources :tags
+
+  map.with_options :path_prefix => ":tag_id", :name_prefix => "tag_" do |tag|
+    tag.resources :forums
+  end
   
   # the following routes are for testing errors
   map.resources :posts, :controller => 'forum_posts'

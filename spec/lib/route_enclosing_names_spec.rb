@@ -93,3 +93,15 @@ describe "#route_enclosing_names Admin::Superduper::ForumsController for named_r
     @controller.send(:route_enclosing_names).should == []
   end
 end
+
+describe "#route_enclosing_names for route with a dynamic segment with no corresponding static segment" do
+  before do
+    @routes = ActionController::Routing::Routes.named_routes
+    @controller = Admin::Superduper::ForumsController.new
+  end
+
+  it ':tag_forums should be [["tags", false]]' do
+    @controller.stub!(:recognized_route).and_return(@routes[:tag_forums])
+    @controller.send(:route_enclosing_names).should == [["tags", false]]
+  end
+end
