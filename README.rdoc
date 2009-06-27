@@ -38,6 +38,7 @@ The following people have made contributions to resources_controller.  Please le
 * Tom Stuart
 * Joel Chippindale
 * Tim Pope
+* Tom ten Thij
 
 == License
 
