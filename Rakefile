@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(rspec_base) if File.exist?(rspec_base) and !$LOAD_PATH.includ
 
 require 'spec/rake/spectask'
 require 'spec/rake/verify_rcov'
-require 'hanna/rdoctask'
+require 'rake/rdoctask'
 
 plugin_name = 'resources_controller'
 
