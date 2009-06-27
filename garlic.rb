@@ -4,7 +4,7 @@ garlic do
   repo 'rspec', :url => 'git://github.com/dchelimsky/rspec'
   repo 'rspec-rails', :url => 'git://github.com/dchelimsky/rspec-rails'
 
-  ['2-2-stable', '2-1-stable', '2-0-stable'].each do |rails|
+  ['2-3-stable', '2-2-stable', '2-1-stable', '2-0-stable'].each do |rails|
 
     target rails, :tree_ish => "origin/#{rails}" do
       prepare do
