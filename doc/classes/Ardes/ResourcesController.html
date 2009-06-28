@@ -1,593 +1,949 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html lang='en'>
-  <head>
-    <title>Module: Ardes::ResourcesController [resources_controller API Docs (071f6f2)]</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../.././rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <div class='name'>
-          <span class='type'>Module</span>
-          Ardes::ResourcesController
-        </div>
-        <ol class='paths'>
-          <li>
-            <a href="../../files/lib/ardes/resources_controller/actions_rb.html">lib/ardes/resources_controller/actions.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/ardes/resources_controller/helper_rb.html">lib/ardes/resources_controller/helper.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/ardes/resources_controller/include_actions_rb.html">lib/ardes/resources_controller/include_actions.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/ardes/resources_controller/named_route_helper_rb.html">lib/ardes/resources_controller/named_route_helper.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/ardes/resources_controller/singleton_actions_rb.html">lib/ardes/resources_controller/singleton_actions.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/ardes/resources_controller/specification_rb.html">lib/ardes/resources_controller/specification.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/ardes/resources_controller_rb.html">lib/ardes/resources_controller.rb</a>
-          </li>
-          <li>
-            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            <p>
-            With resources_controller (<a
-            href="http://svn.ardes.com/rails_plugins/resources_controller">svn.ardes.com/rails_plugins/resources_controller</a>)
-            you can quickly add an ActiveResource compliant controller for your your
-            RESTful models.
-            </p>
-            <h1>Examples</h1>
-            <p>
-            Here are some examples - for more on how to use RC go to the Usage section
-            at the bottom, for syntax head to <a
-            href="ResourcesController.html#M000002">resources_controller_for</a>
-            </p>
-            <h4>Example 1: Super simple usage</h4>
-            <p>
-            Here&#8217;s a simple example of how it works with a Forums has many Posts
-            model:
-            </p>
-            <pre>class ForumsController &lt; ApplicationController&#x000A;  resources_controller_for :forums&#x000A;end</pre>
-            <p>
-            Your controller will get the standard CRUD actions, @forum will be set in
-            member actions, @forums in index.
-            </p>
-            <h4>Example 2: Specifying enclosing resources</h4>
-            <pre>class PostsController &lt; ApplicationController&#x000A;  resources_controller_for :posts, :in =&gt; :forum&#x000A;end</pre>
-            <p>
-            As above, but the controller will load @forum on every action, and use
-            @forum to find and create @posts
-            </p>
-            <h4>Wildcard enclosing resources</h4>
-            <p>
-            All of the above examples will work for any routes that match what it
-            specified
-            </p>
-            <pre>            PATH                     RESOURCES CONTROLLER WILL DO:&#x000A;&#x000A;Example 1  /forums                   @forums = Forum.find(:all)&#x000A;&#x000A;           /users/2/forums           @user = User.find(2)&#x000A;                                     @forums = @user.forums.find(:all)&#x000A;&#x000A;Example 2  /posts                    This won't work as the controller specified&#x000A;                                     that :posts are :in =&gt; :forum&#x000A;&#x000A;           /forums/2/posts           @forum = Forum.find(2)&#x000A;                                     @posts = @forum.posts.find(:all)&#x000A;&#x000A;           /sites/4/forums/3/posts   @site = Site.find(4)&#x000A;                                     @forum = @site.forums.find(3)&#x000A;                                     @posts = @forum.posts.find(:all)&#x000A;&#x000A;           /users/2/posts/1          This won't work as the controller specified&#x000A;                                     that :posts are :in =&gt; :forum</pre>
-            <p>
-            It is up to you which routes to open to the controller (in
-            config/routes.rb). When you do, RC will use the route segments to drill
-            down to the specified resource. This means that if User 3 does not have
-            Post 5, then /users/3/posts/5 will raise a RecordNotFound Error. You
-            dont&#8217; have to write any extra code to do this oft repeated controller
-            pattern.
-            </p>
-            <p>
-            With RC, your route specification flows through to the controller - no need
-            to repeat yourself.
-            </p>
-            <p>
-            If you don&#8217;t want to have RC match wildcard resources just pass
-            :load_enclosing => false
-            </p>
-            <pre>resources_controller_for :posts, :in =&gt; :forum, :load_enclosing =&gt; false</pre>
-            <h4>Example 3: Singleton resource</h4>
-            <p>
-            Here&#8217;s an example of a singleton, the account pattern that is so
-            common.
-            </p>
-            <pre>class AccountController &lt; ApplicationController&#x000A;  resources_controller_for :account, :class =&gt; User, :singleton =&gt; true do&#x000A;    @current_user&#x000A;  end&#x000A;end</pre>
-            <p>
-            Your controller will use the block to find the resource. The @account will
-            be assigned to @current_user
-            </p>
-            <h4>Example 4: Allowing PostsController to be used all over</h4>
-            <p>
-            First thing to do is remove :in => :forum
-            </p>
-            <pre>class PostsController &lt; ApplicationController&#x000A;  resources_controller_for :posts&#x000A;end</pre>
-            <p>
-            This will now work for /users/2/posts.
-            </p>
-            <h4>Example 4 and a bit: Mapping non standard resources</h4>
-            <p>
-            How about /account/posts? The account is found in a non standard way - RC
-            won&#8217;t be able to figure out how tofind it if it appears in the route.
-            So we give it some help.
-            </p>
-            <p>
-            (in PostsController)
-            </p>
-            <pre>map_enclosing_resource :account, :singleton =&gt; true, :class =&gt; User, :find =&gt; :current_user</pre>
-            <p>
-            Now, if :account apears in any part of a route (for PostsController) it
-            will be mapped to (in this case) the current_user method of teh
-            PostsController.
-            </p>
-            <p>
-            To make the :account mapping available to all, just chuck it in
-            ApplicationController
-            </p>
-            <p>
-            This will work for any resource which can&#8217;t be inferred from its
-            route segment name
-            </p>
-            <pre>map_enclosing_resource :users, :segment =&gt; :peeps, :key =&gt; 'peep_id'&#x000A;map_enclosing_resource :posts, :class =&gt; OddlyNamedPostClass</pre>
-            <h4>Example 5: Singleton association</h4>
-            <p>
-            Here&#8217;s another singleton example - one where it corresponds to a
-            has_one or belongs_to association
-            </p>
-            <pre>class ImageController &lt; ApplicationController&#x000A;  resources_controller_for :image, :singleton =&gt; true&#x000A;end</pre>
-            <p>
-            When invoked with /users/3/image RC will find @user, and use @user.image to
-            find the resource, and @user.build_image, to create a new resource.
-            </p>
-            <h4>Example 6: :resource_path (equivalent resource path): aliasing a named route to a RESTful route</h4>
-            <p>
-            You may have a named route that maps a url to a particular controller and
-            action, this causes resources_controller problems as it relies on the route
-            to load the resources. You can get around this by specifying :resource_path
-            as a param in routes.rb
-            </p>
-            <pre>map.root :controller =&gt; :forums, :action =&gt; :index, :resource_path =&gt; '/forums'</pre>
-            <p>
-            When the controller is invoked via the &#8217;&#8217; url, rc will use
-            :resource_path to recognize the route.
-            </p>
-            <h4>Putting it all together</h4>
-            <p>
-            An exmaple app
-            </p>
-            <p>
-            config/routes.rb:
-            </p>
-            <pre>map.resource :account do |account|&#x000A;  account.resource :image&#x000A;  account.resources :posts&#x000A;end&#x000A;&#x000A;map.resources :users do |user|&#x000A;  user.resource :image&#x000A;  user.resources :posts&#x000A;end&#x000A;&#x000A;map.resources :forums do |forum|&#x000A;  forum.resources :posts&#x000A;  forum.resource :image&#x000A;end&#x000A;&#x000A;map.root :controller =&gt; :forums, :action =&gt; :index, :resource_path =&gt; '/forums'</pre>
-            <p>
-            app/controllers:
-            </p>
-            <pre>class ApplicationController &lt; ActionController::Base&#x000A;  map_enclosing_resource :account, :singleton =&gt; true, :find =&gt; :current_user&#x000A;&#x000A;  def current_user # get it from session or whatnot&#x000A;end&#x000A;&#x000A;class ForumsController &lt; AplicationController&#x000A;  resources_controller_for :forums&#x000A;end&#x000A;&#x000A;class PostsController &lt; AplicationController&#x000A;  resources_controller_for :posts&#x000A;end&#x000A;&#x000A;class UsersController &lt; AplicationController&#x000A;  resources_controller_for :users&#x000A;end&#x000A;&#x000A;class ImageController &lt; AplicationController&#x000A;  resources_controller_for :image, :singleton =&gt; true&#x000A;end&#x000A;&#x000A;class AccountController &lt; ApplicationController&#x000A;  resources_controller_for :account, :singleton =&gt; true, :find =&gt; :current_user&#x000A;end</pre>
-            <p>
-            This is how the app will handle the following routes:
-            </p>
-            <pre>PATH                   CONTROLLER    WHICH WILL DO:&#x000A;&#x000A;/forums                forums        @forums = Forum.find(:all)&#x000A;&#x000A;/forums/2/posts        posts         @forum = Forum.find(2)&#x000A;                                     @posts = @forum.forums.find(:all)&#x000A;&#x000A;/forums/2/image        image         @forum = Forum.find(2)&#x000A;                                     @image = @forum.image&#x000A;&#x000A;/image                       &lt;no route&gt;&#x000A;&#x000A;/posts                       &lt;no route&gt;&#x000A;&#x000A;/users/2/posts/3       posts         @user = User.find(2)&#x000A;                                     @post = @user.posts.find(3)&#x000A;&#x000A;/users/2/image POST    image         @user = User.find(2)&#x000A;                                     @image = @user.build_image(params[:image])&#x000A;&#x000A;/account               account       @account = self.current_user&#x000A;&#x000A;/account/image         image         @account = self.current_user&#x000A;                                     @image = @account.image&#x000A;&#x000A;/account/posts/3 PUT   posts         @account = self.current_user&#x000A;                                     @post = @account.posts.find(3)&#x000A;                                     @post.update_attributes(params[:post])</pre>
-            <h3>Views</h3>
-            <p>
-            Ok - so how do I write the views?
-            </p>
-            <p>
-            For most cases, just in exactly the way you would expect to. RC sets the
-            instance variables to what they should be.
-            </p>
-            <p>
-            But, in some cases, you are going to have different variables set - for
-            example
-            </p>
-            <pre>/users/1/posts    =&gt;  @user, @posts&#x000A;/forums/2/posts   =&gt;  @forum, @posts</pre>
-            <p>
-            Here are some options (all are appropriate for different circumstances):
-            </p>
-            <ul>
-            <li>test for the existence of @user or @forum in the view, and display it
-            differently
-            
-            </li>
-            <li>have two different controllers UserPostsController and
-            ForumPostsController, with different views (and direct the routes to them
-            in routes.rb)
-            
-            </li>
-            <li>use enclosing_resource - which always refers to the... immediately
-            enclosing resource.
-            
-            </li>
-            </ul>
-            <p>
-            Using the last technique, you might write your posts index as follows (here
-            assuming that both Forum and User have .name)
-            </p>
-            <pre>&lt;h1&gt;Posts for &lt;%= link_to enclosing_resource_path, &quot;#{enclosing_resource_name.humanize}: #{enclosing_resource.name}&quot; %&gt;&lt;/h1&gt;&#x000A;&#x000A;&lt;%= render :partial =&gt; 'post', :collection =&gt; @posts %&gt;</pre>
-            <p>
-            Notice <b>enclosing_resource_name</b> - this will be something like
-            &#8216;user&#8217;, or &#8216;post&#8217;. Also
-            <b>enclosing_resource_path</b> - in RC you get all of the named route
-            helpers relativised to the current resource and enclosing_resource. See <a
-            href="ResourcesController/NamedRouteHelper.html">NamedRouteHelper</a> for
-            more details.
-            </p>
-            <p>
-            This can useful when writing the _post partial:
-            </p>
-            <pre>&lt;p&gt;&#x000A;  &lt;%= post.name %&gt;&#x000A;  &lt;%= link_to 'edit', edit_resource_path(tag) %&gt;&#x000A;  &lt;%= link_to 'destroy', resource_path(tag), :method =&gt; :delete %&gt;&#x000A;&lt;/p&gt;</pre>
-            <p>
-            when viewed at /users/1/posts it will show
-            </p>
-            <pre>&lt;p&gt;&#x000A;  Cool post&#x000A;  &lt;a href=&quot;/users/1/posts/1/edit&quot;&gt;edit&lt;/a&gt;&#x000A;  &lt;a href=&quot;js nightmare with /users/1/posts/1&quot;&gt;delete&lt;/a&gt;&#x000A;&lt;/p&gt;&#x000A;...</pre>
-            <p>
-            when viewd at /forums/1/posts it will show
-            </p>
-            <pre>&lt;p&gt;&#x000A;  Other post&#x000A;  &lt;a href=&quot;/forums/1/posts/3/edit&quot;&gt;edit&lt;/a&gt;&#x000A;  &lt;a href=&quot;js nightmare with /forums/1/posts/3&quot;&gt;delete&lt;/a&gt;&#x000A;&lt;/p&gt;&#x000A;...</pre>
-            <p>
-            This is like polymorphic urls, except that RC will just use whatever
-            enclosing resources are loaded to generate the urls/paths.
-            </p>
-            <h1>Usage</h1>
-            <p>
-            To use RC, there are just three class methods on controller to learn.
-            </p>
-            <p>
-            <a href="ResourcesController.html#M000002">resources_controller_for</a>
-            <name>, <options>, <&amp;block>
-            </p>
-            <p>
-            <a
-            href="ResourcesController/ClassMethods.html#M000014">ClassMethods#nested_in</a>
-            <name>, <options>, <&amp;block>
-            </p>
-            <p>
-            <a href="ResourcesController.html#M000003">map_enclosing_resource</a>
-            <name>, <options>, <&amp;block>
-            </p>
-            <h3>Customising finding and creating</h3>
-            <p>
-            If you want to implement something like query params you can override
-            <b>find_resources</b>. If you want to change the way your new resources are
-            created you can override <b>new_resource</b>.
-            </p>
-            <pre>class PostsController &lt; ApplicationController&#x000A;  resources_controller_for :posts&#x000A;&#x000A;  def find_resources&#x000A;    resource_service.find :all, :order =&gt; params[:sort_by]&#x000A;  end&#x000A;&#x000A;  def new_resource&#x000A;    returning resource_service.new(params[resource_name]) do |post|&#x000A;      post.ip_address = request.remote_ip&#x000A;    end&#x000A;  end&#x000A;end</pre>
-            <p>
-            In the same way, you can override <b>find_resource</b>.
-            </p>
-            <h3>Writing controller actions</h3>
-            <p>
-            You can make use of RC internals to simplify your actions.
-            </p>
-            <p>
-            Here&#8217;s an example where you want to re-order an acts_as_list model.
-            You define a class method on the model (say <b>order_by_ids</b> which takes
-            and array of ids). You can then make use of <b>resource_service</b> (which
-            makes use of awesome rails magic) to send correctly scoped messages to your
-            models.
-            </p>
-            <p>
-            Here&#8217;s how to write an order action
-            </p>
-            <pre>def order&#x000A;  resource_service.order_by_ids[&quot;things_order&quot;]&#x000A;end</pre>
-            <p>
-            the route
-            </p>
-            <pre>map.resources :things, :collection =&gt; {:order =&gt; :put}</pre>
-            <p>
-            and the view can conatin a scriptaculous drag and drop with param name
-            &#8216;things_order&#8216;
-            </p>
-            <p>
-            When this controller is invoked of /things the :order_by_ids message will
-            be sent to the Thing class, when it&#8217;s invoked by /foos/1/things, then
-            :order_by_ids message will be send to Foo.find(1).things association
-            </p>
-            <h3>using non standard ids</h3>
-            <p>
-            Lets say you want to set to_param to login, and use find_by_login for your
-            users in your URLs, with routes as follows:
-            </p>
-            <pre>map.reosurces :users do |user|&#x000A;  user.resources :addresses&#x000A;end</pre>
-            <p>
-            First, the users controller needs to find reosurces using find_by_login
-            </p>
-            <pre>class UsersController &lt; ApplicationController&#x000A;  resources_controller_for :users&#x000A;&#x000A;protected&#x000A;  def find_resource(id = params[:id])&#x000A;    resource_service.find_by_login(id)&#x000A;  end&#x000A;end</pre>
-            <p>
-            This controller will find users (for editing, showing, and destroying) as
-            directed. (this controller will work for any route where user is the last
-            resource, including the /users/dave route)
-            </p>
-            <p>
-            Now you need to specify that the user as enclosing resource needs to be
-            found with find_by_login. For the addresses case above, you would do this:
-            </p>
-            <pre>class AddressesController &lt; ApplicationController&#x000A;  resources_controller_for :addresses&#x000A;  nested_in :user do&#x000A;    User.find_by_login(params[:user_id])&#x000A;  end&#x000A;end</pre>
-            <p>
-            If you wanted to open up more nested resources under user, you could repeat
-            this specification in all such controllers, alternatively, you could map
-            the resource in the ApplicationController, which would be usable by any
-            controller
-            </p>
-            <p>
-            If you know that user is never nested (i.e. /users/dave/addresses), then do
-            this:
-            </p>
-            <pre>class ApplicationController &lt; ActionController::Base&#x000A;  map_enclosing_resource :user do&#x000A;    User.find(params[:user_id])&#x000A;  end&#x000A;end</pre>
-            <p>
-            or, if user is sometimes nested (i.e. /forums/1/users/dave/addresses), do
-            this:
-            </p>
-            <pre>map_enclosing_resource :user do&#x000A;  ((enclosing_resource &amp;&amp; enclosing_resource.users) || User).find(params[:user_id])&#x000A;end</pre>
-            <p>
-            Your Addresses controller will now be the very simple one, and the resource
-            map will load user as specified when it is hit by a route
-            /users/dave/addresses.
-            </p>
-            <pre>class AddressesController &lt; ApplicationController&#x000A;  resources_controller_for :addresses&#x000A;end</pre>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>public class</h3>
-            <ol>
-              <li><a href="#M000001">extended</a></li>
-            </ol>
-            <h3>public instance</h3>
-            <ol>
-              <li><a href="#M000005">include_actions</a></li>
-              <li><a href="#M000003">map_enclosing_resource</a></li>
-              <li><a href="#M000004">map_resource</a></li>
-              <li><a href="#M000002">resources_controller_for</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-            <div id='includes'>
-              <h2>Included modules</h2>
-              <ol>
-                <li><a href="ResourcesController/InstanceMethods.html">ResourcesController::InstanceMethods</a></li>
-                <li><a href="ResourcesController/NamedRouteHelper.html">ResourcesController::NamedRouteHelper</a></li>
-              </ol>
-            </div>
-          </div>
-          <div id='section'>
-            <div id='class-list'>
-              <h2>Classes and Modules</h2>
-              Module <a href="ResourcesController/Actions.html" class="link">Ardes::ResourcesController::Actions</a><br />
-              Module <a href="ResourcesController/ClassMethods.html" class="link">Ardes::ResourcesController::ClassMethods</a><br />
-              Module <a href="ResourcesController/Helper.html" class="link">Ardes::ResourcesController::Helper</a><br />
-              Module <a href="ResourcesController/IncludeActions.html" class="link">Ardes::ResourcesController::IncludeActions</a><br />
-              Module <a href="ResourcesController/InstanceMethods.html" class="link">Ardes::ResourcesController::InstanceMethods</a><br />
-              Module <a href="ResourcesController/NamedRouteHelper.html" class="link">Ardes::ResourcesController::NamedRouteHelper</a><br />
-              Module <a href="ResourcesController/SingletonActions.html" class="link">Ardes::ResourcesController::SingletonActions</a><br />
-              Class <a href="ResourcesController/ResourceService.html" class="link">Ardes::ResourcesController::ResourceService</a><br />
-              Class <a href="ResourcesController/SingletonResourceService.html" class="link">Ardes::ResourcesController::SingletonResourceService</a><br />
-              Class <a href="ResourcesController/SingletonSpecification.html" class="link">Ardes::ResourcesController::SingletonSpecification</a><br />
-              Class <a href="ResourcesController/Specification.html" class="link">Ardes::ResourcesController::Specification</a><br />
-            </div>
-            <div id='methods'>
-              <h2>Public class methods</h2>
-              <div class='public-class method' id='method-M000001'>
-                <a name='M000001'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>extended</span>
-                  <span class='arguments'>(base)</span>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000001-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000001-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 375</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">extended</span>(<span class="ruby-identifier">base</span>)&#x000A;      <span class="ruby-identifier">base</span>.<span class="ruby-identifier">class_eval</span> <span class="ruby-keyword kw">do</span>&#x000A;        <span class="ruby-identifier">class_inheritable_reader</span> <span class="ruby-identifier">:resource_specification_map</span>&#x000A;        <span class="ruby-identifier">write_inheritable_attribute</span>(<span class="ruby-identifier">:resource_specification_map</span>, {})&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000005'>
-                <a name='M000005'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>include_actions</span>
-                  <span class='arguments'>(mixin, options = {})</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  Include the specified module, optionally specifying which public methods to
-                  include, for example:
-                  </p>
-                  <pre>include_actions ActionMixin, :only =&gt; :index&#x000A;include_actions ActionMixin, :except =&gt; [:create, :new]</pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000005-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000005-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 490</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">include_actions</span>(<span class="ruby-identifier">mixin</span>, <span class="ruby-identifier">options</span> = {})&#x000A;      <span class="ruby-identifier">mixin</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">IncludeActions</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">mixin</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">:include_actions</span>)&#x000A;      <span class="ruby-identifier">mixin</span>.<span class="ruby-identifier">include_actions</span>(<span class="ruby-keyword kw">self</span>, <span class="ruby-identifier">options</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <div class='public-instance method' id='method-M000003'>
-                <a name='M000003'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>map_enclosing_resource</span>
-                  <span class='arguments'>(name, options = {}, &amp;block)</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  Creates a resource specification mapping. Use this to specify how to find
-                  an enclosing resource that does not obey usual rails conventions. Most
-                  commonly this would be a singleton resource.
-                  </p>
-                  <p>
-                  See <a
-                  href="ResourcesController/Specification.html#M000058">Specification#new</a>
-                  for details of how to call this
-                  </p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000003-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000003-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 477</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">map_enclosing_resource</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;      <span class="ruby-identifier">spec</span> = <span class="ruby-constant">Specification</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;      <span class="ruby-identifier">resource_specification_map</span>[<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">segment</span>] = <span class="ruby-identifier">spec</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <div class='public-instance method' id='method-M000004'>
-                <a name='M000004'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>map_resource</span>
-                  <span class='arguments'>(*args, &amp;block)</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  this will be deprecated soon as it&#8217;s badly named - use <a
-                  href="ResourcesController.html#M000003">map_enclosing_resource</a>
-                  </p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000004-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000004-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 483</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">map_resource</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;      <span class="ruby-identifier">map_enclosing_resource</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <div class='public-instance method' id='method-M000002'>
-                <a name='M000002'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>resources_controller_for</span>
-                  <span class='arguments'>(name, options = {}, &amp;block)</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  Specifies that this controller is a REST style controller for the named
-                  resource
-                  </p>
-                  <p>
-                  Enclosing resources are loaded automatically by default, you can turn this
-                  off with :load_enclosing (see options below)
-                  </p>
-                  <p>
-                  <a href="ResourcesController.html#M000002">resources_controller_for</a>
-                  <name>, <options>, <&amp;block>
-                  </p>
-                  <h4>Options:</h4>
-                  <ul>
-                  <li><tt>:singleton:</tt> (default false) set this to true if the resource is a
-                  Singleton
-                  
-                  </li>
-                  <li><tt>:find:</tt> (default null) set this to a symbol or Proc to specify how
-                  to find the resource. Use this if the resource is found in an
-                  unconventional way. Passing a block has the same effect as setting :find =>
-                  a Proc
-                  
-                  </li>
-                  <li><tt>:in:</tt> specify the enclosing resources, by name. <a
-                  href="ResourcesController/ClassMethods.html#M000014">ClassMethods#nested_in</a>
-                  can be used to specify this more fully.
-                  
-                  </li>
-                  <li><tt>:load_enclosing:</tt> (default true) loads enclosing resources
-                  automatically.
-                  
-                  </li>
-                  <li><tt>:actions:</tt> (default nil) set this to false if you don&#8217;t want
-                  the default RC actions. Set this to a module to use that module for your
-                  own actions.
-                  
-                  </li>
-                  <li><tt>:only:</tt> only include the specified actions.
-                  
-                  </li>
-                  <li><tt>:except:</tt> include all actions except the specified actions.
-                  
-                  </li>
-                  </ul>
-                  <h5>Options for unconvential use</h5>
-                  <p>
-                  (otherwise these are all inferred from the <em>name</em>)
-                  </p>
-                  <ul>
-                  <li><tt>:route:</tt> the route name (without name_prefix) if it can&#8217;t be
-                  inferred from <em>name</em>. For a collection resource this should be
-                  plural, for a singleton it should be singular.
-                  
-                  </li>
-                  <li><tt>:source:</tt> a string or symbol (e.g. :users, or :user). This is used
-                  to find the class or association name
-                  
-                  </li>
-                  <li><tt>:class:</tt> a Class. This is the class of the resource (if it
-                  can&#8217;t be inferred from <em>name</em> or :source)
-                  
-                  </li>
-                  <li><tt>:segment:</tt> (e.g. &#8216;users&#8217;) the segment name in the route
-                  that is matched
-                  
-                  </li>
-                  </ul>
-                  <h3>The :in option</h3>
-                  <p>
-                  The default behavior is to set up before filters that load the enclosing
-                  resource, and to use associations on that model to find and create the
-                  resources. See <a
-                  href="ResourcesController/ClassMethods.html#M000014">ClassMethods#nested_in</a>
-                  for more details on this, and customising the default behaviour.
-                  </p>
-                  <h3>load_enclosing_resources</h3>
-                  <p>
-                  By default, a before_filter is added by resources_controller called
-                  :load_enclosing_resources - which does all the work of loading the
-                  enclosing resources. You can use ActionControllers standard filter
-                  mechanisms to control when this filter is invoked. For example - you can
-                  choose not to load resources on an action
-                  </p>
-                  <pre>resources_controller_for :foos&#x000A;skip_before_filter :load_enclosing_resources, :only =&gt; :static_page</pre>
-                  <p>
-                  Or, you can change the order of when the filter is invoked by adding the
-                  filter call yourself (rc will only add the filter if it doesn&#8217;t
-                  exist)
-                  </p>
-                  <pre>before_filter :do_something&#x000A;prepend_before_filter :load_enclosing_resources&#x000A;resources_controller_for :foos&#x000A;before_filter :do_something_else     # chain =&gt; [:load_enclosing_resources, :do_something, :do_something_else]</pre>
-                  <h3>Default actions module</h3>
-                  <p>
-                  If you have your own actions module you prefer to use other than the
-                  standard resources_controller ones you can set
-                  Ardes::ResourcesController.actions to that module to have this be included
-                  by default
-                  </p>
-                  <pre>Ardes::ResourcesController.actions = MyAwesomeActions&#x000A;Ardes::ResourcesController.singleton_actions = MyAweseomeSingletonActions&#x000A;&#x000A;class AwesomenessController &lt; ApplicationController&#x000A;  resources_controller_for :awesomenesses # includes MyAwesomeActions by default&#x000A;end</pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000002-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000002-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 442</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">resources_controller_for</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;      <span class="ruby-identifier">options</span>.<span class="ruby-identifier">assert_valid_keys</span>(<span class="ruby-identifier">:class</span>, <span class="ruby-identifier">:source</span>, <span class="ruby-identifier">:singleton</span>, <span class="ruby-identifier">:actions</span>, <span class="ruby-identifier">:in</span>, <span class="ruby-identifier">:find</span>, <span class="ruby-identifier">:load_enclosing</span>, <span class="ruby-identifier">:route</span>, <span class="ruby-identifier">:segment</span>, <span class="ruby-identifier">:as</span>, <span class="ruby-identifier">:only</span>, <span class="ruby-identifier">:except</span>)&#x000A;      <span class="ruby-identifier">when_options</span> = {<span class="ruby-identifier">:only</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:only</span>), <span class="ruby-identifier">:except</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:except</span>)}&#x000A;      &#x000A;      <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">included_modules</span>.<span class="ruby-identifier">include?</span> <span class="ruby-constant">ResourcesController</span><span class="ruby-operator">::</span><span class="ruby-constant">InstanceMethods</span>&#x000A;        <span class="ruby-identifier">class_inheritable_reader</span> <span class="ruby-identifier">:specifications</span>, <span class="ruby-identifier">:route_name</span>&#x000A;        <span class="ruby-identifier">hide_action</span> <span class="ruby-identifier">:specifications</span>, <span class="ruby-identifier">:route_name</span>&#x000A;        <span class="ruby-identifier">extend</span>  <span class="ruby-constant">ResourcesController</span><span class="ruby-operator">::</span><span class="ruby-constant">ClassMethods</span>&#x000A;        <span class="ruby-identifier">helper</span>  <span class="ruby-constant">ResourcesController</span><span class="ruby-operator">::</span><span class="ruby-constant">Helper</span>&#x000A;        <span class="ruby-identifier">include</span> <span class="ruby-constant">ResourcesController</span><span class="ruby-operator">::</span><span class="ruby-constant">InstanceMethods</span>, <span class="ruby-constant">ResourcesController</span><span class="ruby-operator">::</span><span class="ruby-constant">NamedRouteHelper</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;      <span class="ruby-identifier">before_filter</span>(<span class="ruby-identifier">:load_enclosing_resources</span>, <span class="ruby-identifier">when_options</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">load_enclosing_resources_filter_exists?</span>&#x000A;      &#x000A;      <span class="ruby-identifier">write_inheritable_attribute</span>(<span class="ruby-identifier">:specifications</span>, [])&#x000A;      <span class="ruby-identifier">specifications</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'*'</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:load_enclosing</span>) <span class="ruby-operator">==</span> <span class="ruby-keyword kw">false</span>&#x000A;      &#x000A;      <span class="ruby-keyword kw">unless</span> (<span class="ruby-identifier">actions</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:actions</span>)) <span class="ruby-operator">==</span> <span class="ruby-keyword kw">false</span>&#x000A;        <span class="ruby-identifier">actions</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:singleton</span>] <span class="ruby-operator">?</span> <span class="ruby-constant">Ardes</span><span class="ruby-operator">::</span><span class="ruby-constant">ResourcesController</span>.<span class="ruby-identifier">singleton_actions</span> <span class="ruby-operator">:</span> <span class="ruby-constant">Ardes</span><span class="ruby-operator">::</span><span class="ruby-constant">ResourcesController</span>.<span class="ruby-identifier">actions</span>&#x000A;        <span class="ruby-identifier">include_actions</span> <span class="ruby-identifier">actions</span>, <span class="ruby-identifier">when_options</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;      &#x000A;      <span class="ruby-identifier">route</span> = (<span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:route</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">name</span>).<span class="ruby-identifier">to_s</span>&#x000A;      <span class="ruby-identifier">name</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:singleton</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">singularize</span>&#x000A;      <span class="ruby-identifier">write_inheritable_attribute</span> <span class="ruby-identifier">:route_name</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:singleton</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">route</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">route</span>.<span class="ruby-identifier">singularize</span>&#x000A;      &#x000A;      <span class="ruby-identifier">nested_in</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:in</span>)) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:in</span>]&#x000A;      &#x000A;      <span class="ruby-identifier">write_inheritable_attribute</span>(<span class="ruby-identifier">:resource_specification</span>, <span class="ruby-constant">Specification</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))&#x000A;    <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Module: Ardes::ResourcesController</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Module</strong></td>
+          <td class="class-name-in-header">Ardes::ResourcesController</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/ardes/resources_controller/actions_rb.html">
+                lib/ardes/resources_controller/actions.rb
+                </a>
+        <br />
+                <a href="../../files/lib/ardes/resources_controller/helper_rb.html">
+                lib/ardes/resources_controller/helper.rb
+                </a>
+        <br />
+                <a href="../../files/lib/ardes/resources_controller/include_actions_rb.html">
+                lib/ardes/resources_controller/include_actions.rb
+                </a>
+        <br />
+                <a href="../../files/lib/ardes/resources_controller/named_route_helper_rb.html">
+                lib/ardes/resources_controller/named_route_helper.rb
+                </a>
+        <br />
+                <a href="../../files/lib/ardes/resources_controller/singleton_actions_rb.html">
+                lib/ardes/resources_controller/singleton_actions.rb
+                </a>
+        <br />
+                <a href="../../files/lib/ardes/resources_controller/specification_rb.html">
+                lib/ardes/resources_controller/specification.rb
+                </a>
+        <br />
+                <a href="../../files/lib/ardes/resources_controller_rb.html">
+                lib/ardes/resources_controller.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        </table>
     </div>
-    <div id='footer'>
-      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+With resources_controller (<a
+href="http://svn.ardes.com/rails_plugins/resources_controller">svn.ardes.com/rails_plugins/resources_controller</a>)
+you can quickly add an ActiveResource compliant controller for your your
+RESTful models.
+</p>
+<h1>Examples</h1>
+<p>
+Here are some examples - for more on how to use RC go to the Usage section
+at the bottom, for syntax head to <a
+href="ResourcesController.html#M000004">resources_controller_for</a>
+</p>
+<h4>Example 1: Super simple usage</h4>
+<p>
+Here&#8216;s a simple example of how it works with a Forums has many Posts
+model:
+</p>
+<pre>
+  class ForumsController &lt; ApplicationController
+    resources_controller_for :forums
+  end
+</pre>
+<p>
+Your controller will get the standard CRUD actions, @forum will be set in
+member actions, @forums in index.
+</p>
+<h4>Example 2: Specifying enclosing resources</h4>
+<pre>
+  class PostsController &lt; ApplicationController
+    resources_controller_for :posts, :in =&gt; :forum
+  end
+</pre>
+<p>
+As above, but the controller will load @forum on every action, and use
+@forum to find and create @posts
+</p>
+<h4>Wildcard enclosing resources</h4>
+<p>
+All of the above examples will work for any routes that match what it
+specified
+</p>
+<pre>
+             PATH                     RESOURCES CONTROLLER WILL DO:
+
+ Example 1  /forums                   @forums = Forum.find(:all)
+
+            /users/2/forums           @user = User.find(2)
+                                      @forums = @user.forums.find(:all)
+
+ Example 2  /posts                    This won't work as the controller specified
+                                      that :posts are :in =&gt; :forum
+
+            /forums/2/posts           @forum = Forum.find(2)
+                                      @posts = @forum.posts.find(:all)
+
+            /sites/4/forums/3/posts   @site = Site.find(4)
+                                      @forum = @site.forums.find(3)
+                                      @posts = @forum.posts.find(:all)
+
+            /users/2/posts/1          This won't work as the controller specified
+                                      that :posts are :in =&gt; :forum
+</pre>
+<p>
+It is up to you which routes to open to the controller (in
+config/routes.rb). When you do, RC will use the route segments to drill
+down to the specified resource. This means that if User 3 does not have
+Post 5, then /users/3/posts/5 will raise a RecordNotFound Error. You
+dont&#8217; have to write any extra code to do this oft repeated controller
+pattern.
+</p>
+<p>
+With RC, your route specification flows through to the controller - no need
+to repeat yourself.
+</p>
+<p>
+If you don&#8216;t want to have RC match wildcard resources just pass
+:load_enclosing =&gt; false
+</p>
+<pre>
+  resources_controller_for :posts, :in =&gt; :forum, :load_enclosing =&gt; false
+</pre>
+<h4>Example 3: Singleton resource</h4>
+<p>
+Here&#8216;s an example of a singleton, the account pattern that is so
+common.
+</p>
+<pre>
+  class AccountController &lt; ApplicationController
+    resources_controller_for :account, :class =&gt; User, :singleton =&gt; true do
+      @current_user
+    end
+  end
+</pre>
+<p>
+Your controller will use the block to find the resource. The @account will
+be assigned to @current_user
+</p>
+<h4>Example 4: Allowing PostsController to be used all over</h4>
+<p>
+First thing to do is remove :in =&gt; :forum
+</p>
+<pre>
+  class PostsController &lt; ApplicationController
+    resources_controller_for :posts
+  end
+</pre>
+<p>
+This will now work for /users/2/posts.
+</p>
+<h4>Example 4 and a bit: Mapping non standard resources</h4>
+<p>
+How about /account/posts? The account is found in a non standard way - RC
+won&#8216;t be able to figure out how tofind it if it appears in the route.
+So we give it some help.
+</p>
+<p>
+(in PostsController)
+</p>
+<pre>
+  map_enclosing_resource :account, :singleton =&gt; true, :class =&gt; User, :find =&gt; :current_user
+</pre>
+<p>
+Now, if :account apears in any part of a route (for PostsController) it
+will be mapped to (in this case) the current_user method of teh
+PostsController.
+</p>
+<p>
+To make the :account mapping available to all, just chuck it in
+ApplicationController
+</p>
+<p>
+This will work for any resource which can&#8216;t be inferred from its
+route segment name
+</p>
+<pre>
+  map_enclosing_resource :users, :segment =&gt; :peeps, :key =&gt; 'peep_id'
+  map_enclosing_resource :posts, :class =&gt; OddlyNamedPostClass
+</pre>
+<h4>Example 5: Singleton association</h4>
+<p>
+Here&#8216;s another singleton example - one where it corresponds to a
+has_one or belongs_to association
+</p>
+<pre>
+  class ImageController &lt; ApplicationController
+    resources_controller_for :image, :singleton =&gt; true
+  end
+</pre>
+<p>
+When invoked with /users/3/image RC will find @user, and use @user.image to
+find the resource, and @user.build_image, to create a new resource.
+</p>
+<h4>Example 6: :resource_path (equivalent resource path): aliasing a named route to a RESTful route</h4>
+<p>
+You may have a named route that maps a url to a particular controller and
+action, this causes resources_controller problems as it relies on the route
+to load the resources. You can get around this by specifying :resource_path
+as a param in routes.rb
+</p>
+<pre>
+  map.root :controller =&gt; :forums, :action =&gt; :index, :resource_path =&gt; '/forums'
+</pre>
+<p>
+When the controller is invoked via the &#8217;&#8217; url, rc will use
+:resource_path to recognize the route.
+</p>
+<h4>Putting it all together</h4>
+<p>
+An exmaple app
+</p>
+<p>
+config/routes.rb:
+</p>
+<pre>
+ map.resource :account do |account|
+   account.resource :image
+   account.resources :posts
+ end
+
+ map.resources :users do |user|
+   user.resource :image
+   user.resources :posts
+ end
+
+ map.resources :forums do |forum|
+   forum.resources :posts
+   forum.resource :image
+ end
+
+ map.root :controller =&gt; :forums, :action =&gt; :index, :resource_path =&gt; '/forums'
+</pre>
+<p>
+app/controllers:
+</p>
+<pre>
+ class ApplicationController &lt; ActionController::Base
+   map_enclosing_resource :account, :singleton =&gt; true, :find =&gt; :current_user
+
+   def current_user # get it from session or whatnot
+ end
+
+ class ForumsController &lt; AplicationController
+   resources_controller_for :forums
+ end
+
+ class PostsController &lt; AplicationController
+   resources_controller_for :posts
+ end
+
+ class UsersController &lt; AplicationController
+   resources_controller_for :users
+ end
+
+ class ImageController &lt; AplicationController
+   resources_controller_for :image, :singleton =&gt; true
+ end
+
+ class AccountController &lt; ApplicationController
+   resources_controller_for :account, :singleton =&gt; true, :find =&gt; :current_user
+ end
+</pre>
+<p>
+This is how the app will handle the following routes:
+</p>
+<pre>
+ PATH                   CONTROLLER    WHICH WILL DO:
+
+ /forums                forums        @forums = Forum.find(:all)
+
+ /forums/2/posts        posts         @forum = Forum.find(2)
+                                      @posts = @forum.forums.find(:all)
+
+ /forums/2/image        image         @forum = Forum.find(2)
+                                      @image = @forum.image
+
+ /image                       &lt;no route&gt;
+
+ /posts                       &lt;no route&gt;
+
+ /users/2/posts/3       posts         @user = User.find(2)
+                                      @post = @user.posts.find(3)
+
+ /users/2/image POST    image         @user = User.find(2)
+                                      @image = @user.build_image(params[:image])
+
+ /account               account       @account = self.current_user
+
+ /account/image         image         @account = self.current_user
+                                      @image = @account.image
+
+ /account/posts/3 PUT   posts         @account = self.current_user
+                                      @post = @account.posts.find(3)
+                                      @post.update_attributes(params[:post])
+</pre>
+<h3>Views</h3>
+<p>
+Ok - so how do I write the views?
+</p>
+<p>
+For most cases, just in exactly the way you would expect to. RC sets the
+instance variables to what they should be.
+</p>
+<p>
+But, in some cases, you are going to have different variables set - for
+example
+</p>
+<pre>
+  /users/1/posts    =&gt;  @user, @posts
+  /forums/2/posts   =&gt;  @forum, @posts
+</pre>
+<p>
+Here are some options (all are appropriate for different circumstances):
+</p>
+<ul>
+<li>test for the existence of @user or @forum in the view, and display it
+differently
+
+</li>
+<li>have two different controllers UserPostsController and
+ForumPostsController, with different views (and direct the routes to them
+in routes.rb)
+
+</li>
+<li>use enclosing_resource - which always refers to the&#8230; immediately
+enclosing resource.
+
+</li>
+</ul>
+<p>
+Using the last technique, you might write your posts index as follows (here
+assuming that both Forum and User have .name)
+</p>
+<pre>
+  &lt;h1&gt;Posts for &lt;%= link_to enclosing_resource_path, &quot;#{enclosing_resource_name.humanize}: #{enclosing_resource.name}&quot; %&gt;&lt;/h1&gt;
+
+  &lt;%= render :partial =&gt; 'post', :collection =&gt; @posts %&gt;
+</pre>
+<p>
+Notice <b>enclosing_resource_name</b> - this will be something like
+&#8216;user&#8217;, or &#8216;post&#8217;. Also
+<b>enclosing_resource_path</b> - in RC you get all of the named route
+helpers relativised to the current resource and enclosing_resource. See <a
+href="ResourcesController/NamedRouteHelper.html">NamedRouteHelper</a> for
+more details.
+</p>
+<p>
+This can useful when writing the _post partial:
+</p>
+<pre>
+  &lt;p&gt;
+    &lt;%= post.name %&gt;
+    &lt;%= link_to 'edit', edit_resource_path(tag) %&gt;
+    &lt;%= link_to 'destroy', resource_path(tag), :method =&gt; :delete %&gt;
+  &lt;/p&gt;
+</pre>
+<p>
+when viewed at /users/1/posts it will show
+</p>
+<pre>
+ &lt;p&gt;
+   Cool post
+   &lt;a href=&quot;/users/1/posts/1/edit&quot;&gt;edit&lt;/a&gt;
+   &lt;a href=&quot;js nightmare with /users/1/posts/1&quot;&gt;delete&lt;/a&gt;
+ &lt;/p&gt;
+ ...
+</pre>
+<p>
+when viewd at /forums/1/posts it will show
+</p>
+<pre>
+ &lt;p&gt;
+   Other post
+   &lt;a href=&quot;/forums/1/posts/3/edit&quot;&gt;edit&lt;/a&gt;
+   &lt;a href=&quot;js nightmare with /forums/1/posts/3&quot;&gt;delete&lt;/a&gt;
+ &lt;/p&gt;
+ ...
+</pre>
+<p>
+This is like polymorphic urls, except that RC will just use whatever
+enclosing resources are loaded to generate the urls/paths.
+</p>
+<h1>Usage</h1>
+<p>
+To use RC, there are just three class methods on controller to learn.
+</p>
+<p>
+<a href="ResourcesController.html#M000004">resources_controller_for</a>
+&lt;name&gt;, &lt;options&gt;, &lt;&amp;block&gt;
+</p>
+<p>
+<a
+href="ResourcesController/ClassMethods.html#M000015">ClassMethods#nested_in</a>
+&lt;name&gt;, &lt;options&gt;, &lt;&amp;block&gt;
+</p>
+<p>
+<a href="ResourcesController.html#M000005">map_enclosing_resource</a>
+&lt;name&gt;, &lt;options&gt;, &lt;&amp;block&gt;
+</p>
+<h3>Customising finding and creating</h3>
+<p>
+If you want to implement something like query params you can override
+<b>find_resources</b>. If you want to change the way your new resources are
+created you can override <b>new_resource</b>.
+</p>
+<pre>
+  class PostsController &lt; ApplicationController
+    resources_controller_for :posts
+
+    def find_resources
+      resource_service.find :all, :order =&gt; params[:sort_by]
+    end
+
+    def new_resource
+      returning resource_service.new(params[resource_name]) do |post|
+        post.ip_address = request.remote_ip
+      end
+    end
+  end
+</pre>
+<p>
+In the same way, you can override <b>find_resource</b>.
+</p>
+<h3>Writing controller actions</h3>
+<p>
+You can make use of RC internals to simplify your actions.
+</p>
+<p>
+Here&#8216;s an example where you want to re-order an acts_as_list model.
+You define a class method on the model (say <b>order_by_ids</b> which takes
+and array of ids). You can then make use of <b>resource_service</b> (which
+makes use of awesome rails magic) to send correctly scoped messages to your
+models.
+</p>
+<p>
+Here&#8216;s how to write an order action
+</p>
+<pre>
+  def order
+    resource_service.order_by_ids[&quot;things_order&quot;]
+  end
+</pre>
+<p>
+the route
+</p>
+<pre>
+  map.resources :things, :collection =&gt; {:order =&gt; :put}
+</pre>
+<p>
+and the view can conatin a scriptaculous drag and drop with param name
+&#8216;things_order&#8216;
+</p>
+<p>
+When this controller is invoked of /things the :order_by_ids message will
+be sent to the Thing class, when it&#8216;s invoked by /foos/1/things, then
+:order_by_ids message will be send to Foo.find(1).things association
+</p>
+<h3>using non standard ids</h3>
+<p>
+Lets say you want to set to_param to login, and use find_by_login for your
+users in your URLs, with routes as follows:
+</p>
+<pre>
+  map.reosurces :users do |user|
+    user.resources :addresses
+  end
+</pre>
+<p>
+First, the users controller needs to find reosurces using find_by_login
+</p>
+<pre>
+  class UsersController &lt; ApplicationController
+    resources_controller_for :users
+
+  protected
+    def find_resource(id = params[:id])
+      resource_service.find_by_login(id)
+    end
+  end
+</pre>
+<p>
+This controller will find users (for editing, showing, and destroying) as
+directed. (this controller will work for any route where user is the last
+resource, including the /users/dave route)
+</p>
+<p>
+Now you need to specify that the user as enclosing resource needs to be
+found with find_by_login. For the addresses case above, you would do this:
+</p>
+<pre>
+  class AddressesController &lt; ApplicationController
+    resources_controller_for :addresses
+    nested_in :user do
+      User.find_by_login(params[:user_id])
+    end
+  end
+</pre>
+<p>
+If you wanted to open up more nested resources under user, you could repeat
+this specification in all such controllers, alternatively, you could map
+the resource in the ApplicationController, which would be usable by any
+controller
+</p>
+<p>
+If you know that user is never nested (i.e. /users/dave/addresses), then do
+this:
+</p>
+<pre>
+  class ApplicationController &lt; ActionController::Base
+    map_enclosing_resource :user do
+      User.find(params[:user_id])
+    end
+  end
+</pre>
+<p>
+or, if user is sometimes nested (i.e. /forums/1/users/dave/addresses), do
+this:
+</p>
+<pre>
+    map_enclosing_resource :user do
+      ((enclosing_resource &amp;&amp; enclosing_resource.users) || User).find(params[:user_id])
+    end
+</pre>
+<p>
+Your Addresses controller will now be the very simple one, and the resource
+map will load user as specified when it is hit by a route
+/users/dave/addresses.
+</p>
+<pre>
+  class AddressesController &lt; ApplicationController
+    resources_controller_for :addresses
+  end
+</pre>
+
     </div>
-  </body>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000003">extended</a>&nbsp;&nbsp;
+      <a href="#M000007">include_actions</a>&nbsp;&nbsp;
+      <a href="#M000005">map_enclosing_resource</a>&nbsp;&nbsp;
+      <a href="#M000006">map_resource</a>&nbsp;&nbsp;
+      <a href="#M000004">resources_controller_for</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+    <div id="includes">
+      <h3 class="section-bar">Included Modules</h3>
+
+      <div id="includes-list">
+        <span class="include-name"><a href="ResourcesController/InstanceMethods.html">ResourcesController::InstanceMethods</a></span>
+        <span class="include-name"><a href="ResourcesController/NamedRouteHelper.html">ResourcesController::NamedRouteHelper</a></span>
+      </div>
+    </div>
+
+    <div id="section">
+
+    <div id="class-list">
+      <h3 class="section-bar">Classes and Modules</h3>
+
+      Module <a href="ResourcesController/Actions.html" class="link">Ardes::ResourcesController::Actions</a><br />
+Module <a href="ResourcesController/ClassMethods.html" class="link">Ardes::ResourcesController::ClassMethods</a><br />
+Module <a href="ResourcesController/Helper.html" class="link">Ardes::ResourcesController::Helper</a><br />
+Module <a href="ResourcesController/IncludeActions.html" class="link">Ardes::ResourcesController::IncludeActions</a><br />
+Module <a href="ResourcesController/InstanceMethods.html" class="link">Ardes::ResourcesController::InstanceMethods</a><br />
+Module <a href="ResourcesController/NamedRouteHelper.html" class="link">Ardes::ResourcesController::NamedRouteHelper</a><br />
+Module <a href="ResourcesController/SingletonActions.html" class="link">Ardes::ResourcesController::SingletonActions</a><br />
+Class <a href="ResourcesController/ResourceService.html" class="link">Ardes::ResourcesController::ResourceService</a><br />
+Class <a href="ResourcesController/SingletonResourceService.html" class="link">Ardes::ResourcesController::SingletonResourceService</a><br />
+Class <a href="ResourcesController/SingletonSpecification.html" class="link">Ardes::ResourcesController::SingletonSpecification</a><br />
+Class <a href="ResourcesController/Specification.html" class="link">Ardes::ResourcesController::Specification</a><br />
+
+    </div>
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000003" class="method-detail">
+        <a name="M000003"></a>
+
+        <div class="method-heading">
+          <a href="#M000003" class="method-signature">
+          <span class="method-name">extended</span><span class="method-args">(base)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000003-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000003-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 375</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">extended</span>(<span class="ruby-identifier">base</span>)
+      <span class="ruby-identifier">base</span>.<span class="ruby-identifier">class_eval</span> <span class="ruby-keyword kw">do</span>
+        <span class="ruby-identifier">class_inheritable_reader</span> <span class="ruby-identifier">:resource_specification_map</span>
+        <span class="ruby-identifier">write_inheritable_attribute</span>(<span class="ruby-identifier">:resource_specification_map</span>, {})
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000007" class="method-detail">
+        <a name="M000007"></a>
+
+        <div class="method-heading">
+          <a href="#M000007" class="method-signature">
+          <span class="method-name">include_actions</span><span class="method-args">(mixin, options = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Include the specified module, optionally specifying which public methods to
+include, for example:
+</p>
+<pre>
+ include_actions ActionMixin, :only =&gt; :index
+ include_actions ActionMixin, :except =&gt; [:create, :new]
+</pre>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000007-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000007-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 490</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">include_actions</span>(<span class="ruby-identifier">mixin</span>, <span class="ruby-identifier">options</span> = {})
+      <span class="ruby-identifier">mixin</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">IncludeActions</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">mixin</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">:include_actions</span>)
+      <span class="ruby-identifier">mixin</span>.<span class="ruby-identifier">include_actions</span>(<span class="ruby-keyword kw">self</span>, <span class="ruby-identifier">options</span>)
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000005" class="method-detail">
+        <a name="M000005"></a>
+
+        <div class="method-heading">
+          <a href="#M000005" class="method-signature">
+          <span class="method-name">map_enclosing_resource</span><span class="method-args">(name, options = {}, &amp;block)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Creates a resource specification mapping. Use this to specify how to find
+an enclosing resource that does not obey usual rails conventions. Most
+commonly this would be a singleton resource.
+</p>
+<p>
+See <a
+href="ResourcesController/Specification.html#M000055">Specification#new</a>
+for details of how to call this
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000005-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000005-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 477</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">map_enclosing_resource</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+      <span class="ruby-identifier">spec</span> = <span class="ruby-constant">Specification</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+      <span class="ruby-identifier">resource_specification_map</span>[<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">segment</span>] = <span class="ruby-identifier">spec</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000006" class="method-detail">
+        <a name="M000006"></a>
+
+        <div class="method-heading">
+          <a href="#M000006" class="method-signature">
+          <span class="method-name">map_resource</span><span class="method-args">(*args, &amp;block)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+this will be deprecated soon as it&#8216;s badly named - use <a
+href="ResourcesController.html#M000005">map_enclosing_resource</a>
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000006-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000006-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 483</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">map_resource</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+      <span class="ruby-identifier">map_enclosing_resource</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000004" class="method-detail">
+        <a name="M000004"></a>
+
+        <div class="method-heading">
+          <a href="#M000004" class="method-signature">
+          <span class="method-name">resources_controller_for</span><span class="method-args">(name, options = {}, &amp;block)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Specifies that this controller is a REST style controller for the named
+resource
+</p>
+<p>
+Enclosing resources are loaded automatically by default, you can turn this
+off with :load_enclosing (see options below)
+</p>
+<p>
+<a href="ResourcesController.html#M000004">resources_controller_for</a>
+&lt;name&gt;, &lt;options&gt;, &lt;&amp;block&gt;
+</p>
+<h4>Options:</h4>
+<ul>
+<li><tt>:singleton:</tt> (default false) set this to true if the resource is a
+Singleton
+
+</li>
+<li><tt>:find:</tt> (default null) set this to a symbol or Proc to specify how
+to find the resource. Use this if the resource is found in an
+unconventional way. Passing a block has the same effect as setting :find
+=&gt; a Proc
+
+</li>
+<li><tt>:in:</tt> specify the enclosing resources, by name. <a
+href="ResourcesController/ClassMethods.html#M000015">ClassMethods#nested_in</a>
+can be used to specify this more fully.
+
+</li>
+<li><tt>:load_enclosing:</tt> (default true) loads enclosing resources
+automatically.
+
+</li>
+<li><tt>:actions:</tt> (default nil) set this to false if you don&#8216;t want
+the default RC actions. Set this to a module to use that module for your
+own actions.
+
+</li>
+<li><tt>:only:</tt> only include the specified actions.
+
+</li>
+<li><tt>:except:</tt> include all actions except the specified actions.
+
+</li>
+</ul>
+<h5>Options for unconvential use</h5>
+<p>
+(otherwise these are all inferred from the <em>name</em>)
+</p>
+<ul>
+<li><tt>:route:</tt> the route name (without name_prefix) if it can&#8216;t be
+inferred from <em>name</em>. For a collection resource this should be
+plural, for a singleton it should be singular.
+
+</li>
+<li><tt>:source:</tt> a string or symbol (e.g. :users, or :user). This is used
+to find the class or association name
+
+</li>
+<li><tt>:class:</tt> a Class. This is the class of the resource (if it
+can&#8216;t be inferred from <em>name</em> or :source)
+
+</li>
+<li><tt>:segment:</tt> (e.g. &#8216;users&#8217;) the segment name in the route
+that is matched
+
+</li>
+</ul>
+<h3>The :in option</h3>
+<p>
+The default behavior is to set up before filters that load the enclosing
+resource, and to use associations on that model to find and create the
+resources. See <a
+href="ResourcesController/ClassMethods.html#M000015">ClassMethods#nested_in</a>
+for more details on this, and customising the default behaviour.
+</p>
+<h3>load_enclosing_resources</h3>
+<p>
+By default, a before_filter is added by resources_controller called
+:load_enclosing_resources - which does all the work of loading the
+enclosing resources. You can use ActionControllers standard filter
+mechanisms to control when this filter is invoked. For example - you can
+choose not to load resources on an action
+</p>
+<pre>
+  resources_controller_for :foos
+  skip_before_filter :load_enclosing_resources, :only =&gt; :static_page
+</pre>
+<p>
+Or, you can change the order of when the filter is invoked by adding the
+filter call yourself (rc will only add the filter if it doesn&#8216;t
+exist)
+</p>
+<pre>
+  before_filter :do_something
+  prepend_before_filter :load_enclosing_resources
+  resources_controller_for :foos
+  before_filter :do_something_else     # chain =&gt; [:load_enclosing_resources, :do_something, :do_something_else]
+</pre>
+<h3>Default actions module</h3>
+<p>
+If you have your own actions module you prefer to use other than the
+standard resources_controller ones you can set
+Ardes::ResourcesController.actions to that module to have this be included
+by default
+</p>
+<pre>
+  Ardes::ResourcesController.actions = MyAwesomeActions
+  Ardes::ResourcesController.singleton_actions = MyAweseomeSingletonActions
+
+  class AwesomenessController &lt; ApplicationController
+    resources_controller_for :awesomenesses # includes MyAwesomeActions by default
+  end
+</pre>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000004-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000004-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 442</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">resources_controller_for</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+      <span class="ruby-identifier">options</span>.<span class="ruby-identifier">assert_valid_keys</span>(<span class="ruby-identifier">:class</span>, <span class="ruby-identifier">:source</span>, <span class="ruby-identifier">:singleton</span>, <span class="ruby-identifier">:actions</span>, <span class="ruby-identifier">:in</span>, <span class="ruby-identifier">:find</span>, <span class="ruby-identifier">:load_enclosing</span>, <span class="ruby-identifier">:route</span>, <span class="ruby-identifier">:segment</span>, <span class="ruby-identifier">:as</span>, <span class="ruby-identifier">:only</span>, <span class="ruby-identifier">:except</span>)
+      <span class="ruby-identifier">when_options</span> = {<span class="ruby-identifier">:only</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:only</span>), <span class="ruby-identifier">:except</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:except</span>)}
+      
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">included_modules</span>.<span class="ruby-identifier">include?</span> <span class="ruby-constant">ResourcesController</span><span class="ruby-operator">::</span><span class="ruby-constant">InstanceMethods</span>
+        <span class="ruby-identifier">class_inheritable_reader</span> <span class="ruby-identifier">:specifications</span>, <span class="ruby-identifier">:route_name</span>
+        <span class="ruby-identifier">hide_action</span> <span class="ruby-identifier">:specifications</span>, <span class="ruby-identifier">:route_name</span>
+        <span class="ruby-identifier">extend</span>  <span class="ruby-constant">ResourcesController</span><span class="ruby-operator">::</span><span class="ruby-constant">ClassMethods</span>
+        <span class="ruby-identifier">helper</span>  <span class="ruby-constant">ResourcesController</span><span class="ruby-operator">::</span><span class="ruby-constant">Helper</span>
+        <span class="ruby-identifier">include</span> <span class="ruby-constant">ResourcesController</span><span class="ruby-operator">::</span><span class="ruby-constant">InstanceMethods</span>, <span class="ruby-constant">ResourcesController</span><span class="ruby-operator">::</span><span class="ruby-constant">NamedRouteHelper</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">before_filter</span>(<span class="ruby-identifier">:load_enclosing_resources</span>, <span class="ruby-identifier">when_options</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">load_enclosing_resources_filter_exists?</span>
+      
+      <span class="ruby-identifier">write_inheritable_attribute</span>(<span class="ruby-identifier">:specifications</span>, [])
+      <span class="ruby-identifier">specifications</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'*'</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:load_enclosing</span>) <span class="ruby-operator">==</span> <span class="ruby-keyword kw">false</span>
+      
+      <span class="ruby-keyword kw">unless</span> (<span class="ruby-identifier">actions</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:actions</span>)) <span class="ruby-operator">==</span> <span class="ruby-keyword kw">false</span>
+        <span class="ruby-identifier">actions</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:singleton</span>] <span class="ruby-operator">?</span> <span class="ruby-constant">Ardes</span><span class="ruby-operator">::</span><span class="ruby-constant">ResourcesController</span>.<span class="ruby-identifier">singleton_actions</span> <span class="ruby-operator">:</span> <span class="ruby-constant">Ardes</span><span class="ruby-operator">::</span><span class="ruby-constant">ResourcesController</span>.<span class="ruby-identifier">actions</span>
+        <span class="ruby-identifier">include_actions</span> <span class="ruby-identifier">actions</span>, <span class="ruby-identifier">when_options</span>
+      <span class="ruby-keyword kw">end</span>
+      
+      <span class="ruby-identifier">route</span> = (<span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:route</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">name</span>).<span class="ruby-identifier">to_s</span>
+      <span class="ruby-identifier">name</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:singleton</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">singularize</span>
+      <span class="ruby-identifier">write_inheritable_attribute</span> <span class="ruby-identifier">:route_name</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:singleton</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">route</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">route</span>.<span class="ruby-identifier">singularize</span>
+      
+      <span class="ruby-identifier">nested_in</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:in</span>)) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:in</span>]
+      
+      <span class="ruby-identifier">write_inheritable_attribute</span>(<span class="ruby-identifier">:resource_specification</span>, <span class="ruby-constant">Specification</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
 </html>

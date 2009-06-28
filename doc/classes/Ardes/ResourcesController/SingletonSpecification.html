@@ -1,144 +1,232 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html lang='en'>
-  <head>
-    <title>Class: Ardes::ResourcesController::SingletonSpecification [resources_controller API Docs (071f6f2)]</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../.././rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>Class</span>
-          Ardes::ResourcesController::SingletonSpecification
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/ardes/resources_controller/specification_rb.html">lib/ardes/resources_controller/specification.rb</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a href="Specification.html">Ardes::ResourcesController::Specification</a></strong>
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Ardes::ResourcesController::SingletonSpecification</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Ardes::ResourcesController::SingletonSpecification</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../files/lib/ardes/resources_controller/specification_rb.html">
+                lib/ardes/resources_controller/specification.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                <a href="Specification.html">
+                Specification
+               </a>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+A Singleton <a href="Specification.html">Specification</a>
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000054">find_resource</a>&nbsp;&nbsp;
+      <a href="#M000052">new</a>&nbsp;&nbsp;
+      <a href="#M000053">singleton?</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000052" class="method-detail">
+        <a name="M000052"></a>
+
+        <div class="method-heading">
+          <a href="#M000052" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">(spec_name, options = {}, &amp;block)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Same as <a href="Specification.html">Specification</a> except:
+</p>
+<p>
+Options for unconvential use (otherwise these are all inferred from the
+<em>name</em>)
+</p>
+<ul>
+<li><tt>:source:</tt> a singular string or symbol (e.g. :blog). This is used to
+find the class or association name
+
+</li>
+<li><tt>:segment:</tt> (e.g. &#8216;blog&#8217;) the segment name in the route
+that is matched
+
+</li>
+</ul>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000052-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000052-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller/specification.rb, line 85</span>
+      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">spec_name</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+        <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:segment</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">spec_name</span>.<span class="ruby-identifier">to_s</span>
+        <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:source</span>]  <span class="ruby-operator">||=</span> <span class="ruby-identifier">spec_name</span>.<span class="ruby-identifier">to_s</span>
+        <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:class</span>]   <span class="ruby-operator">||=</span> (<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:source</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">spec_name</span>).<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">camelize</span>.<span class="ruby-identifier">constantize</span>
+        <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">spec_name</span>, <span class="ruby-identifier">options</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+      <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
         </div>
       </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            <p>
-            A Singleton <a href="Specification.html">Specification</a>
-            </p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>public class</h3>
-            <ol>
-              <li><a href="#M000055">new</a></li>
-            </ol>
-            <h3>public instance</h3>
-            <ol>
-              <li><a href="#M000057">find_resource</a></li>
-              <li><a href="#M000056">singleton?</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public class methods</h2>
-              <div class='public-class method' id='method-M000055'>
-                <a name='M000055'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>new</span>
-                  <span class='arguments'>(spec_name, options = {}, &amp;block)</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  Same as <a href="Specification.html">Specification</a> except:
-                  </p>
-                  <p>
-                  Options for unconvential use (otherwise these are all inferred from the
-                  <em>name</em>)
-                  </p>
-                  <ul>
-                  <li><tt>:source:</tt> a singular string or symbol (e.g. :blog). This is used to
-                  find the class or association name
-                  
-                  </li>
-                  <li><tt>:segment:</tt> (e.g. &#8216;blog&#8217;) the segment name in the route
-                  that is matched
-                  
-                  </li>
-                  </ul>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000055-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000055-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/specification.rb, line 85</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">spec_name</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;        <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:segment</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">spec_name</span>.<span class="ruby-identifier">to_s</span>&#x000A;        <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:source</span>]  <span class="ruby-operator">||=</span> <span class="ruby-identifier">spec_name</span>.<span class="ruby-identifier">to_s</span>&#x000A;        <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:class</span>]   <span class="ruby-operator">||=</span> (<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:source</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">spec_name</span>).<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">camelize</span>.<span class="ruby-identifier">constantize</span>&#x000A;        <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">spec_name</span>, <span class="ruby-identifier">options</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;      <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000057'>
-                <a name='M000057'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>find_resource</span>
-                  <span class='arguments'>(controller)</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  finds the resource from the enclosing resource. Raise CantFindSingleton if
-                  there is no enclosing resource
-                  </p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000057-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000057-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/specification.rb, line 98</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find_resource</span>(<span class="ruby-identifier">controller</span>)&#x000A;        <span class="ruby-constant">ResourcesController</span>.<span class="ruby-identifier">raise_cant_find_singleton</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">klass</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">controller</span>.<span class="ruby-identifier">enclosing_resource</span>&#x000A;        <span class="ruby-identifier">controller</span>.<span class="ruby-identifier">enclosing_resource</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">source</span>)&#x000A;      <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <div class='public-instance method' id='method-M000056'>
-                <a name='M000056'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>singleton?</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  returns true
-                  </p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000056-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000056-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/specification.rb, line 93</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">singleton?</span>&#x000A;        <span class="ruby-keyword kw">true</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-            </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000054" class="method-detail">
+        <a name="M000054"></a>
+
+        <div class="method-heading">
+          <a href="#M000054" class="method-signature">
+          <span class="method-name">find_resource</span><span class="method-args">(controller)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+finds the resource from the enclosing resource. Raise CantFindSingleton if
+there is no enclosing resource
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000054-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000054-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller/specification.rb, line 98</span>
+      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find_resource</span>(<span class="ruby-identifier">controller</span>)
+        <span class="ruby-constant">ResourcesController</span>.<span class="ruby-identifier">raise_cant_find_singleton</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">klass</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">controller</span>.<span class="ruby-identifier">enclosing_resource</span>
+        <span class="ruby-identifier">controller</span>.<span class="ruby-identifier">enclosing_resource</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">source</span>)
+      <span class="ruby-keyword kw">end</span>
+</pre>
           </div>
         </div>
       </div>
-      <div id='footer-push'></div>
+
+      <div id="method-M000053" class="method-detail">
+        <a name="M000053"></a>
+
+        <div class="method-heading">
+          <a href="#M000053" class="method-signature">
+          <span class="method-name">singleton?</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+returns true
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000053-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000053-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller/specification.rb, line 93</span>
+      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">singleton?</span>
+        <span class="ruby-keyword kw">true</span>
+      <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
     </div>
-    <div id='footer'>
-      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
-    </div>
-  </body>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
 </html>

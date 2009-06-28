@@ -1,126 +1,228 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html lang='en'>
-  <head>
-    <title>Module: Ardes::ResourcesController::IncludeActions [resources_controller API Docs (071f6f2)]</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../.././rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>Module</span>
-          Ardes::ResourcesController::IncludeActions
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/ardes/resources_controller/include_actions_rb.html">lib/ardes/resources_controller/include_actions.rb</a>
-          </li>
-        </ol>
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Module: Ardes::ResourcesController::IncludeActions</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Module</strong></td>
+          <td class="class-name-in-header">Ardes::ResourcesController::IncludeActions</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../files/lib/ardes/resources_controller/include_actions_rb.html">
+                lib/ardes/resources_controller/include_actions.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+extension for any module that is used as an <a
+href="Actions.html">Actions</a> module.
+</p>
+<p>
+After extending the module (say &#8216;MyActions&#8217;), instead of doing
+this:
+</p>
+<pre>
+  self.include ActionsModule
+</pre>
+<p>
+do this:
+</p>
+<pre>
+  ActionsModule.include_actions(self, &lt;:only or :except options&gt;)
+</pre>
+<p>
+RC extends any actions module with this automatically, so you don&#8216;t
+need to know about it.
+</p>
+<p>
+However, if you ahve any special behaviour in your actions module that is
+sensitive to :only and :except, you can define your own <a
+href="IncludeActions.html#M000012">include_actions</a> method on that
+module to effect this special behaviour.
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000014">action_methods_to_remove</a>&nbsp;&nbsp;
+      <a href="#M000012">include_actions</a>&nbsp;&nbsp;
+      <a href="#M000013">remove_action_method</a>&nbsp;&nbsp;
       </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            <p>
-            extension for any module that is used as an <a
-            href="Actions.html">Actions</a> module.
-            </p>
-            <p>
-            After extending the module (say &#8216;MyActions&#8217;), instead of doing
-            this:
-            </p>
-            <pre>self.include ActionsModule</pre>
-            <p>
-            do this:
-            </p>
-            <pre>ActionsModule.include_actions(self, &lt;:only or :except options&gt;)</pre>
-            <p>
-            RC extends any actions module with this automatically, so you don&#8217;t
-            need to know about it.
-            </p>
-            <p>
-            However, if you ahve any special behaviour in your actions module that is
-            sensitive to :only and :except, you can define your own <a
-            href="IncludeActions.html#M000011">include_actions</a> method on that
-            module to effect this special behaviour.
-            </p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>public instance</h3>
-            <ol>
-              <li><a href="#M000013">action_methods_to_remove</a></li>
-              <li><a href="#M000011">include_actions</a></li>
-              <li><a href="#M000012">remove_action_method</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000013'>
-                <a name='M000013'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>action_methods_to_remove</span>
-                  <span class='arguments'>(options = {})</span>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000013-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000013-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/include_actions.rb, line 28</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">action_methods_to_remove</span>(<span class="ruby-identifier">options</span> = {})&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:only</span>]&#x000A;          <span class="ruby-identifier">instance_methods</span> <span class="ruby-operator">-</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:only</span>]).<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">:to_s</span>)&#x000A;        <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:except</span>]&#x000A;          <span class="ruby-constant">Array</span>(<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:except</span>]).<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">:to_s</span>) <span class="ruby-operator">&amp;</span> <span class="ruby-identifier">instance_methods</span>&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          []&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <div class='public-instance method' id='method-M000011'>
-                <a name='M000011'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>include_actions</span>
-                  <span class='arguments'>(controller, options = {})</span>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000011-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000011-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/include_actions.rb, line 16</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">include_actions</span>(<span class="ruby-identifier">controller</span>, <span class="ruby-identifier">options</span> = {})&#x000A;        <span class="ruby-identifier">options</span>.<span class="ruby-identifier">assert_valid_keys</span>(<span class="ruby-identifier">:only</span>, <span class="ruby-identifier">:except</span>)&#x000A;        <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;you can only specify either :except or :only, not both&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:only</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:except</span>]&#x000A;        <span class="ruby-identifier">mixin</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">clone</span>&#x000A;        <span class="ruby-identifier">action_methods_to_remove</span>(<span class="ruby-identifier">options</span>).<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">mixin</span>.<span class="ruby-identifier">remove_action_method</span>(<span class="ruby-identifier">a</span>) }&#x000A;        <span class="ruby-identifier">controller</span>.<span class="ruby-identifier">send</span> <span class="ruby-identifier">:include</span>, <span class="ruby-identifier">mixin</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <div class='public-instance method' id='method-M000012'>
-                <a name='M000012'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>remove_action_method</span>
-                  <span class='arguments'>(action)</span>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000012-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000012-source'><span class="ruby-comment cmt"># File lib/ardes/resources_controller/include_actions.rb, line 24</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">remove_action_method</span>(<span class="ruby-identifier">action</span>)&#x000A;        <span class="ruby-identifier">undef_method</span> <span class="ruby-identifier">action</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-            </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000014" class="method-detail">
+        <a name="M000014"></a>
+
+        <div class="method-heading">
+          <a href="#M000014" class="method-signature">
+          <span class="method-name">action_methods_to_remove</span><span class="method-args">(options = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000014-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000014-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller/include_actions.rb, line 28</span>
+      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">action_methods_to_remove</span>(<span class="ruby-identifier">options</span> = {})
+        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:only</span>]
+          <span class="ruby-identifier">instance_methods</span> <span class="ruby-operator">-</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:only</span>]).<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">:to_s</span>)
+        <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:except</span>]
+          <span class="ruby-constant">Array</span>(<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:except</span>]).<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">:to_s</span>) <span class="ruby-operator">&amp;</span> <span class="ruby-identifier">instance_methods</span>
+        <span class="ruby-keyword kw">else</span>
+          []
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+</pre>
           </div>
         </div>
       </div>
-      <div id='footer-push'></div>
+
+      <div id="method-M000012" class="method-detail">
+        <a name="M000012"></a>
+
+        <div class="method-heading">
+          <a href="#M000012" class="method-signature">
+          <span class="method-name">include_actions</span><span class="method-args">(controller, options = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000012-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000012-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller/include_actions.rb, line 16</span>
+      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">include_actions</span>(<span class="ruby-identifier">controller</span>, <span class="ruby-identifier">options</span> = {})
+        <span class="ruby-identifier">options</span>.<span class="ruby-identifier">assert_valid_keys</span>(<span class="ruby-identifier">:only</span>, <span class="ruby-identifier">:except</span>)
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;you can only specify either :except or :only, not both&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:only</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:except</span>]
+        <span class="ruby-identifier">mixin</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">clone</span>
+        <span class="ruby-identifier">action_methods_to_remove</span>(<span class="ruby-identifier">options</span>).<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">mixin</span>.<span class="ruby-identifier">remove_action_method</span>(<span class="ruby-identifier">a</span>) }
+        <span class="ruby-identifier">controller</span>.<span class="ruby-identifier">send</span> <span class="ruby-identifier">:include</span>, <span class="ruby-identifier">mixin</span>
+      <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000013" class="method-detail">
+        <a name="M000013"></a>
+
+        <div class="method-heading">
+          <a href="#M000013" class="method-signature">
+          <span class="method-name">remove_action_method</span><span class="method-args">(action)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000013-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000013-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller/include_actions.rb, line 24</span>
+      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">remove_action_method</span>(<span class="ruby-identifier">action</span>)
+        <span class="ruby-identifier">undef_method</span> <span class="ruby-identifier">action</span>
+      <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
     </div>
-    <div id='footer'>
-      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
-    </div>
-  </body>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
 </html>
