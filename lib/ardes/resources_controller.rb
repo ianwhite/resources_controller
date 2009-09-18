@@ -744,7 +744,7 @@ module Ardes#:nodoc:
             end
           end
         end
-      rescue MissingSegment
+      rescue MissingSegment, NoRecognizedRoute
         # fallback: construct enclosing names from param ids
         @route_enclosing_names = params.keys.select{|k| k.to_s =~ /_id$/}.map{|id| [id.sub('_id','').pluralize, false]}
       end

@@ -63,7 +63,7 @@ ActionController::Routing::Routes.draw do |map|
     foo.resources :bars, :controller => 'forum_posts'
   end
   
-  map.connect ':controller/:action/:id'
+  map.default ':controller/:action/:id' # naming this so we can test missing segment errors
   map.connect ':controller/:action/:id.:format'
 end
 

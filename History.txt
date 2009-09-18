@@ -1,3 +1,5 @@
+* Further relaxed RC's route pickiness.  If a route is not recognised, construct segments from the params
+
 * Relaxed RC's pickiness about what route was used to invoke a controller.
 
 * Removed deprecation warning from save_resource, and added cautionary notes to the comments instead
