@@ -4,6 +4,7 @@
 # Routing
 ##########
 
+ActionController::Routing::Routes.clear!
 ActionController::Routing::Routes.draw do |map|
   # this tests :resource_path (or :erp), for named routes that map to resources
   map.root :controller => 'forums', :action => 'index', :resource_path => '/forums'
