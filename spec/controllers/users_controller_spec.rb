@@ -47,7 +47,7 @@ describe UsersController, "#params_from" do
     params_from(:get, "/users/dave").should == {:controller => "users", :action => "show", :id => "dave"}
   end
   
-  it "should generate params { :controller => 'users', action => 'edit', id => '1' } from GET /users/dave;edit" do
+  it "should generate params { :controller => 'users', action => 'edit', id => '1' } from GET /users/dave/edit" do
     params_from(:get, "/users/dave/edit").should == {:controller => "users", :action => "edit", :id => "dave"}
   end
   
