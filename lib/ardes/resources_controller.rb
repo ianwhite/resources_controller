@@ -117,6 +117,8 @@ module Ardes#:nodoc:
   # When the controller is invoked via the '' url, rc will use :resource_path to recognize the
   # route.
   #
+  # This is only necessary if you have wildcard enclosing resources enabled (the default)
+  #
   # ==== Putting it all together
   #
   # An exmaple app
