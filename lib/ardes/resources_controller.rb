@@ -679,78 +679,9 @@ module Ardes#:nodoc:
       end
       
     private
-      # returns the route that was used to invoke this controller and current action.  The path is found first from params[:resource_path]
-      # if it exists, and then from the request.path.  Likewise the method is found from params[:resource_method]
-      #
-      # params[:erp] == params[:resource_path] for BC
-      def recognized_route
-        unless @recognized_route
-          path = params[:resource_path] || params[:erp] || request.path
-          environment = ::ActionController::Routing::Routes.extract_request_environment(request)
-          environment.merge!(:method => params[:resource_method]) if params[:resource_method]
-          @recognized_route ||= ::ActionController::Routing::Routes.routes_for_controller_and_action(controller_path, action_name).find do |route|
-            route.recognize(path, environment)
-          end or ResourcesController.raise_no_recognized_route(self)
-        end
-        @recognized_route
-      end
-      
-      # returns the all route segments except for the ones corresponding to the current resource and action.
-      # Also remove any route segments from the front which correspond to modules (namespaces)
-      def enclosing_segments
-        segments = remove_namespaces_from_segments(recognized_route.segments.dup)
-        while segments.size > 0
-          segment = segments.pop
-          return segments if segment.is_a?(::ActionController::Routing::StaticSegment) && segment.value == resource_specification.segment
-        end
-        ResourcesController.raise_missing_segment(self)
-      end
-      
-      # shift namespaces from segments, update the name_prefix accordingly for outgoing routes. 
-      def remove_namespaces_from_segments(segments)
-        namespaces = controller_path.sub(controller_name,'').sub(/\/$/,'').split('/')
-        while namespaces.size > 0
-          if segments[0].is_a?(ActionController::Routing::DividerSegment) && segments[1].is_a?(ActionController::Routing::StaticSegment) && segments[1].value == namespaces.first
-            segments.shift; segments.shift # shift the '/' & 'namespace' segments
-            update_name_prefix("#{namespaces.shift}_")
-          else
-            break
-          end
-        end
-        segments
-      end
-      
-      # Returns an array of pairs [<name>, <singleton?>] e.g. [[users, false], [blog, true], [posts, false]]
-      # corresponding to the enclosing resource route segments
-      #
-      # This is used to map resources and automatically load resources.
-      def route_enclosing_names
-        last_segment_type = nil
-        @route_enclosing_names ||= returning(Array.new) do |req|
-          enclosing_segments.each do |segment|
-            unless segment.is_optional or segment.is_a?(::ActionController::Routing::DividerSegment)
-              if segment.is_a?(::ActionController::Routing::StaticSegment)
-                req << [segment.value, true]
-                last_segment_type = :static
-              end
-              if segment.is_a?(::ActionController::Routing::DynamicSegment)
-                if last_segment_type == :static
-                  req.last[1] = false
-                else
-                  req << [segment.key.to_s.sub('_id','').pluralize, false]
-                end
-                last_segment_type = :dynamic
-              end
-            end
-          end
-        end
-      rescue MissingSegment, NoRecognizedRoute
-        # fallback: construct enclosing names from param ids
-        @route_enclosing_names = params.keys.select{|k| k.to_s =~ /_id$/}.map{|id| [id.sub('_id','').pluralize, false]}
-      end
-      
       # this is the before_filter that loads all specified and wildcard resources
       def load_enclosing_resources
+        namespace_segments.each {|segment| update_name_prefix("#{segment}_") }
         specifications.each_with_index do |spec, idx|
           case spec
             when '*' then load_wildcards_from(idx)
@@ -765,8 +696,11 @@ module Ardes#:nodoc:
       # * creating one using the segment name
       # Optionally takes a variable name to set the instance variable as (for polymorphic use)
       def load_wildcard(as = nil)
-        route_enclosing_names[enclosing_resources.size] or ResourcesController.raise_resource_mismatch(self)
-        segment, singleton = *route_enclosing_names[enclosing_resources.size]
+        seg = nesting_segments[enclosing_resources.size] or ResourcesController.raise_resource_mismatch(self)
+        
+        segment = seg[:segment]
+        singleton = seg[:singleton]
+        
         if resource_specification_map[segment]
           spec = resource_specification_map[segment]
           spec = returning(spec.dup) {|s| s.as = as} if as
@@ -783,10 +717,10 @@ module Ardes#:nodoc:
       # the current route enclosing names will be the number of wildcards we need to load
       def load_wildcards_from(start)
         specs = specifications.slice(start..-1)
-        encls = route_enclosing_names.slice(enclosing_resources.size..-1)
+        encls = nesting_segments.slice(enclosing_resources.size..-1)
         
         if spec = specs.find {|s| s.is_a?(Specification)}
-          spec_seg = encls.index([spec.segment, spec.singleton?]) or ResourcesController.raise_resource_mismatch(self)
+          spec_seg = encls.index({:segment => spec.segment, :singleton => spec.singleton?}) or ResourcesController.raise_resource_mismatch(self)
           number_of_wildcards = spec_seg - (specs.index(spec) -1)
         else
           number_of_wildcards = encls.length - (specs.length - 1)
@@ -796,7 +730,7 @@ module Ardes#:nodoc:
       end
          
       def load_enclosing_resource_from_specification(spec)
-        spec.segment == route_enclosing_names[enclosing_resources.size].first or ResourcesController.raise_resource_mismatch(self)
+        spec.segment == nesting_segments[enclosing_resources.size][:segment] or ResourcesController.raise_resource_mismatch(self)
         returning spec.find_from(self) do |resource|
           add_enclosing_resource(resource, :name => spec.name, :name_prefix => spec.name_prefix, :is_singleton => spec.singleton?, :as => spec.as)
         end
@@ -870,12 +804,6 @@ module Ardes#:nodoc:
     
     class CantFindSingleton < RuntimeError #:nodoc:
     end
-
-    class MissingSegment < RuntimeError #:nodoc:
-    end
-
-    class NoRecognizedRoute < RuntimeError #:nodoc:
-    end
     
     class ResourceMismatch < RuntimeError #:nodoc:
     end
@@ -902,41 +830,11 @@ help.  Do this by mapping the route segment to a resource in the controller, or 
   map_enclosing_resource :#{name}, :segment => ..., :singleton => true <.. as above ..>
 end_str
       end
-
-      def raise_missing_segment(controller) #:nodoc:
-        raise MissingSegment, <<-end_str
-Could not recognize segment '#{controller.resource_specification.segment}' in route:
-  #{controller.send(:recognized_route)}
-
-Check that config/routes.rb defines a route named '#{controller.name_prefix}#{controller.resource_specification.singleton? ? controller.route_name : controller.route_name.pluralize}'
-  for controller: #{controller.controller_name.camelize}Controller"
-end_str
-      end
-      
-      def raise_no_recognized_route(controller) #:nodoc:
-        raise NoRecognizedRoute, <<-end_str
-resources_controller could not recognize a route that that the controller
-was invoked with.  This is probably being raised in a test.
-
-The controller name is '#{controller.controller_name}'
-The request.path is '#{controller.request.path}'
-The route request environment is:
-  #{::ActionController::Routing::Routes.extract_request_environment(controller.request).inspect}
-
-Possible reasons for this:
-- routes have not been loaded
-- the controller has been invoked with params that don't correspond to a
-  route (and so would never be invoked in a real app)
-- the test can't figure out which route corresponds to the params, in this 
-  case you may need to stub the recognized_route. (rspec example:)
-  @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:the_route])
-        end_str
-      end
       
       def raise_resource_mismatch(controller) #:nodoc:
         raise ResourceMismatch, <<-end_str
 resources_controller can't match the route to the resource specification
-  route:         #{controller.send(:recognized_route)}
+  path:         #{controller.send(:request_path)}
   specification: enclosing: [#{controller.specifications.collect{|s| s.is_a?(Specification) ? ":#{s.segment}" : s}.join(', ')}], resource :#{controller.resource_specification.segment}
   
 the successfully loaded enclosing resources are: #{controller.enclosing_resources.join(', ')}

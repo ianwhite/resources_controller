@@ -9,7 +9,7 @@ describe "Routing shortcuts for Tags should map" do
     @tag.stub!(:to_param).and_return('2')
     Tag.stub!(:find).and_return(@tag)
     
-    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:tag])
+    @controller.stub!(:request_path).and_return('/tags/2')
     get :show, :id => "2"
   end
   
@@ -60,7 +60,7 @@ describe "resource_service in TagsController" do
   end
 end
 
-describe "Requesting /tags when no recognised route" do
+describe "Requesting /tags/index" do
   controller_name :tags
 
   before(:each) do
@@ -69,31 +69,7 @@ describe "Requesting /tags when no recognised route" do
   end
   
   def do_get
-    @controller.stub!(:recognized_route).and_raise(Ardes::ResourcesController::NoRecognizedRoute)
-    get :index
-  end
-
-  it "should find the tags" do
-    Tag.should_receive(:find).with(:all).and_return(@tags)
-    do_get
-  end
-
-  it "should assign the tags for the view" do
-    do_get
-    assigns[:tags].should == @tags
-  end
-end
-
-describe "Requesting /tags when missing segment" do
-  controller_name :tags
-
-  before(:each) do
-    @tags = mock('Tags')
-    Tag.stub!(:find).and_return(@tags)
-  end
-  
-  def do_get
-    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:default])
+    @controller.stub!(:request_path).and_return('/tags/index')
     get :index
   end
 

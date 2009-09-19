@@ -27,7 +27,7 @@ describe "Routing shortcuts for Tags via Forum and Post (forums/1/posts/2/tags/3
     @tag.stub!(:to_param).and_return('3')
     @post_tags.stub!(:find).and_return(@tag)
     
-    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:forum_post_tag])
+    @controller.stub!(:request_path).and_return('/forums/1/posts/1/tags/3')
     get :show, :forum_id => "1", :post_id => "2", :id => "3"
   end
   
@@ -70,7 +70,7 @@ describe "resource_service in TagsController via Forum and Post" do
     @other_post  = Post.create :forum_id => @forum.id
     @other_tag   = Tag.create :taggable_id => @other_post.id, :taggable_type => 'Post'
     
-    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:forum_post_tags])
+    @controller.stub!(:request_path).and_return("/forums/:id/posts/:id/tags")
     get :index, :forum_id => @forum.id, :post_id => @post.id
     @resource_service = controller.send :resource_service
   end
@@ -108,7 +108,7 @@ describe "Requesting /forums/1/posts/2/tags using GET" do
   end
   
   def do_get
-    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:forum_post_tags])
+    @controller.stub!(:request_path).and_return("/forums/1/posts/2/tags")
     get :index, :forum_id => 1, :post_id => 2
   end
 

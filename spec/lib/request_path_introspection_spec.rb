@@ -50,6 +50,13 @@ module RequestPathIntrospectionSpec
       end
     end
     
+    it "#namespace_segments should return namespace segments if present in request_path" do
+      @controller.stub!(:controller_path).and_return('some/name/space/forums')
+      @controller.send(:namespace_segments).should == []
+      @controller.stub!(:request_path).and_return('/some/name/space/users/1/secret/forums')
+      @controller.send(:namespace_segments).should == ['some', 'name', 'space']
+    end
+    
     describe "#nesting_segments" do
       describe "when params include :user_id" do
         before do

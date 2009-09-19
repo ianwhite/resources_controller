@@ -25,7 +25,7 @@ describe "Routing shortcuts for Tags via account info (/account/info/) should ma
     @tag.stub!(:to_param).and_return('2')
     @info_tags.stub!(:find).and_return(@tag)
     
-    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:account_info_tag])
+    @controller.stub!(:request_path).and_return('/account/info/tags/2')
     get :show, :id => 2
   end
   
@@ -69,7 +69,7 @@ describe "resource_service in TagsController via Account Info" do
     @other_tag = Tag.create
     
     @controller.instance_variable_set('@current_user', @account)
-    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:account_info_tags])
+    @controller.stub!(:request_path).and_return('/account/info/tags')
     get :index
     @resource_service = controller.send :resource_service
   end
@@ -107,7 +107,7 @@ describe "Requesting /forums/1/tags using GET" do
   end
   
   def do_get
-    @controller.stub!(:recognized_route).and_return(ActionController::Routing::Routes.named_routes[:account_info_tags])
+    @controller.stub!(:request_path).and_return('/account/info/tags')
     get :index
   end
 

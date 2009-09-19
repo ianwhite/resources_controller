@@ -104,11 +104,6 @@ describe ForumPostsController, " errors" do
   it "should raise ResourceMismatch, when route does not contain the resource segment" do
     lambda{ get :index, :foo_id => 1}.should raise_error(Ardes::ResourcesController::ResourceMismatch)
   end
-  
-  it "should raise NoRecognizedRoute when no route is recognized" do
-    ::ActionController::Routing::Routes.stub!(:routes_for_controller_and_action).and_return([])
-    lambda{ get :index }.should raise_error(Ardes::ResourcesController::NoRecognizedRoute)
-  end
 end
 
 describe "resource_service in ForumPostsController" do

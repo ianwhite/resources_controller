@@ -10,6 +10,7 @@ module LoadEnclosingResourcesSpecHelper
 
   def setup_common
     @controller = @klass.new
+    @controller.stub!(:request_path).and_return('')
     # stub :load_enclosing_resource_from_specification, increase enclosing_resources by one, and return a mock resource
     @controller.stub!(:load_enclosing_resource_from_specification).and_return do |name, _|
       returning mock("resource: #{name}") do |resource|
@@ -19,12 +20,12 @@ module LoadEnclosingResourcesSpecHelper
   end
 end
 
-describe "#load_enclosing_resources for resources_controller_for :tags (when route_enclosing_names is [['users', false]])" do
+describe "#load_enclosing_resources for resources_controller_for :tags (when nesting_segments is [{:segment => 'users', :singleton => false}])" do
   include LoadEnclosingResourcesSpecHelper
 
   before do
     setup_tags_controller
-    @controller.stub!(:route_enclosing_names).and_return [['users', false]]
+    @controller.stub!(:nesting_segments).and_return [{:segment => 'users', :singleton => false}]
   end
     
   it "should call load_wildcard once" do
@@ -38,14 +39,14 @@ describe "#load_enclosing_resources for resources_controller_for :tags (when rou
   end
 end
 
-describe "#load_enclosing_resources for resources_controller_for :tags, with :account mapping (when route_enclosing_names is [['account', true]])" do
+describe "#load_enclosing_resources for resources_controller_for :tags, with :account mapping (when nesting_segments is [{:segment => 'account', :singleton => true}])" do
   include LoadEnclosingResourcesSpecHelper
 
   before do
     setup_tags_controller
     @klass.map_resource :account, :singleton => true, :class => User
     @account_spec = @controller.resource_specification_map['account']
-    @controller.stub!(:route_enclosing_names).and_return [['account', true]]
+    @controller.stub!(:nesting_segments).and_return [{:segment => 'account', :singleton => true}]
   end
     
   it "should call load_wildcard once" do
@@ -64,12 +65,12 @@ describe "#load_enclosing_resources for resources_controller_for :tags, with :ac
   end
 end
 
-describe "#load_enclosing_resources for resources_controller_for :tags (when route_enclosing_names is [['users', false], ['forums', false]])" do
+describe "#load_enclosing_resources for resources_controller_for :tags (when nesting_segments is [{:segment =>'users', :singleton => false}, {:segment =>'forums', :singleton => false}])" do
   include LoadEnclosingResourcesSpecHelper
 
   before do
     setup_tags_controller
-    @controller.stub!(:route_enclosing_names).and_return [['users', false], ['forums', false]]
+    @controller.stub!(:nesting_segments).and_return [{:segment =>'users', :singleton => false}, {:segment =>'forums', :singleton => false}]
   end
     
   it "should call load_wildcard twice" do
@@ -84,12 +85,12 @@ describe "#load_enclosing_resources for resources_controller_for :tags (when rou
   end
 end
 
-describe "#load_enclosing_resources for resources_controller_for :tags, :in => ['*', :comment] (when route_enclosing_names is [['comments', false]])" do
+describe "#load_enclosing_resources for resources_controller_for :tags, :in => ['*', :comment] (when nesting_segments is [{:segment => 'comments', :singleton => false}])" do
   include LoadEnclosingResourcesSpecHelper
 
   before do
     setup_tags_controller :in => ['*', :comment]
-    @controller.stub!(:route_enclosing_names).and_return [['comments', false]]
+    @controller.stub!(:nesting_segments).and_return [{:segment => 'comments', :singleton => false}]
   end
   
   it "should not call load_wildcard" do
@@ -103,12 +104,12 @@ describe "#load_enclosing_resources for resources_controller_for :tags, :in => [
   end
 end
 
-describe "#load_enclosing_resources for resources_controller_for :tags, :in => ['*', :comment] (when route_enclosing_names is [['users', false], ['forums', false], ['comments', false]])" do
+describe "#load_enclosing_resources for resources_controller_for :tags, :in => ['*', :comment] (when nesting_segments is [{:segment => 'users', :singleton => false}, {:segment => 'forums', :singleton => false}, {:segment =>'comments', :singleton => false}])" do
   include LoadEnclosingResourcesSpecHelper
 
   before do
     setup_tags_controller :in => ['*', :comment]
-    @controller.stub!(:route_enclosing_names).and_return [['users', false], ['forums', false], ['comments', false]]
+    @controller.stub!(:nesting_segments).and_return [{:segment => 'users', :singleton => false}, {:segment => 'forums', :singleton => false}, {:segment =>'comments', :singleton => false}]
   end
   
   it "should call load_wildcard twice" do
@@ -123,33 +124,12 @@ describe "#load_enclosing_resources for resources_controller_for :tags, :in => [
   end
 end
 
-describe "#load_enclosing_resources for resources_controller_for :tags, :in => ['*', :comment] (when route_enclosing_names is [['users', false], ['forums', false], ['special', true], ['comments', false]])" do
-  include LoadEnclosingResourcesSpecHelper
-
-  before do
-    setup_tags_controller :in => ['*', :comment]
-    @controller.stub!(:route_enclosing_names).and_return [['users', false], ['forums', false], ['special', true], ['comments', false]]
-  end
-  
-  it "should call load_wildcard three times" do
-    @controller.should_receive(:load_wildcard).exactly(3).times
-    @controller.send(:load_enclosing_resources)
-  end
-  
-  it "should call Specification.new with ('user', :singleton => false, :as => nil), ('forum', :singleton => false, :as => nil), then ('special', :singleton => true, :as => nil)" do
-    Ardes::ResourcesController::Specification.should_receive(:new).with('user', :singleton => false, :as => nil).ordered
-    Ardes::ResourcesController::Specification.should_receive(:new).with('forum', :singleton => false, :as => nil).ordered
-    Ardes::ResourcesController::Specification.should_receive(:new).with('special', :singleton => true, :as => nil).ordered
-    @controller.send(:load_enclosing_resources)
-  end
-end
-
-describe "#load_enclosing_resources for resources_controller_for :tags, :in => ['*', '?commentable', :comment] (when route_enclosing_names is [['users', false], ['comments', false]])" do
+describe "#load_enclosing_resources for resources_controller_for :tags, :in => ['*', '?commentable', :comment] (when nesting_segments is [{:segment => 'users', :singleton => false}, {:segment => 'comments', :singleton => false}])" do
   include LoadEnclosingResourcesSpecHelper
 
   before do
     setup_tags_controller :in => ['*', '?commentable', :comment]
-    @controller.stub!(:route_enclosing_names).and_return [['users', false], ['comments', false]]
+    @controller.stub!(:nesting_segments).and_return [{:segment => 'users', :singleton => false}, {:segment => 'comments', :singleton => false}]
   end
   
   it "should call load_wildcard once with 'commentable'" do
@@ -163,12 +143,12 @@ describe "#load_enclosing_resources for resources_controller_for :tags, :in => [
   end
 end
 
-describe "#load_enclosing_resources for resources_controller_for :tags, :in => ['*', '?commentable', :comment] (when route_enclosing_names is [['users', false], ['forums', false], ['comments', false]])" do
+describe "#load_enclosing_resources for resources_controller_for :tags, :in => ['*', '?commentable', :comment] (when nesting_segments is [{:segment => 'users', :singleton => false}, {:segment => 'forums', :singleton => false}, {:segment => 'comments', :singleton => false}])" do
   include LoadEnclosingResourcesSpecHelper
 
   before do
     setup_tags_controller :in => ['*', '?commentable', :comment]
-    @controller.stub!(:route_enclosing_names).and_return [['users', false], ['forums', false], ['comments', false]]
+    @controller.stub!(:nesting_segments).and_return [{:segment => 'users', :singleton => false}, {:segment => 'forums', :singleton => false}, {:segment => 'comments', :singleton => false}]
   end
   
   it "should call load_wildcard twice" do
@@ -184,12 +164,12 @@ describe "#load_enclosing_resources for resources_controller_for :tags, :in => [
   end
 end
 
-describe "#load_enclosing_resources for resources_controller_for :tags, :in => ['*', '?commentable', :comment] (when route_enclosing_names is [['users', false], ['forums', false], ['posts', false], ['comments', false]])" do
+describe "#load_enclosing_resources for resources_controller_for :tags, :in => ['*', '?commentable', :comment] (when nesting_segments is [{:segment => 'users', :singleton => false}, {:segment => 'forums', :singleton => false}, {:segment => 'posts', :singleton => false}, {:segment => 'comments', :singleton => false}])" do
   include LoadEnclosingResourcesSpecHelper
 
   before do
     setup_tags_controller :in => ['*', '?commentable', :comment]
-    @controller.stub!(:route_enclosing_names).and_return [['users', false], ['forums', false], ['posts', false], ['comments', false]]
+    @controller.stub!(:nesting_segments).and_return [{:segment => 'users', :singleton => false}, {:segment => 'forums', :singleton => false}, {:segment => 'posts', :singleton => false}, {:segment => 'comments', :singleton => false}]
   end
   
   it "should call load_wildcard twice, then once with 'commentable'" do
@@ -206,13 +186,13 @@ describe "#load_enclosing_resources for resources_controller_for :tags, :in => [
   end
 end
 
-describe "#load_enclosing_resources for resources_controller_for :tags, :in => ['user', '*', '?taggable'] (when route_enclosing_names is [['users', false], ['comments', false]])" do
+describe "#load_enclosing_resources for resources_controller_for :tags, :in => ['user', '*', '?taggable'] (when nesting_segments is [{:segment => 'users', :singleton => false}, {:segment => 'comments', :singleton => false}])" do
   include LoadEnclosingResourcesSpecHelper
 
   before do
     setup_tags_controller :in => ['user', '*', '?taggable']
     @user_spec = @controller.send(:specifications)[1]
-    @controller.stub!(:route_enclosing_names).and_return [['users', false], ['comments', false]]
+    @controller.stub!(:nesting_segments).and_return [{:segment => 'users', :singleton => false}, {:segment => 'comments', :singleton => false}]
   end
   
   it "should call load_enclosing_resource_from_specification with user spec, then load_wildcard once with 'taggable'" do
