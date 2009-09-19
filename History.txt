@@ -1,3 +1,8 @@
+* RC no longer uses the route that invoked the controller to figure out wildcard enclosing resources.
+
+  - this change also means that you will no longer get those pesky 'NoRecognizedRoute' action when your controller
+    is invoked by another route, such as a :controller/:action/:id route.
+
 * Further relaxed RC's route pickiness.  If a route is not recognised, construct segments from the params
 
 * Relaxed RC's pickiness about what route was used to invoke a controller.
