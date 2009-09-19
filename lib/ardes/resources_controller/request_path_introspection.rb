@@ -1,7 +1,8 @@
 module Ardes
   module ResourcesController
     module RequestPathIntrospection
-    
+      extend ActiveSupport::Memoizable
+      
     protected
       def request_path
         @request_path ||= params[:resource_path] || request.path
@@ -40,6 +41,7 @@ module Ardes
         end
         segments
       end
+      memoize :segments_for_path_and_keys
       
       def segment_for_key(key)
         if respond_to?(:specifications) && spec = specifications.find{|s| s.respond_to?(:key) && s.key == key.to_s}

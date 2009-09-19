@@ -78,7 +78,7 @@ module RequestPathIntrospectionSpec
           end
         end
         
-        describe "when enclosing reosurce has mapping for :user => 'muchachos'" do
+        describe "when enclosing resource has mapping for :user => 'muchachos'" do
           before do
             @klass.map_enclosing_resource :user, :segment => "muchachos", :class => RequestPathIntrospectionSpec::User
           end
