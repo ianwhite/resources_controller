@@ -34,7 +34,11 @@ module Ardes
       end
         
       def remove_namespace(path)
-        (controller_path != controller_name) ? path.sub(%r(^/#{namespace_segments.join('/')}), '') : path
+        if (controller_path != controller_name) && namespace_segments.any?
+          path.sub(%r(^/#{namespace_segments.join('/')}), '')
+        else
+          path
+        end
       end
       
       def segments_for_path_and_keys(path, keys)
