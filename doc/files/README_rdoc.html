@@ -1,213 +1,160 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE html 
-     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-  <title>File: README.rdoc</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-  <meta http-equiv="Content-Script-Type" content="text/javascript" />
-  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
-  <script type="text/javascript">
-  // <![CDATA[
-
-  function popupCode( url ) {
-    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-  }
-
-  function toggleCode( id ) {
-    if ( document.getElementById )
-      elem = document.getElementById( id );
-    else if ( document.all )
-      elem = eval( "document.all." + id );
-    else
-      return false;
-
-    elemStyle = elem.style;
-    
-    if ( elemStyle.display != "block" ) {
-      elemStyle.display = "block"
-    } else {
-      elemStyle.display = "none"
-    }
-
-    return true;
-  }
-  
-  // Make codeblocks hidden by default
-  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
-  
-  // ]]>
-  </script>
-
-</head>
-<body>
-
-
-
-  <div id="fileHeader">
-    <h1>README.rdoc</h1>
-    <table class="header-table">
-    <tr class="top-aligned-row">
-      <td><strong>Path:</strong></td>
-      <td>README.rdoc
-      </td>
-    </tr>
-    <tr class="top-aligned-row">
-      <td><strong>Last Update:</strong></td>
-      <td>Tue Sep 29 09:32:42 +0100 2009</td>
-    </tr>
-    </table>
-  </div>
-  <!-- banner header -->
-
-  <div id="bodyContent">
-
-
-
-  <div id="contextContent">
-
-    <div id="description">
-      <h1>resources_controller</h1>
-<p>
-is a plugin to facilitate inheritance and DRYness in your resources
-controllers. It introduces some abstraction to help you override the
-default RESTful funtionality in a clean and simple manner.
-</p>
-<p>
-See History.txt for recent changes.
-</p>
-<h2>Resources</h2>
-<p>
-<b>Github</b> for code: <a
-href="http://github.com/ianwhite/resources_controller">github.com/ianwhite/resources_controller</a>
-</p>
-<p>
-<b>API</b> docs: <a
-href="http://ianwhite.github.com/resources_controller/doc">ianwhite.github.com/resources_controller/doc</a>
-</p>
-<p>
-<b>Google group</b> for questions: <a
-href="http://groups.google.com/group/resources_controller">groups.google.com/group/resources_controller</a>
-</p>
-<p>
-<b>Lighthouse</b> for bugs: <a
-href="http://ianwhite.lighthouseapp.com/projects/10598-resources_controller">ianwhite.lighthouseapp.com/projects/10598-resources_controller</a>
-</p>
-<p>
-<b>Blog</b> articles: <a
-href="http://blog.ardes.com/resources_controller">blog.ardes.com/resources_controller</a>
-</p>
-<p>
-<b>RailsConfEurope</b> presentation files: <a
-href="http://en.oreilly.com/railseurope2008/public/schedule/detail/3536">en.oreilly.com/railseurope2008/public/schedule/detail/3536</a>
-</p>
-<h2>works with rails 2.x</h2>
-<p>
-resources_controller works with rails 2.x, and is currently tested against
-2.0, 2.1, 2.2, and 2.3 stable branches
-</p>
-<h2>Specs and Coverage</h2>
-<ul>
-<li>The SPECDOC lists the specifications
-
-</li>
-<li>Coverage is 100% (C0), and the spec suite is quite comprehensive
-
-</li>
-<li>Rspec&#8216;s generated rspec_scaffold controller specs are tested against
-a simple rc controller (see rake spec:generate)
-
-</li>
-</ul>
-<p>
-RSpec is used for testing, so the tests are in <tt>spec/</tt> rather than
-<tt>test/</tt> Do rake &#8212;tasks for more details.
-</p>
-<h2>Continuous Integration</h2>
-<p>
-garlic (at <a
-href="http://github.com/ianwhite/garlic">github.com/ianwhite/garlic</a>) is
-used for CI. To run the CI suite have a look at garlic.rb
-</p>
-<h2>Contributors</h2>
-<p>
-The following people have made contributions to resources_controller.
-Please let me know if I&#8216;ve missed you out.
-</p>
-<ul>
-<li>Chris Hapgood
-
-</li>
-<li>Jason Lee
-
-</li>
-<li>Richard Hooker
-
-</li>
-<li>Matt Mower
-
-</li>
-<li>Inviz
-
-</li>
-<li>Dan Kubb
-
-</li>
-<li>Rein Henrichs
-
-</li>
-<li>Tom Stuart
-
-</li>
-<li>Joel Chippindale
-
-</li>
-<li>Tim Pope
-
-</li>
-<li>Tom ten Thij
-
-</li>
-<li>Sergei Serdyuk
-
-</li>
-</ul>
-<h2>License</h2>
-<p>
-Copyright (c) 2007-2009 Ian White, MIT License
-</p>
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>File: README.rdoc [Resources Controller API Documentation (2c87336)]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <div class='name'>README.rdoc</div>
+        <div class='paths'>
+          README.rdoc
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>Tue Sep 29 09:38:02 +0100 2009</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <h1>resources_controller</h1>
+            <p>
+            is a plugin to facilitate inheritance and DRYness in your resources
+            controllers. It introduces some abstraction to help you override the
+            default RESTful funtionality in a clean and simple manner.
+            </p>
+            <p>
+            See <a href="History_txt.html">History.txt</a> for recent changes.
+            </p>
+            <h2>Resources</h2>
+            <p>
+            <b>Github</b> for code: <a
+            href="http://github.com/ianwhite/resources_controller">github.com/ianwhite/resources_controller</a>
+            </p>
+            <p>
+            <b>API</b> docs: <a
+            href="http://ianwhite.github.com/resources_controller/doc">ianwhite.github.com/resources_controller/doc</a>
+            </p>
+            <p>
+            <b>Google group</b> for questions: <a
+            href="http://groups.google.com/group/resources_controller">groups.google.com/group/resources_controller</a>
+            </p>
+            <p>
+            <b>Lighthouse</b> for bugs: <a
+            href="http://ianwhite.lighthouseapp.com/projects/10598-resources_controller">ianwhite.lighthouseapp.com/projects/10598-resources_controller</a>
+            </p>
+            <p>
+            <b>Blog</b> articles: <a
+            href="http://blog.ardes.com/resources_controller">blog.ardes.com/resources_controller</a>
+            </p>
+            <p>
+            <b>RailsConfEurope</b> presentation files: <a
+            href="http://en.oreilly.com/railseurope2008/public/schedule/detail/3536">en.oreilly.com/railseurope2008/public/schedule/detail/3536</a>
+            </p>
+            <h2>works with rails 2.x</h2>
+            <p>
+            resources_controller works with rails 2.x, and is currently tested against
+            2.0, 2.1, 2.2, and 2.3 stable branches
+            </p>
+            <h2>Specs and Coverage</h2>
+            <ul>
+            <li>The SPECDOC lists the specifications
+            
+            </li>
+            <li>Coverage is 100% (C0), and the spec suite is quite comprehensive
+            
+            </li>
+            <li>Rspec&#8217;s generated rspec_scaffold controller specs are tested against
+            a simple rc controller (see rake spec:generate)
+            
+            </li>
+            </ul>
+            <p>
+            RSpec is used for testing, so the tests are in <tt>spec/</tt> rather than
+            <tt>test/</tt> Do rake &#8212;tasks for more details.
+            </p>
+            <h2>Continuous Integration</h2>
+            <p>
+            garlic (at <a
+            href="http://github.com/ianwhite/garlic">github.com/ianwhite/garlic</a>) is
+            used for CI. To run the CI suite have a look at garlic.rb
+            </p>
+            <h2>Contributors</h2>
+            <p>
+            The following people have made contributions to resources_controller.
+            Please let me know if I&#8217;ve missed you out.
+            </p>
+            <ul>
+            <li>Chris Hapgood
+            
+            </li>
+            <li>Jason Lee
+            
+            </li>
+            <li>Richard Hooker
+            
+            </li>
+            <li>Matt Mower
+            
+            </li>
+            <li>Inviz
+            
+            </li>
+            <li>Dan Kubb
+            
+            </li>
+            <li>Rein Henrichs
+            
+            </li>
+            <li>Tom Stuart
+            
+            </li>
+            <li>Joel Chippindale
+            
+            </li>
+            <li>Tim Pope
+            
+            </li>
+            <li>Tom ten Thij
+            
+            </li>
+            <li>Sergei Serdyuk
+            
+            </li>
+            </ul>
+            <h2>License</h2>
+            <p>
+            Copyright &#169; 2007-2009 Ian White, MIT License
+            </p>
+          </div>
+          <div id='section'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
     </div>
-
-
-   </div>
-
-
-  </div>
-
-
-    <!-- if includes -->
-
-    <div id="section">
-
-
-
-
-
-      
-
-
-    <!-- if method_list -->
-
-
-  </div>
-
-
-<div id="validator-badges">
-  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
-</div>
-
-</body>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
 </html>

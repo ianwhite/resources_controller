@@ -1,585 +1,433 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE html 
-     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-  <title>File: History.txt</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-  <meta http-equiv="Content-Script-Type" content="text/javascript" />
-  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
-  <script type="text/javascript">
-  // <![CDATA[
-
-  function popupCode( url ) {
-    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-  }
-
-  function toggleCode( id ) {
-    if ( document.getElementById )
-      elem = document.getElementById( id );
-    else if ( document.all )
-      elem = eval( "document.all." + id );
-    else
-      return false;
-
-    elemStyle = elem.style;
-    
-    if ( elemStyle.display != "block" ) {
-      elemStyle.display = "block"
-    } else {
-      elemStyle.display = "none"
-    }
-
-    return true;
-  }
-  
-  // Make codeblocks hidden by default
-  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
-  
-  // ]]>
-  </script>
-
-</head>
-<body>
-
-
-
-  <div id="fileHeader">
-    <h1>History.txt</h1>
-    <table class="header-table">
-    <tr class="top-aligned-row">
-      <td><strong>Path:</strong></td>
-      <td>History.txt
-      </td>
-    </tr>
-    <tr class="top-aligned-row">
-      <td><strong>Last Update:</strong></td>
-      <td>Tue Sep 29 09:12:30 +0100 2009</td>
-    </tr>
-    </table>
-  </div>
-  <!-- banner header -->
-
-  <div id="bodyContent">
-
-
-
-  <div id="contextContent">
-
-    <div id="description">
-      <ul>
-<li>Bugs introduced with RequestPathIntrospection (5 and 6 on lighthouse)
-solved thanks to Sergei Serdyuk
-
-</li>
-<li>RC no longer uses the route that invoked the controller to figure out
-wildcard enclosing resources.
-
-<ul>
-<li>this change means that you will no longer get those pesky
-&#8216;NoRecognizedRoute&#8217; errors when your controller is invoked by
-another route, such as a :controller/:action/:id route.
-
-</li>
-</ul>
-</li>
-<li>Further relaxed RC&#8216;s route pickiness. If a route is not recognised,
-construct segments from the params
-
-</li>
-<li>Relaxed RC&#8216;s pickiness about what route was used to invoke a
-controller.
-
-</li>
-<li>Removed deprecation warning from save_resource, and added cautionary notes
-to the comments instead
-
-</li>
-<li>If you use your own Action modules, you can now define a module method
-include_actions to do the :only / :except handling yourself. See <a
-href="../classes/Ardes/ResourcesController/IncludeActions.html">Ardes::ResourcesController::IncludeActions</a>.
-This change is completely BC, you don&#8216;t need to do anything to any of
-your existing action modules.
-
-</li>
-<li>use add_enclosing_resource to add your own enclosing resources if
-you&#8216;re skipping load_enclosing_resources [Tom Stuart, Joel
-Chippindale]
-
-</li>
-<li>The reason for the reversion in c21f35c has been fixed. Thanks Jason Lee
-for the bug report.
-
-<p>
-The problem was that I had changed resource_saved?&#8216;s behaviour to
-<b>not</b> saving the model if it had already been saved. In the future
-resource_saved? will be deprecated, but not yet.
-</p>
-<p>
-BTW. All of these changes to resource_saved? behaviour is aimed at making
-RC drop in compatible with rspec&#8216;s generated controller specs (try
-rake spec:generate).
-</p>
-<p>
-To do that I need the default update action to use :update_attributes. This
-meant that the old strategy of keeping track of saves by using
-save_resource wont work. Instead, we keep track by looking at the
-AR&#8216;s state (see lib/ardes/active_record/saved.rb) which is a far
-better solution anyway.
-</p>
-</li>
-<li>API change: save_resource deprecated
-
-<p>
-So save_resource is now deprecated, just use resource.save ActiveRecords
-can now be asked if they are saved?
-</p>
-</li>
-<li>rspec compat: Added new rake task to test that an RC controller passes the
-default rspec_scaffold controller specs.
-
-</li>
-<li>Added BC for 2-0-stable branch re: find_filter, and regression specs
-
-</li>
-<li>find_filter no longer exists in edge - updated accordingly [Jason Lee <a
-href="http://github.com/jlsync">github.com/jlsync</a>]
-
-</li>
-<li>Added ability to pass options to named route in form_for_resource
-
-<pre>
- form_for_resource :url_options =&gt; {:gday =&gt; 'mate'}
-
- # =&gt; action=&quot;/products/1?gday=mate&quot;  (for update)
- # =&gt; action=&quot;/products?gday=mate&quot;    (for create)
-</pre>
-</li>
-<li>changed :erp to :resource_path, and added :resource_method.
-
-<p>
-This means you can connect a named route up with a REST action and also
-change the method
-</p>
-<p>
-map.activate_account &#8217;/activate/:code&#8217;, :controller =&gt;
-&#8216;activations&#8217;, :action =&gt; &#8216;create&#8217;,
-:resource_path =&gt; &#8217;/activations&#8217;, :resource_method =&gt;
-:post
-</p>
-<p>
-:erp retained for BC
-</p>
-</li>
-<li>save_resource and resource_saved? added. These simply save the resource and
-cache the result of that save. This means you can use the result of the
-resource save in your response_for blocks (if you&#8216;re using
-response_for)
-
-<p>
-response_for :create do |format|
-</p>
-<pre>
-  if resource_saved?
-    format.html {}
-  else
-    format.html {}
-  end
-</pre>
-<p>
-end
-</p>
-<p>
-def create
-</p>
-<pre>
-  self.resource = new_resource
-  save_resource
-</pre>
-<p>
-end
-</p>
-</li>
-<li>added Ardes::ResourcesController.actions and
-Ardes::ResourcesController.singleton_actions accessors so you can set the
-default actions module across your app
-
-</li>
-<li>Added resource_saved? method to controller. This is useful for sharing the
-result of a save outside action methods (for example in response_for
-blocks)
-
-</li>
-<li>added error_messages_for_resource to Helper
-
-</li>
-<li>fixed form_for_resource when resource is new and controller is for
-singleton resource
-
-</li>
-<li>added :erp patch, doc and specs [thanks Chris Hapgood for the initial
-patch]
-
-<p>
-Use the :erp param when you are routing a non RESTful route to your rc
-controller This allows rc to load the resources using the route.
-</p>
-<p>
-e.g. map.home &#8217;&#8217;, :controller =&gt; &#8216;forums&#8217;,
-:action =&gt; &#8216;index&#8217;, :erp =&gt; &#8217;/forums&#8216;
-</p>
-</li>
-<li>Removed deprecated options (in r492 - I forgot to say so)
-
-</li>
-<li>Coverage back to 100%
-
-</li>
-<li>you can alias an enclosing resource with :as
-
-<p>
-This can be useful when you have a tree like domain:
-</p>
-<pre>
-  map.resources :categories do |category|
-    category.resources :categories
-  end
-
-  class CategoriesController &lt; ApplicationController
-    resources_controller_for :categories
-    map_resource :category, :as =&gt; :parent
-  end
-</pre>
-</li>
-<li>you can now specify which actions are loaded from the actions module
-
-<pre>
-  resources_controller_for :forums, :only =&gt; [:index, :show]
-  resources_controller_for :forums, :actions =&gt; MyActions, :except =&gt; :destroy
-</pre>
-<p>
-The method used to achieve this is
-Ardes::ResourcesController::include_actions which can be used in any
-ActionController when resources_controller is in your plugins directory
-</p>
-</li>
-<li>- :polymorphic =&gt; true is back:
-
-<pre>
-    resources_controller_for :tags
-    nested_in :taggable, :polymorphic =&gt; true
-
-  This will load the enclosing resource (which can be a mapped resource) as
-  @taggable as well as its default name
-
-  The following syntax is equivalent to the above two lines:
-    resources_controller_for :tags, :in =&gt; '?taggable'
-
-  And you can specify a single wildcard '?' as well as expanding wildcards '*':
-    resources_controller_for :images, :in =&gt; '?', :load_enclosing =&gt; false
-    # this will work for routes like /users/1/images, /forums/2/images, /featured/images
-</pre>
-<ul>
-<li>test coverage is up
-
-</li>
-<li>moved some of the &#8216;friend&#8217; functionality out of Specification,
-as it smelt bad
-
-</li>
-</ul>
-</li>
-<li>added specs for when you want to find_by_(something other than id) (users,
-addresses, interests)
-
-<p>
-Fixed a bug where the resource mapping was using name instead of segment to
-match when a map should be used (this meant mapping didn&#8216;t work for
-non singleton resources)
-</p>
-<p>
-Thanks to Inviz &lt;invi&#8230;@gmail.com&gt; and Matt Mower
-&lt;matt.mo&#8230;@gmail.com&gt; in <a
-href="http://groups.google.com/group/resources_controller/browse_thread/thread/b71b2ce196a09d15">groups.google.com/group/resources_controller/browse_thread/thread/b71b2ce196a09d15</a>
-for the bug reports
-</p>
-</li>
-<li>Updated actions to be more in line with recent rails scaffold [Jason Lee
-&lt;jlsync@gmail.com&gt;]
-
-</li>
-<li>resources_controller now uses before_filter (instead of
-prepend_before_filter) for load_enclosing_resources. So the resources will
-be loaded at the point where resources_controller_for is specified.
-However, it only adds the filter if it&#8216;s not already there - so you
-can play around with the order if you need to:
-
-<pre>
-  prepend_before_filter :load_enclosing_resources
-  resources_controller_for :foos
-</pre>
-<p>
-(common case for the above is where superclass defines filters that need
-access to enclosing resources)
-</p>
-</li>
-<li>resources_controller_for can now be specified more than once in a
-controller heirachy. The latter definition will overwrite the previous one,
-and will also &#8216;reset&#8217; the nestings.
-
-</li>
-<li>First stab at namespace support: map.namespace :admin do |admin|
-
-<pre>
-  admin.resources :forums
-</pre>
-<p>
-end
-</p>
-<p>
-module Admin
-</p>
-<pre>
-  module Forums &lt; ApplicationController
-    resources_controller_for :forums
-  end
-</pre>
-<p>
-end
-</p>
-<p>
-in an action:
-</p>
-<pre>
-  resources_path # =&gt; '/admin/forums'
-  enclosing_resources # =&gt; []
-</pre>
-</li>
-<li>Minor doc improvements Speced better js response on edit and new actions
-[Jason Lee &lt;jlsync@gmail.com&gt;]
-
-</li>
-<li>The Routing patch has been removed from RC as it has been accepted and
-applied to edge (8930). This is not a dependency of RC, but it is of the
-specs - so grab latest edge to run them.
-
-</li>
-<li>Major internal changes, and some API change: see the rdoc for details. The
-headlines:
-
-<pre>
- - load_enclosing is now true by default
- - BC: the old options work for now, but you'll get deprecation messages
- - refactored a lot of code into friend classes - in particular there is now
-   ResourcesController::Specification which specifies how to find a resource from the route
-</pre>
-</li>
-<li>Fixed some problems with internals of RC when :load_enclosing =&gt; true
-
-</li>
-<li>resources_controller now supports singleton resources! and much better
-:load_enclosing support Booya! =&gt;
-
-<pre>
-  class TagsController &lt; ApplicationController
-    resources_controller_for :tags, :load_enclosing =&gt; true
-  end
-
-  this will service all these routes (loading the resources into assigns for the view)
-
-    /tags
-    /forums/2/tags
-    /images/1/tags
-    /home/tags          &lt;= singular resource
-    /users/1/image/tags &lt;= nested singular resource
-
-  Also
-
-  class BlogController &lt; ApplicationController
-    resources_controller_for :blog, :singleton =&gt; true, :load_enclosing =&gt; true
-  end
-
-  class PostController &lt; ApplicationController
-    resources_controller_for :post, :load_enclosing =&gt; true
-  end
-
-  for /campaigns/1/blog
-      /users/2/blog
-      /campaigns/1/blog/posts
-      /users/2/blog/posts
-
-      etc...
-</pre>
-<p>
-TODO: rewrite docs - for now check out the spec suite. TODO: refactor code
-- I did it BDD stylee, so there&#8216;s lots of specs but also a lot of
-code that &#8216;is the simplest thing that makes the specs pass&#8216;
-</p>
-</li>
-<li>resources_request has changed format - it now returns an array like this [
-{:name =&gt; &quot;forums&quot;, :name_prefix =&gt; &quot;forum_&quot;,
-:key =&gt; :forum_id, :id =&gt; &quot;1&quot;}, {:name =&gt;
-&quot;posts&quot;}] Singular resources are detected properly (see
-spec/specs/resources_controller_spec for some tests). This paves the way
-for singular_resource support, and better &#8216;many routes/one
-controller&#8217; support
-
-<p>
-Decided that Patching Routing was a bad idea, so route is re-recognized
-using the request path. This only happens for controllers with
-:load_enclosing =&gt; true
-</p>
-</li>
-<li>You can now call methods such as enclosing_resource_path,
-enclosing_resources_path, etc in your controller and view and the correct
-url helper will be called. These url_helpers are defined as they are
-needed, so it&#8216;s pretty fast.
-
-</li>
-<li>Removing routing decoration for now
-
-</li>
-<li>Enclosing resources are now all loaded by one method :load_enclosing which
-is a prepend_before_filter. This means that you can access the enclosing
-resources in all before_filters, even when a subclass adds more nestings.
-
-<p>
-Example:
-</p>
-<pre>
-  class PostsController &lt; ApplicationController
-    resources_controller_for :posts
-  end
-
-  class UserPostsController &lt; PostsController
-    nested_in :user
-
-    before_filter {|c| raise 'boom' if @user.name == 'Santa'}
-  end
-</pre>
-</li>
-<li>Removed ResourceService proxy class. This was mainly used for BC with rails
-&lt;= 1.2.2. If you&#8216;re using this, then freeze to r377 of
-resources_controller. The resource_service is now either an ActiveRecord or
-association proxy.
-
-</li>
-<li>Added route decoration to access the recognized route in the controller
-(for future parsing of singular resources, and better polymorphic support)
-
-</li>
-<li>Removed Ardes::ResourcesController::Spec::ViewHelper as it&#8216;s best to
-not have a dependency like this in your specs. Just stub out the resource
-methods that are needed by that view, or use the default assigns.
-
-</li>
-<li>Named path support is much improved. All named routes for the current
-resource can be called by substituting &#8216;resource&#8217;. E.g. the
-following methods in your controller or view will work:
-:formatted_resource_path, :preview_resource_path (if :preview is in
-:member), :resource_tags_path, etc, etc. This helps with decoupling the
-model name from the controller and view.
-
-</li>
-<li>Added flash tests [frederikfix at eml dot cc]
-
-</li>
-<li>Added rjs actions [frederikfix at eml dot cc]
-
-</li>
-<li>Added Ardes::ResourcesController::Spec::ViewHelper for easy view testing
-
-</li>
-<li>Added Helper#form_for_resource for easy form generation, see rdoc for
-details
-
-</li>
-<li>Enclosed named paths use the new edge rails conventions for named routes.
-
-<p>
-So to get the path to edit a child tag resource (where resource is
-&#8216;forum:1&#8217;)
-</p>
-<pre>
-  edit_resource_tag_path(@tag) # =&gt; '/forums/1/tags/2/edit'
-</pre>
-</li>
-<li>Handles options passed to named routes
-
-<pre>
-  resource_path(:sort_by =&gt; 'article') # =&gt; '/forums/2?sort_by=article'
-</pre>
-</li>
-<li>Now handles enclosing named paths. You can reference named routes that are
-&#8216;below&#8217; (or enclosed by) the current resource by appending
-resource_ to that named route. [thanks Chris Hapgood for the initial idea]
-
-</li>
-<li>(find|new)_resource(s) methods are now defined by resources_controller_for
-only if they do not already exist
-
-</li>
-<li>Better regexp for resources_request [Chris Hapgood]
-
-</li>
-<li>Added more specs to get coverage to 100%
-
-</li>
-<li>Upgraded to rpsec 0.9, improved Rakefile and specs so that spec:plugins
-will work
-
-</li>
-<li>Removed ApplicationController from spec/app.rb to avoid conflicts with en-
-closing rails application
-
-</li>
-<li>Added method_missing proxy to ResourceService, to enable the
-resource_service to be used for things other than find or new (for example
-Pagination) [Dan Kubb]
-
-</li>
-<li>Fixed small error in flash message of destroy action [Dan Kubb]
-
-</li>
-<li>Removing experimental cruft
-
-</li>
-<li>CHANGELOG started
-
-</li>
-</ul>
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>File: History.txt [Resources Controller API Documentation (2c87336)]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>History.txt</h1>
+        <div class='paths'>
+          History.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>Tue Sep 29 09:38:02 +0100 2009</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <ul>
+            <li>Bugs introduced with RequestPathIntrospection (5 and 6 on lighthouse)
+            solved thanks to Sergei Serdyuk
+            
+            </li>
+            <li>RC no longer uses the route that invoked the controller to figure out
+            wildcard enclosing resources.
+            
+            <ul>
+            <li>this change means that you will no longer get those pesky
+            &#8216;NoRecognizedRoute&#8217; errors when your controller is invoked by
+            another route, such as a :controller/:action/:id route.
+            
+            </li>
+            </ul>
+            </li>
+            <li>Further relaxed RC&#8217;s route pickiness. If a route is not recognised,
+            construct segments from the params
+            
+            </li>
+            <li>Relaxed RC&#8217;s pickiness about what route was used to invoke a
+            controller.
+            
+            </li>
+            <li>Removed deprecation warning from save_resource, and added cautionary notes
+            to the comments instead
+            
+            </li>
+            <li>If you use your own Action modules, you can now define a module method
+            include_actions to do the :only / :except handling yourself. See <a
+            href="../classes/Ardes/ResourcesController/IncludeActions.html">Ardes::ResourcesController::IncludeActions</a>.
+            This change is completely BC, you don&#8217;t need to do anything to any of
+            your existing action modules.
+            
+            </li>
+            <li>use add_enclosing_resource to add your own enclosing resources if
+            you&#8217;re skipping load_enclosing_resources [Tom Stuart, Joel
+            Chippindale]
+            
+            </li>
+            <li>The reason for the reversion in c21f35c has been fixed. Thanks Jason Lee
+            for the bug report.
+            
+            <p>
+            The problem was that I had changed resource_saved?&#8217;s behaviour to
+            <b>not</b> saving the model if it had already been saved. In the future
+            resource_saved? will be deprecated, but not yet.
+            </p>
+            <p>
+            BTW. All of these changes to resource_saved? behaviour is aimed at making
+            RC drop in compatible with rspec&#8217;s generated controller specs (try
+            rake spec:generate).
+            </p>
+            <p>
+            To do that I need the default update action to use :update_attributes. This
+            meant that the old strategy of keeping track of saves by using
+            save_resource wont work. Instead, we keep track by looking at the
+            AR&#8217;s state (see <a
+            href="lib/ardes/active_record/saved_rb.html">lib/ardes/active_record/saved.rb</a>)
+            which is a far better solution anyway.
+            </p>
+            </li>
+            <li>API change: save_resource deprecated
+            
+            <p>
+            So save_resource is now deprecated, just use resource.save ActiveRecords
+            can now be asked if they are saved?
+            </p>
+            </li>
+            <li>rspec compat: Added new rake task to test that an RC controller passes the
+            default rspec_scaffold controller specs.
+            
+            </li>
+            <li>Added BC for 2-0-stable branch re: find_filter, and regression specs
+            
+            </li>
+            <li>find_filter no longer exists in edge - updated accordingly [Jason Lee <a
+            href="http://github.com/jlsync">github.com/jlsync</a>]
+            
+            </li>
+            <li>Added ability to pass options to named route in form_for_resource
+            
+            <pre>form_for_resource :url_options =&gt; {:gday =&gt; 'mate'}&#x000A;&#x000A;# =&gt; action=&quot;/products/1?gday=mate&quot;  (for update)&#x000A;# =&gt; action=&quot;/products?gday=mate&quot;    (for create)</pre>
+            </li>
+            <li>changed :erp to :resource_path, and added :resource_method.
+            
+            <p>
+            This means you can connect a named route up with a REST action and also
+            change the method
+            </p>
+            <p>
+            map.activate_account &#8217;/activate/:code&#8217;, :controller =>
+            &#8216;activations&#8217;, :action => &#8216;create&#8217;, :resource_path
+            => &#8217;/activations&#8217;, :resource_method => :post
+            </p>
+            <p>
+            :erp retained for BC
+            </p>
+            </li>
+            <li>save_resource and resource_saved? added. These simply save the resource and
+            cache the result of that save. This means you can use the result of the
+            resource save in your response_for blocks (if you&#8217;re using
+            response_for)
+            
+            <p>
+            response_for :create do |format|
+            </p>
+            <pre>if resource_saved?&#x000A;  format.html {}&#x000A;else&#x000A;  format.html {}&#x000A;end</pre>
+            <p>
+            end
+            </p>
+            <p>
+            def create
+            </p>
+            <pre>self.resource = new_resource&#x000A;save_resource</pre>
+            <p>
+            end
+            </p>
+            </li>
+            <li>added Ardes::ResourcesController.actions and
+            Ardes::ResourcesController.singleton_actions accessors so you can set the
+            default actions module across your app
+            
+            </li>
+            <li>Added resource_saved? method to controller. This is useful for sharing the
+            result of a save outside action methods (for example in response_for
+            blocks)
+            
+            </li>
+            <li>added error_messages_for_resource to Helper
+            
+            </li>
+            <li>fixed form_for_resource when resource is new and controller is for
+            singleton resource
+            
+            </li>
+            <li>added :erp patch, doc and specs [thanks Chris Hapgood for the initial
+            patch]
+            
+            <p>
+            Use the :erp param when you are routing a non RESTful route to your rc
+            controller This allows rc to load the resources using the route.
+            </p>
+            <p>
+            e.g. map.home &#8217;&#8217;, :controller => &#8216;forums&#8217;, :action
+            => &#8216;index&#8217;, :erp => &#8217;/forums&#8217;
+            </p>
+            </li>
+            <li>Removed deprecated options (in r492 - I forgot to say so)
+            
+            </li>
+            <li>Coverage back to 100%
+            
+            </li>
+            <li>you can alias an enclosing resource with :as
+            
+            <p>
+            This can be useful when you have a tree like domain:
+            </p>
+            <pre>map.resources :categories do |category|&#x000A;  category.resources :categories&#x000A;end&#x000A;&#x000A;class CategoriesController &lt; ApplicationController&#x000A;  resources_controller_for :categories&#x000A;  map_resource :category, :as =&gt; :parent&#x000A;end</pre>
+            </li>
+            <li>you can now specify which actions are loaded from the actions module
+            
+            <pre>resources_controller_for :forums, :only =&gt; [:index, :show]&#x000A;resources_controller_for :forums, :actions =&gt; MyActions, :except =&gt; :destroy</pre>
+            <p>
+            The method used to achieve this is
+            Ardes::ResourcesController::include_actions which can be used in any
+            ActionController when resources_controller is in your plugins directory
+            </p>
+            </li>
+            <li>- :polymorphic => true is back:
+            
+            <pre>  resources_controller_for :tags&#x000A;  nested_in :taggable, :polymorphic =&gt; true&#x000A;&#x000A;This will load the enclosing resource (which can be a mapped resource) as&#x000A;@taggable as well as its default name&#x000A;&#x000A;The following syntax is equivalent to the above two lines:&#x000A;  resources_controller_for :tags, :in =&gt; '?taggable'&#x000A;&#x000A;And you can specify a single wildcard '?' as well as expanding wildcards '*':&#x000A;  resources_controller_for :images, :in =&gt; '?', :load_enclosing =&gt; false&#x000A;  # this will work for routes like /users/1/images, /forums/2/images, /featured/images</pre>
+            <ul>
+            <li>test coverage is up
+            
+            </li>
+            <li>moved some of the &#8216;friend&#8217; functionality out of Specification,
+            as it smelt bad
+            
+            </li>
+            </ul>
+            </li>
+            <li>added specs for when you want to find_by_(something other than id) (users,
+            addresses, interests)
+            
+            <p>
+            Fixed a bug where the resource mapping was using name instead of segment to
+            match when a map should be used (this meant mapping didn&#8217;t work for
+            non singleton resources)
+            </p>
+            <p>
+            Thanks to Inviz <invi...@gmail.com> and Matt Mower <matt.mo...@gmail.com>
+            in <a
+            href="http://groups.google.com/group/resources_controller/browse_thread/thread/b71b2ce196a09d15">groups.google.com/group/resources_controller/browse_thread/thread/b71b2ce196a09d15</a>
+            for the bug reports
+            </p>
+            </li>
+            <li>Updated actions to be more in line with recent rails scaffold [Jason Lee
+            <jlsync@gmail.com>]
+            
+            </li>
+            <li>resources_controller now uses before_filter (instead of
+            prepend_before_filter) for load_enclosing_resources. So the resources will
+            be loaded at the point where resources_controller_for is specified.
+            However, it only adds the filter if it&#8217;s not already there - so you
+            can play around with the order if you need to:
+            
+            <pre>prepend_before_filter :load_enclosing_resources&#x000A;resources_controller_for :foos</pre>
+            <p>
+            (common case for the above is where superclass defines filters that need
+            access to enclosing resources)
+            </p>
+            </li>
+            <li>resources_controller_for can now be specified more than once in a
+            controller heirachy. The latter definition will overwrite the previous one,
+            and will also &#8216;reset&#8217; the nestings.
+            
+            </li>
+            <li>First stab at namespace support: map.namespace :admin do |admin|
+            
+            <pre>admin.resources :forums</pre>
+            <p>
+            end
+            </p>
+            <p>
+            module Admin
+            </p>
+            <pre>module Forums &lt; ApplicationController&#x000A;  resources_controller_for :forums&#x000A;end</pre>
+            <p>
+            end
+            </p>
+            <p>
+            in an action:
+            </p>
+            <pre>resources_path # =&gt; '/admin/forums'&#x000A;enclosing_resources # =&gt; []</pre>
+            </li>
+            <li>Minor doc improvements Speced better js response on edit and new actions
+            [Jason Lee <jlsync@gmail.com>]
+            
+            </li>
+            <li>The Routing patch has been removed from RC as it has been accepted and
+            applied to edge (8930). This is not a dependency of RC, but it is of the
+            specs - so grab latest edge to run them.
+            
+            </li>
+            <li>Major internal changes, and some API change: see the rdoc for details. The
+            headlines:
+            
+            <pre>- load_enclosing is now true by default&#x000A;- BC: the old options work for now, but you'll get deprecation messages&#x000A;- refactored a lot of code into friend classes - in particular there is now&#x000A;  ResourcesController::Specification which specifies how to find a resource from the route</pre>
+            </li>
+            <li>Fixed some problems with internals of RC when :load_enclosing => true
+            
+            </li>
+            <li>resources_controller now supports singleton resources! and much better
+            :load_enclosing support Booya! =>
+            
+            <pre>class TagsController &lt; ApplicationController&#x000A;  resources_controller_for :tags, :load_enclosing =&gt; true&#x000A;end&#x000A;&#x000A;this will service all these routes (loading the resources into assigns for the view)&#x000A;&#x000A;  /tags&#x000A;  /forums/2/tags&#x000A;  /images/1/tags&#x000A;  /home/tags          &lt;= singular resource&#x000A;  /users/1/image/tags &lt;= nested singular resource&#x000A;&#x000A;Also&#x000A;&#x000A;class BlogController &lt; ApplicationController&#x000A;  resources_controller_for :blog, :singleton =&gt; true, :load_enclosing =&gt; true&#x000A;end&#x000A;&#x000A;class PostController &lt; ApplicationController&#x000A;  resources_controller_for :post, :load_enclosing =&gt; true&#x000A;end&#x000A;&#x000A;for /campaigns/1/blog&#x000A;    /users/2/blog&#x000A;    /campaigns/1/blog/posts&#x000A;    /users/2/blog/posts&#x000A;&#x000A;    etc...</pre>
+            <p>
+            TODO: rewrite docs - for now check out the spec suite. TODO: refactor code
+            - I did it BDD stylee, so there&#8217;s lots of specs but also a lot of
+            code that &#8216;is the simplest thing that makes the specs pass&#8217;
+            </p>
+            </li>
+            <li>resources_request has changed format - it now returns an array like this [
+            {:name => &#8220;forums&#8221;, :name_prefix => &#8220;forum_&#8221;, :key
+            => :forum_id, :id => &#8220;1&#8221;}, {:name => &#8220;posts&#8221;}]
+            Singular resources are detected properly (see
+            spec/specs/resources_controller_spec for some tests). This paves the way
+            for singular_resource support, and better &#8216;many routes/one
+            controller&#8217; support
+            
+            <p>
+            Decided that Patching Routing was a bad idea, so route is re-recognized
+            using the request path. This only happens for controllers with
+            :load_enclosing => true
+            </p>
+            </li>
+            <li>You can now call methods such as enclosing_resource_path,
+            enclosing_resources_path, etc in your controller and view and the correct
+            url helper will be called. These url_helpers are defined as they are
+            needed, so it&#8217;s pretty fast.
+            
+            </li>
+            <li>Removing routing decoration for now
+            
+            </li>
+            <li>Enclosing resources are now all loaded by one method :load_enclosing which
+            is a prepend_before_filter. This means that you can access the enclosing
+            resources in all before_filters, even when a subclass adds more nestings.
+            
+            <p>
+            Example:
+            </p>
+            <pre>class PostsController &lt; ApplicationController&#x000A;  resources_controller_for :posts&#x000A;end&#x000A;&#x000A;class UserPostsController &lt; PostsController&#x000A;  nested_in :user&#x000A;&#x000A;  before_filter {|c| raise 'boom' if @user.name == 'Santa'}&#x000A;end</pre>
+            </li>
+            <li>Removed ResourceService proxy class. This was mainly used for BC with rails
+            <= 1.2.2. If you&#8217;re using this, then freeze to r377 of
+            resources_controller. The resource_service is now either an ActiveRecord or
+            association proxy.
+            
+            </li>
+            <li>Added route decoration to access the recognized route in the controller
+            (for future parsing of singular resources, and better polymorphic support)
+            
+            </li>
+            <li>Removed Ardes::ResourcesController::Spec::ViewHelper as it&#8217;s best to
+            not have a dependency like this in your specs. Just stub out the resource
+            methods that are needed by that view, or use the default assigns.
+            
+            </li>
+            <li>Named path support is much improved. All named routes for the current
+            resource can be called by substituting &#8216;resource&#8217;. E.g. the
+            following methods in your controller or view will work:
+            :formatted_resource_path, :preview_resource_path (if :preview is in
+            :member), :resource_tags_path, etc, etc. This helps with decoupling the
+            model name from the controller and view.
+            
+            </li>
+            <li>Added flash tests [frederikfix at eml dot cc]
+            
+            </li>
+            <li>Added rjs actions [frederikfix at eml dot cc]
+            
+            </li>
+            <li>Added Ardes::ResourcesController::Spec::ViewHelper for easy view testing
+            
+            </li>
+            <li>Added Helper#form_for_resource for easy form generation, see rdoc for
+            details
+            
+            </li>
+            <li>Enclosed named paths use the new edge rails conventions for named routes.
+            
+            <p>
+            So to get the path to edit a child tag resource (where resource is
+            &#8216;forum:1&#8217;)
+            </p>
+            <pre>edit_resource_tag_path(@tag) # =&gt; '/forums/1/tags/2/edit'</pre>
+            </li>
+            <li>Handles options passed to named routes
+            
+            <pre>resource_path(:sort_by =&gt; 'article') # =&gt; '/forums/2?sort_by=article'</pre>
+            </li>
+            <li>Now handles enclosing named paths. You can reference named routes that are
+            &#8216;below&#8217; (or enclosed by) the current resource by appending
+            resource_ to that named route. [thanks Chris Hapgood for the initial idea]
+            
+            </li>
+            <li>(find|new)_resource(s) methods are now defined by resources_controller_for
+            only if they do not already exist
+            
+            </li>
+            <li>Better regexp for resources_request [Chris Hapgood]
+            
+            </li>
+            <li>Added more specs to get coverage to 100%
+            
+            </li>
+            <li>Upgraded to rpsec 0.9, improved Rakefile and specs so that spec:plugins
+            will work
+            
+            </li>
+            <li>Removed ApplicationController from spec/app.rb to avoid conflicts with en-
+            closing rails application
+            
+            </li>
+            <li>Added method_missing proxy to ResourceService, to enable the
+            resource_service to be used for things other than find or new (for example
+            Pagination) [Dan Kubb]
+            
+            </li>
+            <li>Fixed small error in flash message of destroy action [Dan Kubb]
+            
+            </li>
+            <li>Removing experimental cruft
+            
+            </li>
+            <li>CHANGELOG started
+            
+            </li>
+            </ul>
+          </div>
+          <div id='section'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
     </div>
-
-
-   </div>
-
-
-  </div>
-
-
-    <!-- if includes -->
-
-    <div id="section">
-
-
-
-
-
-      
-
-
-    <!-- if method_list -->
-
-
-  </div>
-
-
-<div id="validator-badges">
-  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
-</div>
-
-</body>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
 </html>
