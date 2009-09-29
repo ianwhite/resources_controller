@@ -4,7 +4,6 @@ $LOAD_PATH.unshift(rspec_base) if File.exist?(rspec_base) and !$LOAD_PATH.includ
 
 require 'spec/rake/spectask'
 require 'spec/rake/verify_rcov'
-require 'rake/rdoctask'
 
 plugin_name = 'resources_controller'
 
@@ -38,15 +37,24 @@ require File.join(File.dirname(__FILE__), 'spec/generate_rake_task')
 task :rdoc => 'doc:build'
 task :doc => 'doc:build'
 
+begin
+  require 'hanna/rdoctask'
+rescue LoadError
+  require 'rake/rdoctask'
+end
+
 namespace :doc do
   
   current_sha = `git log HEAD -1 --pretty=format:"%H"`[0..6]
   
   Rake::RDocTask.new(:build) do |d|
     d.rdoc_dir = 'doc'
+    d.title    = "Resources Controller API Documentation (#{current_sha})"
     d.main     = 'README.rdoc'
-    d.title    = "#{plugin_name} API Docs (#{current_sha})"
     d.rdoc_files.include('README.rdoc', 'History.txt', 'License.txt', 'Todo.txt', 'lib/**/*.rb')
+    d.options << '--line-numbers' << '--inline-source'
+    d.options << '-A cattr_accessor=object'
+    d.options << '--charset' << 'utf-8'
   end
   
   task :push => 'doc:build' do
