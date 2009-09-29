@@ -1,7 +1,7 @@
 = resources_controller
 
 plugin to facilitate inheritance and DRYness in your resources controllers.
-See the docs at http://plugins.ardes.com/doc/resources_controller for details.
+See the API docs at http://ianwhite.github.com/resources_controller/doc .
 Also see http://blog.ardes.com/resources_controller
 
 See the CHANGLELOG for recent changes.
