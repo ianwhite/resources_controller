@@ -1,3 +1,5 @@
+* Bugs introduced with RequestPathIntrospection (#5 and #6 on lighthouse) solved thanks to Sergei Serdyuk
+
 * RC no longer uses the route that invoked the controller to figure out wildcard enclosing resources.
 
   - this change means that you will no longer get those pesky 'NoRecognizedRoute' errors when your controller
