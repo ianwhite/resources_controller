@@ -16,12 +16,16 @@ module Ardes
       
       # returns an array of hashes like {:segment => 'forum', :singleton => false}
       def nesting_segments
-        @nesting_segments ||= segments_for_path_and_keys(nesting_request_path, params.keys.select{|k| k.to_s[-3..-1] == '_id'})
+        @nesting_segments ||= segments_for_path_and_keys(nesting_request_path, param_keys)
       end
       
       def namespace_segments
         namespace = controller_path.sub(%r(#{controller_name}$), '')
         request_path =~ %r(^/#{namespace}) ? namespace.split('/') : []
+      end
+      
+      def param_keys
+        params.keys.map(&:to_s).select{|k| k[-3..-1] == '_id'}
       end
       
     private
