@@ -8,7 +8,7 @@ See the CHANGLELOG for recent changes.
 
 == works with rails 2.x
 
-resources_controller works with rails 2.x, and is currently tested against 2.0, 2.1, and 2.2 stable branches
+resources_controller works with rails 2.x, and is currently tested against 2.0, 2.1, 2.2, and 2.3 stable branches
 
 == Specs and Coverage
 
@@ -39,6 +39,7 @@ The following people have made contributions to resources_controller.  Please le
 * Joel Chippindale
 * Tim Pope
 * Tom ten Thij
+* Sergei Serdyuk
 
 == License
 
