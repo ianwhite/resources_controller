@@ -93,6 +93,11 @@ module Ardes#:nodoc:
       def singleton?
         true
       end
+      
+      # no key for singleton resources
+      def key
+        false
+      end
     
       # finds the resource from the enclosing resource.  Raise CantFindSingleton if there is no enclosing resource
       def find_resource(controller)

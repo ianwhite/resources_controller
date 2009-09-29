@@ -97,5 +97,18 @@ module RequestPathIntrospectionSpec
         end
       end
     end
+  
+    describe "#segment_for_key" do
+      describe "when controller has map {:user, :singelton => true}" do
+        before do
+          @klass.resources_controller_for :forums, :class => RequestPathIntrospectionSpec::Forum
+          @klass.map_enclosing_resource :user, :singleton => true, :class => RequestPathIntrospectionSpec::User
+        end
+        
+        it "('user_id') should return 'users'" do
+          @controller.send(:segment_for_key, 'user_id').should == 'users'
+        end
+      end
+    end
   end
 end
