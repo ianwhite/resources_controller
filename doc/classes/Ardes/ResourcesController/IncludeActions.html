@@ -97,7 +97,7 @@ need to know about it.
 <p>
 However, if you ahve any special behaviour in your actions module that is
 sensitive to :only and :except, you can define your own <a
-href="IncludeActions.html#M000012">include_actions</a> method on that
+href="IncludeActions.html#M000017">include_actions</a> method on that
 module to effect this special behaviour.
 </p>
 
@@ -110,9 +110,9 @@ module to effect this special behaviour.
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000014">action_methods_to_remove</a>&nbsp;&nbsp;
-      <a href="#M000012">include_actions</a>&nbsp;&nbsp;
-      <a href="#M000013">remove_action_method</a>&nbsp;&nbsp;
+      <a href="#M000019">action_methods_to_remove</a>&nbsp;&nbsp;
+      <a href="#M000017">include_actions</a>&nbsp;&nbsp;
+      <a href="#M000018">remove_action_method</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -134,19 +134,19 @@ module to effect this special behaviour.
     <div id="methods">
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000014" class="method-detail">
-        <a name="M000014"></a>
+      <div id="method-M000019" class="method-detail">
+        <a name="M000019"></a>
 
         <div class="method-heading">
-          <a href="#M000014" class="method-signature">
+          <a href="#M000019" class="method-signature">
           <span class="method-name">action_methods_to_remove</span><span class="method-args">(options = {})</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000014-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000014-source">
+            onclick="toggleCode('M000019-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000019-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/include_actions.rb, line 28</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">action_methods_to_remove</span>(<span class="ruby-identifier">options</span> = {})
@@ -163,19 +163,19 @@ module to effect this special behaviour.
         </div>
       </div>
 
-      <div id="method-M000012" class="method-detail">
-        <a name="M000012"></a>
+      <div id="method-M000017" class="method-detail">
+        <a name="M000017"></a>
 
         <div class="method-heading">
-          <a href="#M000012" class="method-signature">
+          <a href="#M000017" class="method-signature">
           <span class="method-name">include_actions</span><span class="method-args">(controller, options = {})</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000012-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000012-source">
+            onclick="toggleCode('M000017-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000017-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/include_actions.rb, line 16</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">include_actions</span>(<span class="ruby-identifier">controller</span>, <span class="ruby-identifier">options</span> = {})
@@ -190,19 +190,19 @@ module to effect this special behaviour.
         </div>
       </div>
 
-      <div id="method-M000013" class="method-detail">
-        <a name="M000013"></a>
+      <div id="method-M000018" class="method-detail">
+        <a name="M000018"></a>
 
         <div class="method-heading">
-          <a href="#M000013" class="method-signature">
+          <a href="#M000018" class="method-signature">
           <span class="method-name">remove_action_method</span><span class="method-args">(action)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000013-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000013-source">
+            onclick="toggleCode('M000018-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000018-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/include_actions.rb, line 24</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">remove_action_method</span>(<span class="ruby-identifier">action</span>)

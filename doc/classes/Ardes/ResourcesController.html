@@ -71,6 +71,10 @@
                 lib/ardes/resources_controller/named_route_helper.rb
                 </a>
         <br />
+                <a href="../../files/lib/ardes/resources_controller/request_path_introspection_rb.html">
+                lib/ardes/resources_controller/request_path_introspection.rb
+                </a>
+        <br />
                 <a href="../../files/lib/ardes/resources_controller/singleton_actions_rb.html">
                 lib/ardes/resources_controller/singleton_actions.rb
                 </a>
@@ -263,6 +267,10 @@ as a param in routes.rb
 When the controller is invoked via the &#8217;&#8217; url, rc will use
 :resource_path to recognize the route.
 </p>
+<p>
+This is only necessary if you have wildcard enclosing resources enabled
+(the default)
+</p>
 <h4>Putting it all together</h4>
 <p>
 An exmaple app
@@ -448,7 +456,7 @@ To use RC, there are just three class methods on controller to learn.
 </p>
 <p>
 <a
-href="ResourcesController/ClassMethods.html#M000015">ClassMethods#nested_in</a>
+href="ResourcesController/ClassMethods.html#M000020">ClassMethods#nested_in</a>
 &lt;name&gt;, &lt;options&gt;, &lt;&amp;block&gt;
 </p>
 <p>
@@ -631,6 +639,7 @@ Module <a href="ResourcesController/Helper.html" class="link">Ardes::ResourcesCo
 Module <a href="ResourcesController/IncludeActions.html" class="link">Ardes::ResourcesController::IncludeActions</a><br />
 Module <a href="ResourcesController/InstanceMethods.html" class="link">Ardes::ResourcesController::InstanceMethods</a><br />
 Module <a href="ResourcesController/NamedRouteHelper.html" class="link">Ardes::ResourcesController::NamedRouteHelper</a><br />
+Module <a href="ResourcesController/RequestPathIntrospection.html" class="link">Ardes::ResourcesController::RequestPathIntrospection</a><br />
 Module <a href="ResourcesController/SingletonActions.html" class="link">Ardes::ResourcesController::SingletonActions</a><br />
 Class <a href="ResourcesController/ResourceService.html" class="link">Ardes::ResourcesController::ResourceService</a><br />
 Class <a href="ResourcesController/SingletonResourceService.html" class="link">Ardes::ResourcesController::SingletonResourceService</a><br />
@@ -663,7 +672,7 @@ Class <a href="ResourcesController/Specification.html" class="link">Ardes::Resou
             onclick="toggleCode('M000003-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000003-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 375</span>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 377</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">extended</span>(<span class="ruby-identifier">base</span>)
       <span class="ruby-identifier">base</span>.<span class="ruby-identifier">class_eval</span> <span class="ruby-keyword kw">do</span>
         <span class="ruby-identifier">class_inheritable_reader</span> <span class="ruby-identifier">:resource_specification_map</span>
@@ -699,7 +708,7 @@ include, for example:
             onclick="toggleCode('M000007-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000007-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 490</span>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 492</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">include_actions</span>(<span class="ruby-identifier">mixin</span>, <span class="ruby-identifier">options</span> = {})
       <span class="ruby-identifier">mixin</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">IncludeActions</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">mixin</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">:include_actions</span>)
       <span class="ruby-identifier">mixin</span>.<span class="ruby-identifier">include_actions</span>(<span class="ruby-keyword kw">self</span>, <span class="ruby-identifier">options</span>)
@@ -726,14 +735,14 @@ commonly this would be a singleton resource.
 </p>
 <p>
 See <a
-href="ResourcesController/Specification.html#M000055">Specification#new</a>
+href="ResourcesController/Specification.html#M000061">Specification#new</a>
 for details of how to call this
 </p>
           <p><a class="source-toggle" href="#"
             onclick="toggleCode('M000005-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000005-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 477</span>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 479</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">map_enclosing_resource</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
       <span class="ruby-identifier">spec</span> = <span class="ruby-constant">Specification</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
       <span class="ruby-identifier">resource_specification_map</span>[<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">segment</span>] = <span class="ruby-identifier">spec</span>
@@ -761,7 +770,7 @@ href="ResourcesController.html#M000005">map_enclosing_resource</a>
             onclick="toggleCode('M000006-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000006-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 483</span>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 485</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">map_resource</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
       <span class="ruby-identifier">map_enclosing_resource</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
     <span class="ruby-keyword kw">end</span>
@@ -805,7 +814,7 @@ unconventional way. Passing a block has the same effect as setting :find
 
 </li>
 <li><tt>:in:</tt> specify the enclosing resources, by name. <a
-href="ResourcesController/ClassMethods.html#M000015">ClassMethods#nested_in</a>
+href="ResourcesController/ClassMethods.html#M000020">ClassMethods#nested_in</a>
 can be used to specify this more fully.
 
 </li>
@@ -853,7 +862,7 @@ that is matched
 The default behavior is to set up before filters that load the enclosing
 resource, and to use associations on that model to find and create the
 resources. See <a
-href="ResourcesController/ClassMethods.html#M000015">ClassMethods#nested_in</a>
+href="ResourcesController/ClassMethods.html#M000020">ClassMethods#nested_in</a>
 for more details on this, and customising the default behaviour.
 </p>
 <h3>load_enclosing_resources</h3>
@@ -898,7 +907,7 @@ by default
             onclick="toggleCode('M000004-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000004-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 442</span>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 444</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">resources_controller_for</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
       <span class="ruby-identifier">options</span>.<span class="ruby-identifier">assert_valid_keys</span>(<span class="ruby-identifier">:class</span>, <span class="ruby-identifier">:source</span>, <span class="ruby-identifier">:singleton</span>, <span class="ruby-identifier">:actions</span>, <span class="ruby-identifier">:in</span>, <span class="ruby-identifier">:find</span>, <span class="ruby-identifier">:load_enclosing</span>, <span class="ruby-identifier">:route</span>, <span class="ruby-identifier">:segment</span>, <span class="ruby-identifier">:as</span>, <span class="ruby-identifier">:only</span>, <span class="ruby-identifier">:except</span>)
       <span class="ruby-identifier">when_options</span> = {<span class="ruby-identifier">:only</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:only</span>), <span class="ruby-identifier">:except</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:except</span>)}

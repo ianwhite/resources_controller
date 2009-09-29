@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Wed Mar 18 02:10:57 +0000 2009</td>
+      <td>Sat Sep 19 21:14:32 +0100 2009</td>
     </tr>
     </table>
   </div>
@@ -70,6 +70,21 @@
 
     <div id="description">
       <ul>
+<li>RC no longer uses the route that invoked the controller to figure out
+wildcard enclosing resources.
+
+<ul>
+<li>this change means that you will no longer get those pesky
+&#8216;NoRecognizedRoute&#8217; errors when your controller is invoked by
+another route, such as a :controller/:action/:id route.
+
+</li>
+</ul>
+</li>
+<li>Further relaxed RC&#8216;s route pickiness. If a route is not recognised,
+construct segments from the params
+
+</li>
 <li>Relaxed RC&#8216;s pickiness about what route was used to invoke a
 controller.
 

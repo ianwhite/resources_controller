@@ -87,7 +87,7 @@ determine a name prefix, based on a route segment or segment pair (e.g.
 <p>
 You don&#8216;t need to instantiate this class directly - it is created by
 <a
-href="ClassMethods.html#M000015">ResourcesController::ClassMethods#nested_in</a>,
+href="ClassMethods.html#M000020">ResourcesController::ClassMethods#nested_in</a>,
 <a
 href="../ResourcesController.html#M000006">ResourcesController#map_resource</a>
 (and ResourcesController::InstanceMethods#load_wildcard)
@@ -113,12 +113,12 @@ This is primarily a container class. A summary of its behaviour:
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000059">find_custom</a>&nbsp;&nbsp;
-      <a href="#M000058">find_from</a>&nbsp;&nbsp;
-      <a href="#M000060">find_resource</a>&nbsp;&nbsp;
-      <a href="#M000055">new</a>&nbsp;&nbsp;
-      <a href="#M000056">new</a>&nbsp;&nbsp;
-      <a href="#M000057">singleton?</a>&nbsp;&nbsp;
+      <a href="#M000065">find_custom</a>&nbsp;&nbsp;
+      <a href="#M000064">find_from</a>&nbsp;&nbsp;
+      <a href="#M000066">find_resource</a>&nbsp;&nbsp;
+      <a href="#M000061">new</a>&nbsp;&nbsp;
+      <a href="#M000062">new</a>&nbsp;&nbsp;
+      <a href="#M000063">singleton?</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -188,11 +188,11 @@ This is primarily a container class. A summary of its behaviour:
     <div id="methods">
       <h3 class="section-bar">Public Class methods</h3>
 
-      <div id="method-M000055" class="method-detail">
-        <a name="M000055"></a>
+      <div id="method-M000061" class="method-detail">
+        <a name="M000061"></a>
 
         <div class="method-heading">
-          <a href="#M000055" class="method-signature">
+          <a href="#M000061" class="method-signature">
           <span class="method-name">new</span><span class="method-args">(name, options = {}, &amp;block)</span>
           </a>
         </div>
@@ -203,12 +203,12 @@ factory for <a href="Specification.html">Specification</a> and <a
 href="SingletonSpecification.html">SingletonSpecification</a>
 </p>
 <p>
-you can call <a href="Specification.html#M000055">Specification.new</a>
+you can call <a href="Specification.html#M000061">Specification.new</a>
 &#8216;name&#8217;, :singleton =&gt; true
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000055-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000055-source">
+            onclick="toggleCode('M000061-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000061-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/specification.rb, line 20</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
@@ -219,11 +219,11 @@ you can call <a href="Specification.html#M000055">Specification.new</a>
         </div>
       </div>
 
-      <div id="method-M000056" class="method-detail">
-        <a name="M000056"></a>
+      <div id="method-M000062" class="method-detail">
+        <a name="M000062"></a>
 
         <div class="method-heading">
-          <a href="#M000056" class="method-signature">
+          <a href="#M000062" class="method-signature">
           <span class="method-name">new</span><span class="method-args">(spec_name, options = {}, &amp;block)</span>
           </a>
         </div>
@@ -281,8 +281,8 @@ that is matched
 Passing a block is the same as passing :find =&gt; Proc
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000056-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000056-source">
+            onclick="toggleCode('M000062-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000062-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/specification.rb, line 44</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">spec_name</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
@@ -303,11 +303,11 @@ Passing a block is the same as passing :find =&gt; Proc
 
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000059" class="method-detail">
-        <a name="M000059"></a>
+      <div id="method-M000065" class="method-detail">
+        <a name="M000065"></a>
 
         <div class="method-heading">
-          <a href="#M000059" class="method-signature">
+          <a href="#M000065" class="method-signature">
           <span class="method-name">find_custom</span><span class="method-args">(controller)</span>
           </a>
         </div>
@@ -317,8 +317,8 @@ Passing a block is the same as passing :find =&gt; Proc
 finds the resource using the custom :find Proc or symbol
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000059-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000059-source">
+            onclick="toggleCode('M000065-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000065-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/specification.rb, line 67</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find_custom</span>(<span class="ruby-identifier">controller</span>)
@@ -330,11 +330,11 @@ finds the resource using the custom :find Proc or symbol
         </div>
       </div>
 
-      <div id="method-M000058" class="method-detail">
-        <a name="M000058"></a>
+      <div id="method-M000064" class="method-detail">
+        <a name="M000064"></a>
 
         <div class="method-heading">
-          <a href="#M000058" class="method-signature">
+          <a href="#M000064" class="method-signature">
           <span class="method-name">find_from</span><span class="method-args">(controller)</span>
           </a>
         </div>
@@ -345,8 +345,8 @@ given a controller object, returns the resource according to this
 specification
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000058-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000058-source">
+            onclick="toggleCode('M000064-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000064-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/specification.rb, line 62</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find_from</span>(<span class="ruby-identifier">controller</span>)
@@ -357,11 +357,11 @@ specification
         </div>
       </div>
 
-      <div id="method-M000060" class="method-detail">
-        <a name="M000060"></a>
+      <div id="method-M000066" class="method-detail">
+        <a name="M000066"></a>
 
         <div class="method-heading">
-          <a href="#M000060" class="method-signature">
+          <a href="#M000066" class="method-signature">
           <span class="method-name">find_resource</span><span class="method-args">(controller)</span>
           </a>
         </div>
@@ -372,8 +372,8 @@ finds the resource on a controller using enclosing resources or resource
 class
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000060-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000060-source">
+            onclick="toggleCode('M000066-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000066-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/specification.rb, line 73</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find_resource</span>(<span class="ruby-identifier">controller</span>)
@@ -384,11 +384,11 @@ class
         </div>
       </div>
 
-      <div id="method-M000057" class="method-detail">
-        <a name="M000057"></a>
+      <div id="method-M000063" class="method-detail">
+        <a name="M000063"></a>
 
         <div class="method-heading">
-          <a href="#M000057" class="method-signature">
+          <a href="#M000063" class="method-signature">
           <span class="method-name">singleton?</span><span class="method-args">()</span>
           </a>
         </div>
@@ -398,8 +398,8 @@ class
 returns false
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000057-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000057-source">
+            onclick="toggleCode('M000063-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000063-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/specification.rb, line 57</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">singleton?</span>

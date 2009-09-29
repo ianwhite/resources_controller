@@ -93,7 +93,7 @@ The idea is to decouple the <b>model name</b> from the action code.
 <p>
 Here&#8216;s how:
 </p>
-<h3>finding and making <a href="Actions.html#M000046">new</a> resources</h3>
+<h3>finding and making <a href="Actions.html#M000051">new</a> resources</h3>
 <p>
 Instead of this:
 </p>
@@ -150,13 +150,13 @@ do this:
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000048">create</a>&nbsp;&nbsp;
-      <a href="#M000050">destroy</a>&nbsp;&nbsp;
-      <a href="#M000047">edit</a>&nbsp;&nbsp;
-      <a href="#M000044">index</a>&nbsp;&nbsp;
-      <a href="#M000046">new</a>&nbsp;&nbsp;
-      <a href="#M000045">show</a>&nbsp;&nbsp;
-      <a href="#M000049">update</a>&nbsp;&nbsp;
+      <a href="#M000053">create</a>&nbsp;&nbsp;
+      <a href="#M000055">destroy</a>&nbsp;&nbsp;
+      <a href="#M000052">edit</a>&nbsp;&nbsp;
+      <a href="#M000049">index</a>&nbsp;&nbsp;
+      <a href="#M000051">new</a>&nbsp;&nbsp;
+      <a href="#M000050">show</a>&nbsp;&nbsp;
+      <a href="#M000054">update</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -178,11 +178,11 @@ do this:
     <div id="methods">
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000048" class="method-detail">
-        <a name="M000048"></a>
+      <div id="method-M000053" class="method-detail">
+        <a name="M000053"></a>
 
         <div class="method-heading">
-          <a href="#M000048" class="method-signature">
+          <a href="#M000053" class="method-signature">
           <span class="method-name">create</span><span class="method-args">()</span>
           </a>
         </div>
@@ -192,8 +192,8 @@ do this:
 POST /events POST /events.xml
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000048-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000048-source">
+            onclick="toggleCode('M000053-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000053-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/actions.rb, line 94</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create</span>
@@ -219,11 +219,11 @@ POST /events POST /events.xml
         </div>
       </div>
 
-      <div id="method-M000050" class="method-detail">
-        <a name="M000050"></a>
+      <div id="method-M000055" class="method-detail">
+        <a name="M000055"></a>
 
         <div class="method-heading">
-          <a href="#M000050" class="method-signature">
+          <a href="#M000055" class="method-signature">
           <span class="method-name">destroy</span><span class="method-args">()</span>
           </a>
         </div>
@@ -233,8 +233,8 @@ POST /events POST /events.xml
 DELETE /events/1 DELETE /events/1.xml
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000050-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000050-source">
+            onclick="toggleCode('M000055-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000055-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/actions.rb, line 136</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">destroy</span>
@@ -254,11 +254,11 @@ DELETE /events/1 DELETE /events/1.xml
         </div>
       </div>
 
-      <div id="method-M000047" class="method-detail">
-        <a name="M000047"></a>
+      <div id="method-M000052" class="method-detail">
+        <a name="M000052"></a>
 
         <div class="method-heading">
-          <a href="#M000047" class="method-signature">
+          <a href="#M000052" class="method-signature">
           <span class="method-name">edit</span><span class="method-args">()</span>
           </a>
         </div>
@@ -268,8 +268,8 @@ DELETE /events/1 DELETE /events/1.xml
 GET /events/1/edit
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000047-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000047-source">
+            onclick="toggleCode('M000052-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000052-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/actions.rb, line 83</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">edit</span>
@@ -285,11 +285,11 @@ GET /events/1/edit
         </div>
       </div>
 
-      <div id="method-M000044" class="method-detail">
-        <a name="M000044"></a>
+      <div id="method-M000049" class="method-detail">
+        <a name="M000049"></a>
 
         <div class="method-heading">
-          <a href="#M000044" class="method-signature">
+          <a href="#M000049" class="method-signature">
           <span class="method-name">index</span><span class="method-args">()</span>
           </a>
         </div>
@@ -299,8 +299,8 @@ GET /events/1/edit
 GET /events GET /events.xml
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000044-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000044-source">
+            onclick="toggleCode('M000049-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000049-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/actions.rb, line 49</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">index</span>
@@ -317,11 +317,11 @@ GET /events GET /events.xml
         </div>
       </div>
 
-      <div id="method-M000046" class="method-detail">
-        <a name="M000046"></a>
+      <div id="method-M000051" class="method-detail">
+        <a name="M000051"></a>
 
         <div class="method-heading">
-          <a href="#M000046" class="method-signature">
+          <a href="#M000051" class="method-signature">
           <span class="method-name">new</span><span class="method-args">()</span>
           </a>
         </div>
@@ -331,8 +331,8 @@ GET /events GET /events.xml
 GET /events/new
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000046-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000046-source">
+            onclick="toggleCode('M000051-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000051-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/actions.rb, line 72</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">new</span>
@@ -349,11 +349,11 @@ GET /events/new
         </div>
       </div>
 
-      <div id="method-M000045" class="method-detail">
-        <a name="M000045"></a>
+      <div id="method-M000050" class="method-detail">
+        <a name="M000050"></a>
 
         <div class="method-heading">
-          <a href="#M000045" class="method-signature">
+          <a href="#M000050" class="method-signature">
           <span class="method-name">show</span><span class="method-args">()</span>
           </a>
         </div>
@@ -363,8 +363,8 @@ GET /events/new
 GET /events/1 GET /events/1.xml
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000045-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000045-source">
+            onclick="toggleCode('M000050-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000050-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/actions.rb, line 61</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">show</span>
@@ -381,11 +381,11 @@ GET /events/1 GET /events/1.xml
         </div>
       </div>
 
-      <div id="method-M000049" class="method-detail">
-        <a name="M000049"></a>
+      <div id="method-M000054" class="method-detail">
+        <a name="M000054"></a>
 
         <div class="method-heading">
-          <a href="#M000049" class="method-signature">
+          <a href="#M000054" class="method-signature">
           <span class="method-name">update</span><span class="method-args">()</span>
           </a>
         </div>
@@ -395,8 +395,8 @@ GET /events/1 GET /events/1.xml
 PUT /events/1 PUT /events/1.xml
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000049-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000049-source">
+            onclick="toggleCode('M000054-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000054-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/ardes/resources_controller/actions.rb, line 115</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">update</span>

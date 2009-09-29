@@ -80,8 +80,8 @@
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000015">nested_in</a>&nbsp;&nbsp;
-      <a href="#M000016">resource_specification</a>&nbsp;&nbsp;
+      <a href="#M000020">nested_in</a>&nbsp;&nbsp;
+      <a href="#M000021">resource_specification</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -103,11 +103,11 @@
     <div id="methods">
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000015" class="method-detail">
-        <a name="M000015"></a>
+      <div id="method-M000020" class="method-detail">
+        <a name="M000020"></a>
 
         <div class="method-heading">
-          <a href="#M000015" class="method-signature">
+          <a href="#M000020" class="method-signature">
           <span class="method-name">nested_in</span><span class="method-args">(*names, &amp;block)</span>
           </a>
         </div>
@@ -121,14 +121,14 @@ This can be called with an array of symbols (in which case options
 can&#8216;t be specified) or a symbol with options.
 </p>
 <p>
-See <a href="Specification.html#M000055">Specification#new</a> for details
+See <a href="Specification.html#M000061">Specification#new</a> for details
 of how to call this.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000015-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000015-source">
+            onclick="toggleCode('M000020-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000020-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 511</span>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 513</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">nested_in</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">names</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
         <span class="ruby-identifier">options</span> = <span class="ruby-identifier">names</span>.<span class="ruby-identifier">extract_options!</span>
         <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;when giving more than one nesting, you may not specify options or a block&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">names</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-keyword kw">and</span> (<span class="ruby-identifier">block_given?</span> <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>)
@@ -152,11 +152,11 @@ of how to call this.
         </div>
       </div>
 
-      <div id="method-M000016" class="method-detail">
-        <a name="M000016"></a>
+      <div id="method-M000021" class="method-detail">
+        <a name="M000021"></a>
 
         <div class="method-heading">
-          <a href="#M000016" class="method-signature">
+          <a href="#M000021" class="method-signature">
           <span class="method-name">resource_specification</span><span class="method-args">()</span>
           </a>
         </div>
@@ -164,13 +164,13 @@ of how to call this.
         <div class="method-description">
           <p>
 return the class <a
-href="ClassMethods.html#M000016">resource_specification</a>
+href="ClassMethods.html#M000021">resource_specification</a>
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000016-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000016-source">
+            onclick="toggleCode('M000021-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000021-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 531</span>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 533</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">resource_specification</span>
         <span class="ruby-identifier">read_inheritable_attribute</span>(<span class="ruby-identifier">:resource_specification</span>)
       <span class="ruby-keyword kw">end</span>

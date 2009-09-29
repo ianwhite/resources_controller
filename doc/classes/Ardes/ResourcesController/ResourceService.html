@@ -82,7 +82,7 @@
       <p>
 Proxy class to provide a consistent API for resource_service. This is
 mostly required for Singleton resources. Also allows decoration of the
-resource <a href="ResourceService.html#M000068">service</a> with custom
+resource <a href="ResourceService.html#M000074">service</a> with custom
 finders
 </p>
 
@@ -95,11 +95,11 @@ finders
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000066">find</a>&nbsp;&nbsp;
-      <a href="#M000065">method_missing</a>&nbsp;&nbsp;
-      <a href="#M000064">new</a>&nbsp;&nbsp;
-      <a href="#M000067">respond_to?</a>&nbsp;&nbsp;
-      <a href="#M000068">service</a>&nbsp;&nbsp;
+      <a href="#M000072">find</a>&nbsp;&nbsp;
+      <a href="#M000071">method_missing</a>&nbsp;&nbsp;
+      <a href="#M000070">new</a>&nbsp;&nbsp;
+      <a href="#M000073">respond_to?</a>&nbsp;&nbsp;
+      <a href="#M000074">service</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -134,21 +134,21 @@ finders
     <div id="methods">
       <h3 class="section-bar">Public Class methods</h3>
 
-      <div id="method-M000064" class="method-detail">
-        <a name="M000064"></a>
+      <div id="method-M000070" class="method-detail">
+        <a name="M000070"></a>
 
         <div class="method-heading">
-          <a href="#M000064" class="method-signature">
+          <a href="#M000070" class="method-signature">
           <span class="method-name">new</span><span class="method-args">(controller)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000064-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000064-source">
+            onclick="toggleCode('M000070-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000070-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 829</span>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 765</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">controller</span>)
         <span class="ruby-ivar">@controller</span> = <span class="ruby-identifier">controller</span>
       <span class="ruby-keyword kw">end</span>
@@ -159,21 +159,21 @@ finders
 
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000066" class="method-detail">
-        <a name="M000066"></a>
+      <div id="method-M000072" class="method-detail">
+        <a name="M000072"></a>
 
         <div class="method-heading">
-          <a href="#M000066" class="method-signature">
+          <a href="#M000072" class="method-signature">
           <span class="method-name">find</span><span class="method-args">(*args, &amp;block)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000066-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000066-source">
+            onclick="toggleCode('M000072-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000072-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 837</span>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 773</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
         <span class="ruby-identifier">resource_specification</span>.<span class="ruby-identifier">find</span> <span class="ruby-value">? </span><span class="ruby-identifier">resource_specification</span>.<span class="ruby-identifier">find_custom</span>(<span class="ruby-identifier">controller</span>) <span class="ruby-operator">:</span> <span class="ruby-keyword kw">super</span>
       <span class="ruby-keyword kw">end</span>
@@ -182,21 +182,21 @@ finders
         </div>
       </div>
 
-      <div id="method-M000065" class="method-detail">
-        <a name="M000065"></a>
+      <div id="method-M000071" class="method-detail">
+        <a name="M000071"></a>
 
         <div class="method-heading">
-          <a href="#M000065" class="method-signature">
+          <a href="#M000071" class="method-signature">
           <span class="method-name">method_missing</span><span class="method-args">(*args, &amp;block)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000065-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000065-source">
+            onclick="toggleCode('M000071-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000071-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 833</span>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 769</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">method_missing</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
         <span class="ruby-identifier">service</span>.<span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
       <span class="ruby-keyword kw">end</span>
@@ -205,21 +205,21 @@ finders
         </div>
       </div>
 
-      <div id="method-M000067" class="method-detail">
-        <a name="M000067"></a>
+      <div id="method-M000073" class="method-detail">
+        <a name="M000073"></a>
 
         <div class="method-heading">
-          <a href="#M000067" class="method-signature">
+          <a href="#M000073" class="method-signature">
           <span class="method-name">respond_to?</span><span class="method-args">(method, include_private = false)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000067-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000067-source">
+            onclick="toggleCode('M000073-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000073-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 841</span>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 777</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">method</span>, <span class="ruby-identifier">include_private</span> = <span class="ruby-keyword kw">false</span>)
         <span class="ruby-keyword kw">super</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">service</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">method</span>)
       <span class="ruby-keyword kw">end</span>
@@ -228,21 +228,21 @@ finders
         </div>
       </div>
 
-      <div id="method-M000068" class="method-detail">
-        <a name="M000068"></a>
+      <div id="method-M000074" class="method-detail">
+        <a name="M000074"></a>
 
         <div class="method-heading">
-          <a href="#M000068" class="method-signature">
+          <a href="#M000074" class="method-signature">
           <span class="method-name">service</span><span class="method-args">()</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000068-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000068-source">
+            onclick="toggleCode('M000074-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000074-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 845</span>
+<span class="ruby-comment cmt"># File lib/ardes/resources_controller.rb, line 781</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">service</span>
         <span class="ruby-ivar">@service</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">enclosing_resource</span> <span class="ruby-value">? </span><span class="ruby-identifier">enclosing_resource</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">resource_specification</span>.<span class="ruby-identifier">source</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">resource_class</span>
       <span class="ruby-keyword kw">end</span>
