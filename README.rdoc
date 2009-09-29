@@ -7,6 +7,8 @@ See History.txt for recent changes.
 
 == Resources
 
+<b>Github</b> for code: http://github.com/ianwhite/resources_controller
+
 <b>API</b> docs: http://ianwhite.github.com/resources_controller/doc
 
 <b>Google group</b> for questions: http://groups.google.com/group/resources_controller
