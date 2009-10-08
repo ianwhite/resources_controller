@@ -1,3 +1,5 @@
+* Fix bug where id is the same name as the resource name [mocoso]
+
 * Bugs introduced with RequestPathIntrospection (#5 and #6 on lighthouse) solved thanks to Sergei Serdyuk
 
 * RC no longer uses the route that invoked the controller to figure out wildcard enclosing resources.

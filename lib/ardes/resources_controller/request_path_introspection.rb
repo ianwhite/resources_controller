@@ -29,7 +29,7 @@ module Ardes
       end
       
     private
-      def remove_current_segment(path, singleton = false)
+      def remove_current_segment(path)
         if respond_to?(:resource_specification) && resource_specification.singleton?
           path.sub(%r(/#{current_segment}(?!.*/#{current_segment}).*$), '')
         else
