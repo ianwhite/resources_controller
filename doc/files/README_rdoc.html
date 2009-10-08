@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>File: README.rdoc [Resources Controller API Documentation (2c87336)]</title>
+    <title>File: README.rdoc [Resources Controller API Documentation (14a40aa)]</title>
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
     <link href='../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>Tue Sep 29 09:38:02 +0100 2009</span>
+          <span class='datetime'>Thu Oct 08 09:28:49 -0400 2009</span>
         </div>
       </div>
       <div id='content'>
@@ -99,6 +99,17 @@
             href="http://github.com/ianwhite/garlic">github.com/ianwhite/garlic</a>) is
             used for CI. To run the CI suite have a look at garlic.rb
             </p>
+            <h2>How to contribute</h2>
+            <p>
+            If you have found a bug, or have a new feature, then spec&#8217;d code is
+            great. To make sure you haven&#8217;t broken rc, you want to run the ci
+            suite. This is pretty easy, you just need to install garlic, and run it in
+            a fresh checkout of rc. The first time it runs it will be a little slow, as
+            it needs to check out various git repos, but subsequent runs will be fast.
+            The following is how I work - you may want to only do a subset of this
+            stuff
+            </p>
+            <pre>sudo gem install garlic&#x000A;&#x000A;# add the following line to your ~/.profile&#x000A;  source `garlic --path`/sh/garlic.sh&#x000A;&#x000A;# reload your profile&#x000A;. ~/.profile&#x000A;&#x000A;# grab resources_controller and run the suite for the first time&#x000A;git clone git://github.com/ianwhite/resources_controller.git&#x000A;cd resources_controller&#x000A;garlic all&#x000A;&#x000A;# jump into 2-3 garlic work repo to make some changes&#x000A;gcdp 2-3&#x000A;&#x000A;# commit some stuff, run the specs with 'rake' etc&#x000A;&#x000A;# then push up to the local master repo&#x000A;gpush&#x000A;&#x000A;# go back to the local master, run garlic again, to see if the 2-3 changes affected anything else&#x000A;gup&#x000A;garlic</pre>
             <h2>Contributors</h2>
             <p>
             The following people have made contributions to resources_controller.
