@@ -11,7 +11,7 @@ module Ardes
       end
       
       def nesting_request_path
-        @nesting_request_path ||= remove_namespace(request_path.sub(%r(/#{current_segment}(?!.+/#{current_segment}).*$), ''))
+        @nesting_request_path ||= remove_namespace(remove_current_segment(request_path))
       end
       
       # returns an array of hashes like {:segment => 'forum', :singleton => false}
@@ -29,6 +29,14 @@ module Ardes
       end
       
     private
+      def remove_current_segment(path, singleton = false)
+        if respond_to?(:resource_specification) && resource_specification.singleton?
+          path.sub(%r(/#{current_segment}(?!.*/#{current_segment}).*$), '')
+        else
+          path.sub(%r(/#{current_segment}(?!.+/#{current_segment}).*$), '')
+        end
+      end
+      
       def current_segment
         respond_to?(:resource_specification) ? resource_specification.segment : controller_name
       end
