@@ -37,6 +37,38 @@ RSpec is used for testing, so the tests are in <tt>spec/</tt> rather than
 garlic (at http://github.com/ianwhite/garlic) is used for CI.  To run the CI suite have a look at
 garlic.rb
 
+== How to contribute
+
+If you have found a bug, or have a new feature, then spec'd code is great.  To make sure you haven't broken rc, you
+want to run the ci suite.  This is pretty easy, you just need to install garlic, and run it in a fresh checkout of rc.
+The first time it runs it will be a little slow, as it needs to check out various git repos, but subsequent runs will
+be fast.  The following is how I work - you may want to only do a subset of this stuff
+
+  sudo gem install garlic
+  
+  # add the following line to your ~/.profile
+    source `garlic --path`/sh/garlic.sh
+  
+  # reload your profile
+  . ~/.profile
+  
+  # grab resources_controller and run the suite for the first time
+  git clone git://github.com/ianwhite/resources_controller.git
+  cd resources_controller
+  garlic all
+  
+  # jump into 2-3 garlic work repo to make some changes
+  gcdp 2-3
+  
+  # commit some stuff, run the specs with 'rake' etc
+  
+  # then push up to the local master repo
+  gpush
+  
+  # go back to the local master, run garlic again, to see if the 2-3 changes affected anything else
+  gup
+  garlic
+
 == Contributors
 
 The following people have made contributions to resources_controller.  Please let me know if I've missed you out.
