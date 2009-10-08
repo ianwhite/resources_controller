@@ -11,7 +11,7 @@ module Ardes
       end
       
       def nesting_request_path
-        @nesting_request_path ||= remove_namespace(request_path.sub(%r(/#{current_segment}(?!.*/#{current_segment}).*$), ''))
+        @nesting_request_path ||= remove_namespace(request_path.sub(%r(/#{current_segment}(?!.+/#{current_segment}).*$), ''))
       end
       
       # returns an array of hashes like {:segment => 'forum', :singleton => false}
