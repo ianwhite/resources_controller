@@ -44,14 +44,14 @@ module RequestPathIntrospectionSpec
       end
 
       it "should remove the controller_name segment, even when id matches controller name" do
-        @controller.stub!(:request_path).and_return('/users/1/forums/forums.atom')
-        @controller.send(:nesting_request_path).should == '/users/1'
+        @controller.stub!(:request_path).and_return('/forums/1/forums/forums.atom')
+        @controller.send(:nesting_request_path).should == '/forums/1'
       end
 
       it "should remove only the controller_name segment even when nesting is same name" do
         @controller.stub!(:resource_specification).and_return(Ardes::ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :singleton => true))
-        @controller.stub!(:request_path).and_return('/users/1/forums/forums.atom')
-        @controller.send(:nesting_request_path).should == '/users/1/forums'
+        @controller.stub!(:request_path).and_return('/users/1/forum/forum.atom')
+        @controller.send(:nesting_request_path).should == '/users/1/forum'
       end
       
       it "should remove any controller namespace" do
