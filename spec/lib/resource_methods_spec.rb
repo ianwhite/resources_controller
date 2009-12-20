@@ -6,16 +6,18 @@ module ResourceMethodsSpec
     resources_controller_for :users
   end
   
-  describe "#new_resource" do
-    it "should accept block syntax" do
-      c = MyController.new
-      c.resource_service = User
-      c.stub!(:params).and_return({})
-      r = c.send(:new_resource) do |u|
-        u.login = "Fred"
+  if Rails.version >= "2.3"
+    describe "#new_resource" do
+      it "should accept block syntax" do
+        c = MyController.new
+        c.resource_service = User
+        c.stub!(:params).and_return({})
+        r = c.send(:new_resource) do |u|
+          u.login = "Fred"
+        end
+        r.should be_kind_of User
+        r.login.should == "Fred"
       end
-      r.should be_kind_of User
-      r.login.should == "Fred"
     end
   end
 end
