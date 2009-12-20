@@ -238,11 +238,13 @@ class OwnersController < ApplicationController
 end
 
 class PostsAbstractController < ApplicationController
+  include Ardes::ResourcesController::ResourceMethods
   attr_accessor :filter_trace
   
   # for testing filter load order
   before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :abstract}
-  
+
+protected
   # redefine find_resources
   def find_resources
     resource_service.find :all, :order => 'id DESC'

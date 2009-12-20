@@ -451,12 +451,17 @@ module Ardes#:nodoc:
         extend  ResourcesController::ClassMethods
         helper  ResourcesController::Helper
         include ResourcesController::InstanceMethods, ResourcesController::NamedRouteHelper
+        include ResourcesController::ResourceMethods unless included_modules.include?(ResourcesController::ResourceMethods)
       end
 
       before_filter(:load_enclosing_resources, when_options) unless load_enclosing_resources_filter_exists?
       
       write_inheritable_attribute(:specifications, [])
       specifications << '*' unless options.delete(:load_enclosing) == false
+      
+      unless (options.delete(:resource_methods) == false)
+        include ResourcesController::ResourceMethods
+      end
       
       unless (actions = options.delete(:actions)) == false
         actions ||= options[:singleton] ? Ardes::ResourcesController.singleton_actions : Ardes::ResourcesController.actions
@@ -550,33 +555,8 @@ module Ardes#:nodoc:
     end
     
     module InstanceMethods
-      def self.included(base)
-        base.class_eval do
-        protected
-          # we define the find|new_resource(s) methods only if they're not already defined
-          # this allows abstract controllers to define the resource service methods
-          unless instance_methods.include?('find_resources')
-            # finds the collection of resources
-            def find_resources
-              resource_service.find :all
-            end
-          end
-
-          unless instance_methods.include?('find_resource')
-            # finds the resource, using the passed id
-            def find_resource(id = params[:id])
-              resource_service.find id
-            end
-          end
-
-          unless instance_methods.include?('new_resource')
-            # makes a new resource, optionally using the passed hash
-            def new_resource(attributes = (params[resource_name] || {}), &block)
-              resource_service.new attributes, &block
-            end
-          end
-        end
-        base.send :hide_action, *instance_methods
+      def self.included(controller)
+        controller.send :hide_action, *instance_methods
       end
       
       def resource_service=(service)
