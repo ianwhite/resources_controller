@@ -6,7 +6,7 @@ module ResourceMethodsSpec
     resources_controller_for :users
   end
   
-  if Rails.version >= "2.3"
+  if Rails.respond_to?(:version) && Rails.version >= "2.3"
     describe "#new_resource" do
       it "should accept block syntax" do
         c = MyController.new
