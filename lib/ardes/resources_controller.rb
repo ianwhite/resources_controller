@@ -571,8 +571,8 @@ module Ardes#:nodoc:
 
           unless instance_methods.include?('new_resource')
             # makes a new resource, optionally using the passed hash
-            def new_resource(attributes = (params[resource_name] || {}))
-              resource_service.new attributes
+            def new_resource(attributes = (params[resource_name] || {}), &block)
+              resource_service.new attributes, &block
             end
           end
         end
