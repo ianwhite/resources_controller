@@ -1,3 +1,5 @@
+* Allow new_resource to use the block initialisation syntax in rails 2.3 (reported by Chris Hapgood)
+
 * Fix bug where id is the same name as the resource name [mocoso]
 
 * Bugs introduced with RequestPathIntrospection (#5 and #6 on lighthouse) solved thanks to Sergei Serdyuk
