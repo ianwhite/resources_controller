@@ -262,7 +262,7 @@ describe "Requesting /forums/2/posts/new using GET" do
   before(:each) do
     setup_mocks
     @post = mock('new Post')
-    @forum_posts.stub!(:new).and_return(@post)
+    @forum_posts.stub!(:build).and_return(@post)
   end
   
   def do_get
@@ -279,8 +279,8 @@ describe "Requesting /forums/2/posts/new using GET" do
     response.should render_template(:new)
   end
   
-  it "should create an new thing" do
-    @forum_posts.should_receive(:new).and_return(@post)
+  it "should build an new thing" do
+    @forum_posts.should_receive(:build).and_return(@post)
     do_get
   end
   
@@ -339,15 +339,15 @@ describe "Requesting /forums/2/posts using POST" do
     @post = mock('Post')
     @post.stub!(:save).and_return(true)
     @post.stub!(:to_param).and_return("1")
-    @forum_posts.stub!(:new).and_return(@post)
+    @forum_posts.stub!(:build).and_return(@post)
   end
   
   def do_post
     post :create, :post => {:name => 'Post'}, :forum_id => "2"
   end
   
-  it "should make a new post" do
-    @forum_posts.should_receive(:new).with({'name' => 'Post'}).and_return(@post)
+  it "should build a new post" do
+    @forum_posts.should_receive(:build).with({'name' => 'Post'}).and_return(@post)
     do_post
   end
 

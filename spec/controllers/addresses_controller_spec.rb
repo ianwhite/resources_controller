@@ -192,7 +192,7 @@ describe "Requesting /users/dave/addresses/new using GET" do
   before(:each) do
     setup_mocks
     @address = mock('new Address')
-    @user_addresses.stub!(:new).and_return(@address)
+    @user_addresses.stub!(:build).and_return(@address)
   end
   
   def do_get
@@ -210,7 +210,7 @@ describe "Requesting /users/dave/addresses/new using GET" do
   end
   
   it "should create an new thing" do
-    @user_addresses.should_receive(:new).and_return(@address)
+    @user_addresses.should_receive(:build).and_return(@address)
     do_get
   end
   
@@ -269,7 +269,7 @@ describe "Requesting /users/dave/addresses using POST" do
     @address = mock('Address')
     @address.stub!(:save).and_return(true)
     @address.stub!(:to_param).and_return("1")
-    @user_addresses.stub!(:new).and_return(@address)
+    @user_addresses.stub!(:build).and_return(@address)
   end
   
   def do_post
@@ -277,7 +277,7 @@ describe "Requesting /users/dave/addresses using POST" do
   end
   
   it "should create a new address" do
-    @user_addresses.should_receive(:new).with({'name' => 'Address'}).and_return(@address)
+    @user_addresses.should_receive(:build).with({'name' => 'Address'}).and_return(@address)
     do_post
   end
 

@@ -754,6 +754,11 @@ module Ardes#:nodoc:
         resource_specification.find ? resource_specification.find_custom(controller) : super
       end
       
+      # build association on the enclosing resource if there is one, otherwise call new
+      def new(*args, &block)
+        enclosing_resource ? service.build(*args, &block) : service.new(*args, &block)
+      end
+      
       def respond_to?(method, include_private = false)
         super || service.respond_to?(method)
       end
@@ -773,10 +778,10 @@ module Ardes#:nodoc:
           ResourcesController.raise_cant_find_singleton(controller.resource_name, controller.resource_class)
         end
       end
-
-      # build association on the enclosing resource if there is one
-      def new(*args)
-        enclosing_resource ? enclosing_resource.send("build_#{resource_specification.source}", *args) : super
+        
+      # build association on the enclosing resource if there is one, otherwise call new
+      def new(*args, &block)
+        enclosing_resource ? enclosing_resource.send("build_#{resource_specification.source}", *args, &block) : service.new(*args, &block)
       end
 
       def service

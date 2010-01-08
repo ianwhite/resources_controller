@@ -16,6 +16,8 @@ module Ardes
 
       # makes a new resource, if attributes are not supplied, determine them from the
       # params hash and the current resource_name
+      #
+      # resource_service transforms a #new message into #build for associations, or #new for classes
       def new_resource(attributes = nil, &block)
         attributes ||= (respond_to?(:params) && params[resource_name]) || {}
         resource_service.new attributes, &block

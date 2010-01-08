@@ -225,7 +225,7 @@ describe "Requesting /forums/3/posts/3/comments/new using GET" do
   before(:each) do
     setup_mocks
     @comment = mock('new Comment')
-    @post_comments.stub!(:new).and_return(@comment)
+    @post_comments.stub!(:build).and_return(@comment)
   end
   
   def do_get
@@ -242,8 +242,8 @@ describe "Requesting /forums/3/posts/3/comments/new using GET" do
     response.should render_template(:new)
   end
   
-  it "should create a new comment" do
-    @post_comments.should_receive(:new).and_return(@comment)
+  it "should build a new comment" do
+    @post_comments.should_receive(:build).and_return(@comment)
     do_get
   end
   
@@ -302,15 +302,15 @@ describe "Requesting /forums/3/posts/3/comments using POST" do
     @comment = mock('Comment')
     @comment.stub!(:save).and_return(true)
     @comment.stub!(:to_param).and_return("1")
-    @post_comments.stub!(:new).and_return(@comment)
+    @post_comments.stub!(:build).and_return(@comment)
   end
   
   def do_post
     post :create, :comment => {:name => 'Comment'}, :forum_id => '3', :post_id => '2'
   end
   
-  it "should create a new comment" do
-    @post_comments.should_receive(:new).with({'name' => 'Comment'}).and_return(@comment)
+  it "should build a new comment" do
+    @post_comments.should_receive(:build).with({'name' => 'Comment'}).and_return(@comment)
     do_post
   end
 

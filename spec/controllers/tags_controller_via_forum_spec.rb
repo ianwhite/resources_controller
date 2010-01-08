@@ -126,7 +126,7 @@ describe "Requesting /forums/1/tags/new using GET" do
   before(:each) do
     setup_mocks
     @tag = mock('Tag')
-    @forum_tags.stub!(:new).and_return(@tag)
+    @forum_tags.stub!(:build).and_return(@tag)
   end
   
   def do_get
@@ -154,8 +154,8 @@ describe "Requesting /forums/1/tags/new using GET" do
     response.should render_template('new')
   end
   
-  it "should create a new tag with params" do
-    @forum_tags.should_receive(:new).with("name" => "hello").and_return(@tag)
+  it "should build a new tag with params" do
+    @forum_tags.should_receive(:build).with("name" => "hello").and_return(@tag)
     do_get
   end
   
