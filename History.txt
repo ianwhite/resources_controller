@@ -1,3 +1,6 @@
+* ResourceMethods#new_resource looks in params[singular_resource_class_name] for attributes, which makes RC much
+  more compatible with form_for (reported by Jason Lee)
+
 * resource_service.new now calls #build if the service is an association, or #new otherwise (reported by Jason Lee)
 
   NOTE: this may break some of your specs if you are expecting, say, a POST action to call :new on an association.

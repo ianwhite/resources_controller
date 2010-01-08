@@ -15,11 +15,12 @@ module Ardes
       end
 
       # makes a new resource, if attributes are not supplied, determine them from the
-      # params hash and the current resource_name
-      #
-      # resource_service transforms a #new message into #build for associations, or #new for classes
+      # params hash and the current resource_class, or resource_name (the latter left in for BC)
       def new_resource(attributes = nil, &block)
-        attributes ||= (respond_to?(:params) && params[resource_name]) || {}
+        if attributes.blank? && respond_to?(:params)
+          resource_form_name = ActionController::RecordIdentifier.singular_class_name(resource_class)
+          attributes = params[resource_form_name] || params[resource_name] || {}
+        end
         resource_service.new attributes, &block
       end
     end
