@@ -20,7 +20,7 @@ Spec::Rake::SpecTask.new(:rcov) do |t|
   t.spec_files  = FileList['spec/**/*_spec.rb']
   t.rcov        = true
   t.rcov_dir    = 'doc/coverage'
-  t.rcov_opts   = ['--text-report', '--exclude', "spec/,rcov.rb,#{File.expand_path(File.join(File.dirname(__FILE__),'../../..'))}"] 
+  t.rcov_opts   = ['--text-report', '--exclude', "gems/,spec/,rcov.rb,#{File.expand_path(File.join(File.dirname(__FILE__),'../../..'))}"] 
 end
 
 namespace :rcov do
