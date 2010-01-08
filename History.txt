@@ -1,5 +1,8 @@
 * resource_service.new now calls #build if the service is an association, or #new otherwise (reported by Jason Lee)
 
+  NOTE: this may break some of your specs if you are expecting, say, a POST action to call :new on an association.
+        You just need to change the mocks to expect :build (when there's an enclosing resource, and resource_service.new is called)
+
 * resource methods (new_resource, find_resource, and find_resources) are now in a mixin so it's easier
   to override them.  Just include a new mixin after the resources_controller_for call, or add them to your
   action module.
