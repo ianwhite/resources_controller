@@ -278,12 +278,10 @@ module Ardes#:nodoc:
   #       resource_service.find :all, :order => params[:sort_by]
   #     end
   #
+  #     # you can call super to help yourself to the existing implementation
   #     def new_resource
-  #       returning resource_service.new(params[resource_name]) do |post|
-  #         post.ip_address = request.remote_ip
-  #       end
+  #       returning super {|r| r.ip_address = request.ip_address }
   #     end
-  #   end
   #
   # In the same way, you can override *find_resource*.
   #
