@@ -29,9 +29,4 @@ describe "resource_service in InfosController via Account(a user)" do
     lambda { @resource_service.destroy }.should change(Info, :count).by(-1)
     lambda { Info.find(@info.id) }.should raise_error(ActiveRecord::RecordNotFound)
   end
-
-  it "should call destroy_info on the account" do
-    @account.should_receive(:destroy_info)
-    @resource_service.destroy
-  end
 end

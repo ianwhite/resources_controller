@@ -40,12 +40,7 @@ describe "resource_service in InterestsController via Forum" do
     lambda { Interest.find(@interest.id) }.should raise_error(ActiveRecord::RecordNotFound)
   end
   
-  it "should call destory(id) on the forum's interests assoc" do
-    @forum.interests.should_receive(:destroy).with(@interest.id)
-    @resource_service.destroy(@interest.id)
-  end
-
-  it "should NOT destory the otehr interest with destroy(@other_interest.id)" do
+  it "should NOT destory the other interest with destroy(@other_interest.id)" do
     lambda { @resource_service.destroy(@other_interest.id) }.should raise_error
     Interest.find(@other_interest.id).should == @other_interest
   end

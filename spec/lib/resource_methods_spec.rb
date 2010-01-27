@@ -101,8 +101,9 @@ module ResourceMethodsSpec
         @controller.send :new_resource, {}
       end
 
-      it "#destroy_resource should call users.destroy_info" do
-        @user.should_receive(:destroy_info)
+      it "#destroy_resource should call user.info.destroy" do
+        @user.should_receive(:info).and_return(info = mock)
+        info.should_receive(:destroy)
         @controller.send(:destroy_resource)
       end
     end

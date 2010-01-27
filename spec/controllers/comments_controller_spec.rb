@@ -365,20 +365,15 @@ describe "Requesting /forums/3/posts/3/comments/1 using DELETE" do
   before(:each) do
     setup_mocks
     @comment = mock('Comment', :null_object => true)
-    @post_comments.stub!(:find).and_return(@comment)
+    @post_comments.stub!(:destroy).and_return(@comment)
   end
   
   def do_delete
     delete :destroy, :id => "1", :forum_id => '3', :post_id => '2'
   end
 
-  it "should find the comment requested" do
-    @post_comments.should_receive(:find).with("1").and_return(@comment)
-    do_delete
-  end
-  
-  it "should call destroy on the found comment" do
-    @comment.should_receive(:destroy)
+  it "should destroy the comment requested" do
+    @post_comments.should_receive(:destroy).with("1").and_return(@comment)
     do_delete
   end
   

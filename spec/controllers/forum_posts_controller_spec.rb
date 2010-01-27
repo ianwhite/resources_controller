@@ -413,20 +413,15 @@ describe "Requesting /forums/2/posts/1 using DELETE" do
   before(:each) do
     setup_mocks
     @post = mock('Post', :null_object => true)
-    @forum_posts.stub!(:find).and_return(@post)
+    @forum_posts.stub!(:destroy).and_return(@post)
   end
   
   def do_delete
     delete :destroy, :id => "1", :forum_id => "2"
   end
 
-  it "should find the post requested" do
-    @forum_posts.should_receive(:find).with("1").and_return(@post)
-    do_delete
-  end
-  
-  it "should call destroy on the found thing" do
-    @post.should_receive(:destroy)
+  it "should destroy the post requested" do
+    @forum_posts.should_receive(:destroy).with("1").and_return(@post)
     do_delete
   end
   

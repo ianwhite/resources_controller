@@ -8,8 +8,7 @@ module Ardes#:nodoc:
       # DELETE /event
       # DELETE /event.xml
       def destroy
-        self.resource = find_resource
-        resource.destroy
+        self.resource = destroy_resource
         respond_to do |format|
           format.html do
             flash[:notice] = "#{resource_name.humanize} was successfully destroyed."

@@ -782,6 +782,10 @@ module Ardes#:nodoc:
         enclosing_resource ? enclosing_resource.send("build_#{resource_specification.source}", *args, &block) : service.new(*args, &block)
       end
 
+      def destroy(*args)
+        find.destroy
+      end
+      
       def service
         resource_class
       end
