@@ -151,6 +151,7 @@ class Forum < ActiveRecord::Base
   has_many :posts
   has_many :tags, :as => :taggable
   has_many :interests, :as => :interested_in
+  has_many :users, :through => :posts
   belongs_to :owner, :class_name => "User"
 end
 
