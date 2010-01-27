@@ -24,6 +24,7 @@ module Ardes
         resource_service.new attributes, &block
       end
       
+      # destroys and returns the resource, using the passed id, defaults to the current params[:id]
       def destroy_resource(id = nil)
         id ||= respond_to?(:params) && params.is_a?(Hash) && params[:id]
         resource_service.destroy id

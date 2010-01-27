@@ -48,6 +48,8 @@ module Ardes#:nodoc:
         end
       end
 
+      # DEPRECATED: you should just be able to use <tt>form_for resource</tt>
+      #
       # Calls form_for with the apropriate action and method for the resource
       #
       # resource.new_record? is used to decide between a create or update action
