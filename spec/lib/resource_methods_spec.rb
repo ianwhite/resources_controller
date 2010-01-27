@@ -76,6 +76,38 @@ module ResourceMethodsSpec
     end
   end
   
+  class MySingletonController < ActionController::Base
+    resources_controller_for :info, :singleton => true
+  end
+  
+  describe "An rc for singleton :info" do
+    before do
+      @controller = MySingletonController.new
+    end
+      
+    describe "with an enclosing resource (a user)" do
+      before do
+        @user = User.create!
+        @controller.send :add_enclosing_resource, @user
+      end
+  
+      it "#find_resource should call user.info" do
+        @user.should_receive(:info)
+        @controller.send(:find_resource)
+      end
+
+      it "#new_resource({}) should call user.build_info({})" do
+        @user.should_receive(:build_info).with({})
+        @controller.send :new_resource, {}
+      end
+
+      it "#destroy_resource should call users.destroy_info" do
+        @user.should_receive(:destroy_info)
+        @controller.send(:destroy_resource)
+      end
+    end
+  end
+  
   module MyResourceMethods
   protected
     def new_resource(attrs = (params[resource_name] || {}), &block)
@@ -120,7 +152,7 @@ module ResourceMethodsSpec
     end
     
     it "#destroy_resource should call MyResourceMethods#destroy_resource" do
-      @controller.send(:destroy_resource).should == 'my destroy_resource'
+      @controller.send(:destroy_resource, 1).should == 'my destroy_resource'
     end
   end
 end

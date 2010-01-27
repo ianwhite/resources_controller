@@ -23,6 +23,11 @@ module Ardes
         end
         resource_service.new attributes, &block
       end
+      
+      def destroy_resource(id = nil)
+        id ||= respond_to?(:params) && params.present? && params[:id]
+        resource_service.destroy id
+      end
     end
   end
 end
