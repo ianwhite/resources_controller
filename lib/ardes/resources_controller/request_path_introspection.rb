@@ -19,9 +19,15 @@ module Ardes
         @nesting_segments ||= segments_for_path_and_keys(nesting_request_path, param_keys)
       end
       
+      # returns an array of segments correspopnding to the namespace of the controller.
+      # If your controller is at a non standard location wrt it's path, you can modify this array in a before filter
+      # to help resources_controller do the right thing
       def namespace_segments
-        namespace = controller_path.sub(%r(#{controller_name}$), '')
-        request_path =~ %r(^/#{namespace}) ? namespace.split('/') : []
+        unless @namespace_segments
+          namespace = controller_path.sub(%r(#{controller_name}$), '')
+          @namespace_segments = (request_path =~ %r(^/#{namespace}) ? namespace.split('/') : [])
+        end
+        @namespace_segments
       end
       
       def param_keys
