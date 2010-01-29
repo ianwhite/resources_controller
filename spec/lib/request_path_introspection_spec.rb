@@ -61,9 +61,14 @@ module RequestPathIntrospectionSpec
       end
     end
     
+    it "#namespace_segments should return [] segments if NOT present in request_path" do
+      @controller.stub!(:controller_path).and_return('some/name/space/forums')
+      @controller.stub!(:request_path).and_return('/SAM/name/space/users/1/secret/forums')
+      @controller.send(:namespace_segments).should == []
+    end
+    
     it "#namespace_segments should return namespace segments if present in request_path" do
       @controller.stub!(:controller_path).and_return('some/name/space/forums')
-      @controller.send(:namespace_segments).should == []
       @controller.stub!(:request_path).and_return('/some/name/space/users/1/secret/forums')
       @controller.send(:namespace_segments).should == ['some', 'name', 'space']
     end
