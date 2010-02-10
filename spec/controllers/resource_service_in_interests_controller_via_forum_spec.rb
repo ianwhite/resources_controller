@@ -44,4 +44,8 @@ describe "resource_service in InterestsController via Forum" do
     lambda { @resource_service.destroy(@other_interest.id) }.should raise_error
     Interest.find(@other_interest.id).should == @other_interest
   end
+  
+  it "should return the destroyed interest with destroy(@interest.id)" do
+    @resource_service.destroy(@interest.id).should == @interest
+  end
 end
