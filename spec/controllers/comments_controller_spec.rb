@@ -364,17 +364,20 @@ describe "Requesting /forums/3/posts/3/comments/1 using DELETE" do
 
   before(:each) do
     setup_mocks
-    @comment = mock('Comment', :null_object => true)
-    @post_comments.stub!(:destroy).and_return(@comment)
+    @comment = mock('Comment', :id => '1', :null_object => true)
+    @post_comments.stub!(:find).and_return(@comment)
+    @post_comments.stub!(:destroy)
   end
   
   def do_delete
     delete :destroy, :id => "1", :forum_id => '3', :post_id => '2'
   end
 
-  it "should destroy the comment requested" do
-    @post_comments.should_receive(:destroy).with("1").and_return(@comment)
+  it "should find and destroy the comment requested" do
+    @post_comments.should_receive(:find).with("1").and_return(@comment)
+    @post_comments.should_receive(:destroy).with("1")
     do_delete
+    assigns['comment'].should == @comment
   end
   
   it "should redirect to the comments list" do

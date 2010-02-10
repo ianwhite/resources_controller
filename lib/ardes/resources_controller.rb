@@ -757,6 +757,19 @@ module Ardes#:nodoc:
         enclosing_resource ? service.build(*args, &block) : service.new(*args, &block)
       end
       
+      # find the resource
+      # If we have a resource service, we call destroy on it with the reosurce id, so that any callbacks can be triggered
+      # Otherwise, just call destroy on the resource
+      def destroy(*args)
+        resource = find(*args)
+        if enclosing_resource
+          service.destroy(*args)
+          resource
+        else
+          resource.destroy
+        end
+      end
+        
       def respond_to?(method, include_private = false)
         super || service.respond_to?(method)
       end

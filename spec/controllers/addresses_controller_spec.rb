@@ -331,17 +331,20 @@ describe "Requesting /users/dave/addresses/1 using DELETE" do
 
   before(:each) do
     setup_mocks
-    @address = mock('Address', :null_object => true)
-    @user_addresses.stub!(:destroy).and_return(@address)
+    @address = mock('Address', :id => "1", :null_object => true)
+    @user_addresses.stub!(:find).and_return(@address)
+    @user_addresses.stub!(:destroy)
   end
   
   def do_delete
     delete :destroy, :id => "1", :user_id => "dave"
   end
 
-  it "should destroy the address requested" do
-    @user_addresses.should_receive(:destroy).with("1").and_return(@address)
+  it "should find and destroy the address requested" do
+    @user_addresses.should_receive(:find).with("1").and_return(@address)
+    @user_addresses.should_receive(:destroy).with("1")
     do_delete
+    assigns(:address).should == @address
   end
   
   it "should redirect to the things list" do

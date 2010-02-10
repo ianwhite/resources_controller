@@ -42,9 +42,10 @@ module ResourceMethodsSpec
         @controller.send(:new_resource, {})
       end
 
-      it "#destroy_resource(<id>) should call User.destroy(<id>)" do
-        User.should_receive(:destroy).with("42")
-        @controller.send(:destroy_resource, "42")
+      it "#destroy_resource(<id>) should call User.find(<id>).destroy" do
+        User.should_receive(:find).with("42").and_return(user = mock)
+        user.should_receive(:destroy).and_return(user)
+        @controller.send(:destroy_resource, "42").should == user
       end
     end
       
@@ -69,9 +70,10 @@ module ResourceMethodsSpec
         @controller.send :new_resource, {}
       end
 
-      it "#destroy_resource(<id>) should call forum.users.destroy(<id>)" do
-        @forum.users.should_receive(:destroy).with("42")
-        @controller.send(:destroy_resource, "42")
+      it "#destroy_resource(<id>) should call forum.users.find(<id>) and forum.users.destroy(<id>)" do
+        @forum.users.should_receive(:find).with("42").and_return(user = mock)
+        @forum.users.should_receive(:destroy).with("42").and_return(useless_array = mock)
+        @controller.send(:destroy_resource, "42").should == user
       end
     end
   end
