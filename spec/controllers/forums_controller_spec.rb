@@ -150,6 +150,12 @@ describe ForumsController, " (checking that non actions are hidden)" do
   end
 end
 
+describe ForumsController, " requesting garbage url" do
+  it "should raise ResourceMismatch" do
+    lambda { get :index, :resource_path => "/forums/\ncrayzeee" }.should raise_error(Ardes::ResourcesController::ResourceMismatch)
+  end
+end
+
 describe ForumsController, " requesting / (testing resource_path)" do
   it "should generate params { :controller => 'forums', :action => 'index', :resource_path => '/forums' } from GET /" do
     params_from(:get, "/").should == { :controller => 'forums', :action => 'index', :resource_path => '/forums' }
