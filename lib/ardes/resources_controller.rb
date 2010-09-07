@@ -740,7 +740,7 @@ module Ardes#:nodoc:
     
     # Proxy class to provide a consistent API for resource_service.  This is mostly
     # required for Singleton resources. Also allows decoration of the resource service with custom finders
-    class ResourceService < Builder::BlankSlate
+    class ResourceService < ActiveSupport::BasicObject
       attr_reader :controller
       delegate :resource_specification, :resource_class, :enclosing_resource, :to => :controller
       

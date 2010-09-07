@@ -2,34 +2,33 @@
 rspec_base = File.expand_path(File.dirname(__FILE__) + '/../rspec/lib')
 $LOAD_PATH.unshift(rspec_base) if File.exist?(rspec_base) and !$LOAD_PATH.include?(rspec_base)
 
-require 'spec/rake/spectask'
-require 'spec/rake/verify_rcov'
+require 'rspec/core/rake_task'
+#require 'spec/rake/verify_rcov'
 
 plugin_name = 'resources_controller'
 
 task :default => :spec
 
 desc "Run the specs for #{plugin_name}"
-Spec::Rake::SpecTask.new(:spec) do |t|
-  t.spec_files = FileList['spec/**/*_spec.rb']
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.pattern = 'spec/**/*_spec.rb'
   t.spec_opts  = ["--colour"]
 end
 
 desc "Generate RCov report for #{plugin_name}"
-Spec::Rake::SpecTask.new(:rcov) do |t|
-  t.spec_files  = FileList['spec/**/*_spec.rb']
+RSpec::Core::RakeTask.new(:rcov) do |t|
+  t.pattern  = 'spec/**/*_spec.rb'
   t.rcov        = true
-  t.rcov_dir    = 'doc/coverage'
-  t.rcov_opts   = ['--text-report', '--exclude', "gems/,spec/,rcov.rb,#{File.expand_path(File.join(File.dirname(__FILE__),'../../..'))}"] 
+  t.rcov_opts   = ['--output', 'doc/coverage','--text-report', '--exclude', "gems/,spec/,rcov.rb,#{File.expand_path(File.join(File.dirname(__FILE__),'../../..'))}"] 
 end
 
-namespace :rcov do
-  desc "Verify RCov threshold for #{plugin_name}"
-  RCov::VerifyTask.new(:verify => :rcov) do |t|
-    t.threshold = 100.0
-    t.index_html = File.join(File.dirname(__FILE__), 'doc/coverage/index.html')
-  end
-end
+# namespace :rcov do
+#   desc "Verify RCov threshold for #{plugin_name}"
+#   RCov::VerifyTask.new(:verify => :rcov) do |t|
+#     t.threshold = 100.0
+#     t.index_html = File.join(File.dirname(__FILE__), 'doc/coverage/index.html')
+#   end
+# end
 
 # load up the tasks for testing rspec generators against RC
 require File.join(File.dirname(__FILE__), 'spec/generate_rake_task')

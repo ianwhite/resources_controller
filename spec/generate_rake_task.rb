@@ -22,7 +22,7 @@ namespace :spec do
     begin
       require File.join(RAILS_ROOT, 'vendor/rails/activesupport/lib/activesupport')
     rescue Exception
-      require 'activesupport'
+      require 'active_support/all'
     end
   end
   
@@ -38,7 +38,7 @@ namespace :spec do
   
   def generate_resource(name)
     puts "** Generating rspec_scaffold for resource: #{name}"
-    `script/generate rspec_scaffold #{name.to_s.classify}`
+    `rails generate scaffold #{name.to_s.classify}`
   end
   
   def make_resources_controller(name)
