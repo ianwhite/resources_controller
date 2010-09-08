@@ -1,3 +1,5 @@
+* upgraded to Rails 3 and RSpec 2. No BC (as of yet).
+
 * added ResourceMethods#destroy_resource, which calls destroy on the resource_service, which in turn finds the best way to 
   destroy the resource to trigger any association callbacks.  Changed actions to use the destroy_resource method. (reported by Jason Lee)
   

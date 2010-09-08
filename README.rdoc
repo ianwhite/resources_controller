@@ -5,6 +5,30 @@ you override the default RESTful funtionality in a clean and simple manner.
 
 See History.txt for recent changes.
 
+== Rails 3 version
+
+Garlic doesn't work with Rails 3, so here's how to test resources_controller in the meantime.
+
+Generate a rails app:
+
+  rails new rc_test
+  
+and then add the following to the generated Gemfile:
+
+  gem 'rspec', '~> 2.0.0.beta.20'
+  gem 'rspec-rails', '~> 2.0.0.beta.20'
+
+Then run
+
+  bundle install
+  rails generate rspec:install
+
+Copy resources_controller into vendor/plugins and run
+
+  rake rcov:verify && rake spec:generate
+  
+from the resources_controller directory
+
 == Resources
 
 <b>Github</b> for code: http://github.com/ianwhite/resources_controller
