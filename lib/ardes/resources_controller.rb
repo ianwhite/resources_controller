@@ -1,3 +1,12 @@
+require 'ardes/resources_controller/actions'
+require 'ardes/resources_controller/helper'
+require 'ardes/resources_controller/include_actions'
+require 'ardes/resources_controller/named_route_helper'
+require 'ardes/resources_controller/request_path_introspection'
+require 'ardes/resources_controller/resource_methods'
+require 'ardes/resources_controller/singleton_actions'
+require 'ardes/resources_controller/specification'
+
 module Ardes#:nodoc:
   # With resources_controller (http://svn.ardes.com/rails_plugins/resources_controller) you can quickly add
   # an ActiveResource compliant controller for your your RESTful models.
