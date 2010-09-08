@@ -74,9 +74,11 @@ end
 
     # remove spec files
     rm "spec/models/#{name}_spec.rb"
-    rm "spec/fixtures/#{plural}.yml"
+    # rm "spec/fixtures/#{plural}.yml"
     rm Dir["spec/controllers/#{plural}*_spec.rb"]
     rm "spec/helpers/#{plural}_helper_spec.rb"
+    rm "spec/requests/#{plural}_spec.rb"
+    rm Dir["spec/routing/#{plural}*_spec.rb"]
     rm_rf "spec/views/#{plural}"
   end
 end

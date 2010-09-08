@@ -93,7 +93,7 @@ Currently:
         if enclosing_resource
           enclosing_route = name_prefix.sub(/_$/,'')
           route_method = method.to_s.sub(/enclosing_resource(s)?/) { $1 ? enclosing_route.pluralize : enclosing_route }
-          return [ActionController::Routing::Routes.named_routes.get(route_method.sub(/_(path|url)$/,'').to_sym), route_method]
+          return [Rails.application.routes.named_routes.get(route_method.sub(/_(path|url)$/,'').to_sym), route_method]
         else
           raise NoMethodError, "Tried to map :#{method} but there is no enclosing_resource for this controller"
         end
@@ -103,7 +103,7 @@ Currently:
       # return the [route, route_method]  for the expanded resource
       def route_and_method_from_resource_method_and_name_prefix(method, name_prefix)
         route_method = method.to_s.sub(/resource(s)?/) { $1 ? "#{name_prefix}#{route_name.pluralize}" : "#{name_prefix}#{route_name}" }
-        return [ActionController::Routing::Routes.named_routes.get(route_method.sub(/_(path|url)$/,'').to_sym), route_method]
+        return [Rails.application.routes.named_routes.get(route_method.sub(/_(path|url)$/,'').to_sym), route_method]
       end
       
       # defines a method that calls the appropriate named route method, with appropraite args.
@@ -124,7 +124,7 @@ Currently:
         name_prefix = method.to_s.sub(/^.*_for_/,'')
         if resource_method =~ /enclosing_resource/
           route, route_method = *route_and_method_from_enclosing_resource_method_and_name_prefix(resource_method, name_prefix)
-          required_args = (route.significant_keys - [:controller, :action, :format]).size
+          required_args = (route.segment_keys - [:format]).size
         
           self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
             def #{method}(*args)
@@ -137,7 +137,7 @@ Currently:
                   
         else
           route, route_method = *route_and_method_from_resource_method_and_name_prefix(resource_method, name_prefix)
-          required_args = (route.significant_keys - [:controller, :action, :format]).size
+          required_args = (route.segment_keys - [:format]).size
 
           self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
             def #{method}(*args)

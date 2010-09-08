@@ -46,7 +46,7 @@ describe "Helper#form_for_resource (when resource is new record)" do
     @specification = mock('Specification')
     @specification.stub!(:singleton?).and_return(false)
     @resource = mock('Forum')
-    @resource = mock('Forum', :null_object => true)
+    @resource = mock('Forum').as_null_object
     @resource.stub!(:new_record?).and_return(true)
     @controller.stub!(:resource).and_return(@resource)
     @controller.stub!(:resource_name).and_return('forum')
@@ -81,7 +81,7 @@ describe "Helper#form_for_resource (when resource is new record) and resource is
     @specification = mock('Specification')
     @specification.stub!(:singleton?).and_return(true)
     @resource = mock('Account')
-    @resource = mock('Account', :null_object => true)
+    @resource = mock('Account').as_null_object
     @resource.stub!(:new_record?).and_return(true)
     @controller.stub!(:resource).and_return(@resource)
     @controller.stub!(:resource_name).and_return('account')
@@ -103,7 +103,7 @@ describe "Helper#form_for_resource (when resource is existing record)" do
     @controller = mock('Controller')
     @specification = mock('Specification')
     @specification.stub!(:singleton?).and_return(false)
-    @resource = mock('Forum', :null_object => true)
+    @resource = mock('Forum').as_null_object
     @resource.stub!(:new_record?).and_return(false)
     @resource.stub!(:to_param).and_return("1")
     @controller.stub!(:resource).and_return(@resource)
@@ -126,7 +126,7 @@ describe "Helper#remote_form_for_resource (when resource is existing record)" do
     @controller = mock('Controller')
     @specification = mock('Specification')
     @specification.stub!(:singleton?).and_return(false)
-    @resource = mock('Forum', :null_object => true)
+    @resource = mock('Forum').as_null_object
     @resource.stub!(:new_record?).and_return(false)
     @resource.stub!(:to_param).and_return("1")
     @controller.stub!(:resource).and_return(@resource)

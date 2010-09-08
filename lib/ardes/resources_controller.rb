@@ -280,7 +280,7 @@ module Ardes#:nodoc:
   #
   #     # you can call super to help yourself to the existing implementation
   #     def new_resource
-  #       returning super {|r| r.ip_address = request.ip_address }
+  #       super.tap {|r| r.ip_address = request.ip_address }
   #     end
   #
   # In the same way, you can override *find_resource*.
@@ -452,7 +452,7 @@ module Ardes#:nodoc:
         include ResourcesController::ResourceMethods unless included_modules.include?(ResourcesController::ResourceMethods)
       end
 
-      before_filter(:load_enclosing_resources, when_options) unless load_enclosing_resources_filter_exists?
+      before_filter(:load_enclosing_resources, when_options.dup) unless load_enclosing_resources_filter_exists?
       
       write_inheritable_attribute(:specifications, [])
       specifications << '*' unless options.delete(:load_enclosing) == false
@@ -502,7 +502,7 @@ module Ardes#:nodoc:
       if respond_to?(:find_filter) # BC 2.0-stable branch
         find_filter(:load_enclosing_resources)
       else
-        filter_chain.detect {|c| c.method == :load_enclosing_resources}
+        _process_action_callbacks.detect {|c| c.filter == :load_enclosing_resources}
       end
     end
   
@@ -683,7 +683,7 @@ module Ardes#:nodoc:
         
         if resource_specification_map[segment]
           spec = resource_specification_map[segment]
-          spec = returning(spec.dup) {|s| s.as = as} if as
+          spec = spec.dup.tap {|s| s.as = as} if as
         else
           begin
             spec = Specification.new(singleton ? segment : segment.singularize, :singleton => singleton, :as => as)
@@ -715,7 +715,7 @@ module Ardes#:nodoc:
          
       def load_enclosing_resource_from_specification(spec)
         spec.segment == nesting_segments[enclosing_resources.size][:segment] or ResourcesController.raise_resource_mismatch(self)
-        returning spec.find_from(self) do |resource|
+        spec.find_from(self).tap do |resource|
           add_enclosing_resource(resource, :name => spec.name, :name_prefix => spec.name_prefix, :is_singleton => spec.singleton?, :as => spec.as)
         end
       end

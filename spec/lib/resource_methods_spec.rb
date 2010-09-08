@@ -24,6 +24,7 @@ module ResourceMethodsSpec
   describe "An rc for collection :users" do
     before do
       @controller = MyController.new
+      @controller.stub!(:params).and_return({})
     end
 
     describe "when no enclosing resource" do
@@ -33,7 +34,7 @@ module ResourceMethodsSpec
       end
     
       it "#find_resources should call User.find(:all)" do
-        User.should_receive(:find).with(:all)
+        User.should_receive(:all)
         @controller.send(:find_resources)
       end
 
@@ -61,7 +62,7 @@ module ResourceMethodsSpec
       end
   
       it "#find_resources should call forum.users.find(:all)" do
-        @forum.users.should_receive(:find).with(:all)
+        @forum.users.should_receive(:all)
         @controller.send(:find_resources)
       end
 
@@ -85,6 +86,7 @@ module ResourceMethodsSpec
   describe "An rc for singleton :info" do
     before do
       @controller = MySingletonController.new
+      @controller.stub!(:params).and_return({})
     end
       
     describe "with an enclosing resource (a user)" do
@@ -140,6 +142,7 @@ module ResourceMethodsSpec
     before do
       @controller = MyControllerWithMyResourceMethods.new
       @controller.resource_service = User
+      @controller.stub!(:params).and_return({})
     end
     
     it "#new_resource should call MyResourceMethods#new_resource" do

@@ -4,8 +4,8 @@
 # Routing
 ##########
 
-ActionController::Routing::Routes.clear!
-ActionController::Routing::Routes.draw do |map|
+Rails.application.routes.clear!
+Rails.application.routes.draw do |map|
   # this tests :resource_path (or :erp), for named routes that map to resources
   map.root :controller => 'forums', :action => 'index', :resource_path => '/forums'
   map.create_forum 'create_forum', :controller => 'forums', :action => 'create', :resource_path => '/forums', :resource_method => :post

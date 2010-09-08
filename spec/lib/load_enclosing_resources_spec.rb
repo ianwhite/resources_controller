@@ -4,6 +4,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
 module LoadEnclosingResourcesSpecHelper
   def setup_tags_controller(options = {})
     @klass = Class.new(ActionController::Base)
+    @klass.stub!(:anonymous?).and_return(false)
     @klass.resources_controller_for :tags, options
     setup_common
   end
@@ -13,7 +14,7 @@ module LoadEnclosingResourcesSpecHelper
     @controller.stub!(:request_path).and_return('')
     # stub :load_enclosing_resource_from_specification, increase enclosing_resources by one, and return a mock resource
     @controller.stub!(:load_enclosing_resource_from_specification).and_return do |name, _|
-      returning mock("resource: #{name}") do |resource|
+      mock("resource: #{name}").tap do |resource|
         @controller.enclosing_resources << resource
       end
     end
@@ -197,7 +198,7 @@ describe "#load_enclosing_resources for resources_controller_for :tags, :in => [
   
   it "should call load_enclosing_resource_from_specification with user spec, then load_wildcard once with 'taggable'" do
     @controller.should_receive(:load_enclosing_resource_from_specification).with(@user_spec).once.ordered do
-      returning(mock('user')){|r| @controller.enclosing_resources << r }
+      mock('user').tap {|r| @controller.enclosing_resources << r }
     end
     @controller.should_receive(:load_wildcard).with('taggable').once.ordered
     @controller.send(:load_enclosing_resources)
@@ -236,8 +237,8 @@ describe "ResourcesController.load_enclosing_resources_filter_exists?" do
       end
     end
         
-    it "should call :filter_chain" do
-      @klass.should_receive(:filter_chain).and_return([])
+    it "should call :_process_action_callbacks" do
+      @klass.should_receive(:_process_action_callbacks).and_return([])
       @klass.send(:load_enclosing_resources_filter_exists?)
     end
   end
