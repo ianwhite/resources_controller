@@ -1,9 +1,19 @@
 # Testing app setup
 
+module ResourcesControllerTest
+  class Application < Rails::Application
+    config.paths.database = File.expand_path('../app/database.yml', __FILE__)
+    config.paths.log = File.expand_path('../../../tmp/log', __FILE__)
+  end
+end
+
+ResourcesControllerTest::Application.initialize!
+
 ##########
 # Routing
 ##########
 
+Rails.application
 Rails.application.routes.clear!
 Rails.application.routes.draw do |map|
   # this tests :resource_path (or :erp), for named routes that map to resources
