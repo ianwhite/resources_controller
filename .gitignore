@@ -2,3 +2,4 @@ doc/*
 .bundle
 .rvmrc
 tmp/*
+.yardoc

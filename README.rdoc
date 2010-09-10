@@ -7,33 +7,15 @@ See History.txt for recent changes.
 
 == Rails 3 version
 
-Garlic doesn't work with Rails 3, so here's how to test resources_controller in the meantime.
-
-Generate a rails app:
-
-  rails new rc_test
+Run the tests
   
-and then add the following to the generated Gemfile:
-
-  gem 'rspec', '~> 2.0.0.beta.20'
-  gem 'rspec-rails', '~> 2.0.0.beta.20'
-
-Then run
-
-  bundle install
-  rails generate rspec:install
-
-Copy resources_controller into vendor/plugins and run
-
-  rake rcov:verify && rake spec:generate
-  
-from the resources_controller directory
+  rake spec:all
 
 == Resources
 
 <b>Github</b> for code: http://github.com/ianwhite/resources_controller
 
-<b>API</b> docs: http://ianwhite.github.com/resources_controller/doc
+<b>Rdoc.info</b> docs: http://rdoc.info/github/ianwhite/resources_controller/master/frames
 
 <b>Google group</b> for questions: http://groups.google.com/group/resources_controller
 
@@ -43,23 +25,15 @@ from the resources_controller directory
 
 <b>RailsConfEurope</b> presentation files: http://en.oreilly.com/railseurope2008/public/schedule/detail/3536
 
-== works with rails 2.x
+== for rails 2.x
 
-resources_controller works with rails 2.x, and is currently tested against 2.0, 2.1, 2.2, and 2.3 stable branches
+use the rails2 branch: http://github.com/ianwhite/resources_controller/tree/rails2
 
 == Specs and Coverage
 
 * The SPECDOC lists the specifications
 * Coverage is 100% (C0), and the spec suite is quite comprehensive
 * Rspec's generated rspec_scaffold controller specs are tested against a simple rc controller (see rake spec:generate)
-
-RSpec is used for testing, so the tests are in <tt>spec/</tt> rather than
-<tt>test/</tt> Do rake --tasks for more details.
-
-== Continuous Integration
-
-garlic (at http://github.com/ianwhite/garlic) is used for CI.  To run the CI suite have a look at
-garlic.rb
 
 == How to contribute
 
@@ -68,35 +42,11 @@ want to run the ci suite.  This is pretty easy, you just need to install garlic,
 The first time it runs it will be a little slow, as it needs to check out various git repos, but subsequent runs will
 be fast.  The following is how I work - you may want to only do a subset of this stuff
 
-  sudo gem install garlic
-  
-  # add the following line to your ~/.profile
-    source `garlic --path`/sh/garlic.sh
-  
-  # reload your profile
-  . ~/.profile
-  
-  # grab resources_controller and run the suite for the first time
-  git clone git://github.com/ianwhite/resources_controller.git
-  cd resources_controller
-  garlic all
-  
-  # jump into 2-3 garlic work repo to make some changes
-  gcdp 2-3
-  
-  # commit some stuff, run the specs with 'rake' etc
-  
-  # then push up to the local master repo
-  gpush
-  
-  # go back to the local master, run garlic again, to see if the 2-3 changes affected anything else
-  gup
-  garlic
-
 == Contributors
 
 The following people have made contributions to resources_controller.  Please let me know if I've missed you out.
 
+* Andrew Bloomgarden
 * Chris Hapgood
 * Jason Lee
 * Richard Hooker
