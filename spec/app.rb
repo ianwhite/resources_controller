@@ -2,8 +2,8 @@
 
 module ResourcesControllerTest
   class Application < Rails::Application
-    config.paths.database = File.expand_path('../app/database.yml', __FILE__)
-    config.paths.log = File.expand_path('../../../tmp/log', __FILE__)
+    paths.config.database = File.expand_path('../app/database.yml', __FILE__)
+    paths.log = File.expand_path('../../../tmp/log', __FILE__)
   end
 end
 

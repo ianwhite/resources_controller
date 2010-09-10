@@ -1,10 +1,9 @@
 namespace :spec do
   desc "Run rspec's generated specs against RC'd controllers"
-  task :generate do
-    RAILS_ROOT = File.expand_path("../../..") # relative to the rc Rakefile
-    require_activesupport
-    
-    cd RAILS_ROOT do
+  task :generate => 'tmp/test_app' do
+    require 'active_support/all'
+
+    cd 'tmp/test_app' do
       begin
         generate_resource :author
         migrate_up
@@ -17,12 +16,33 @@ namespace :spec do
       end
     end
   end
+
+  desc "make a test rails app in tmp/test_app"
+  task :make_test_app => ['spec:clobber_test_app', 'tmp/test_app' ]
   
-  def require_activesupport
-    begin
-      require File.join(RAILS_ROOT, 'vendor/rails/activesupport/lib/activesupport')
-    rescue Exception
-      require 'active_support/all'
+  task :clobber_test_app do
+    rm_rf 'tmp/test_app'
+  end
+  
+  file 'tmp/test_app' do
+    puts "Generating test app"
+    cd 'tmp' do
+      system "rails new test_app"
+      
+      cd 'test_app' do
+        File.open('Gemfile', 'w+') do |file|
+          file << <<-EOD
+            source :rubygems
+            gem 'rails', '3.0.0'
+            gem 'sqlite3-ruby'
+            gem 'rspec', '~>2.0.0.beta.20'
+            gem 'rspec-rails', '~>2.0.0.beta.20'
+            gem 'resources_controller', :git => '../../../resources_controller'
+          EOD
+        end
+        system "bundle"
+        system "rails g rspec:install"
+      end
     end
   end
   

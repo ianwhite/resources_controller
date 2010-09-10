@@ -1,21 +1,13 @@
-# use pluginized rpsec if it exists
-rspec_base = File.expand_path(File.dirname(__FILE__) + '/../rspec/lib')
-$LOAD_PATH.unshift(rspec_base) if File.exist?(rspec_base) and !$LOAD_PATH.include?(rspec_base)
-
 require 'rspec/core/rake_task'
 require 'spec/verify_rcov' # a local file future-ported from RSpec 1.x
 
-plugin_name = 'resources_controller'
-
 task :default => :spec
 
-desc "Run the specs for #{plugin_name}"
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = 'spec/**/*_spec.rb'
   t.spec_opts  = ["--colour"]
 end
 
-desc "Generate RCov report for #{plugin_name}"
 RSpec::Core::RakeTask.new(:rcov) do |t|
   t.pattern  = 'spec/**/*_spec.rb'
   t.rcov        = true
@@ -23,7 +15,6 @@ RSpec::Core::RakeTask.new(:rcov) do |t|
 end
 
 namespace :rcov do
-  desc "Verify RCov threshold for #{plugin_name}"
   RCov::VerifyTask.new(:verify => :rcov) do |t|
     t.threshold = 100.0
     t.index_html = File.join(File.dirname(__FILE__), 'doc/coverage/index.html')
@@ -31,65 +22,4 @@ namespace :rcov do
 end
 
 # load up the tasks for testing rspec generators against RC
-require File.join(File.dirname(__FILE__), 'spec/generate_rake_task')
-
-task :rdoc => 'doc:build'
-task :doc => 'doc:build'
-
-begin
-  require 'hanna/rdoctask'
-rescue LoadError
-  require 'rake/rdoctask'
-end
-
-namespace :doc do
-  
-  current_sha = `git log HEAD -1 --pretty=format:"%H"`[0..6]
-  
-  Rake::RDocTask.new(:build) do |d|
-    d.rdoc_dir = 'doc'
-    d.title    = "Resources Controller API Documentation (#{current_sha})"
-    d.main     = 'README.rdoc'
-    d.rdoc_files.include('README.rdoc', 'History.txt', 'License.txt', 'Todo.txt', 'lib/**/*.rb')
-    d.options << '--line-numbers' << '--inline-source'
-    d.options << '-A cattr_accessor=object'
-    d.options << '--charset' << 'utf-8'
-  end
-  
-  task :push => 'doc:build' do
-    mv 'doc', 'newdoc'
-    on_gh_pages do
-      if doc_changed_sha?('newdoc', 'doc')
-        puts "doc has changed, pushing to gh-pages"
-        `rm -rf doc && mv newdoc doc`
-        `git add doc`
-        `git commit -a -m "Update API docs"`
-        `git push`
-      else
-        puts "doc is unchanged"
-        rm_rf 'newdoc'
-      end
-    end
-  end
-  
-  def doc_changed_sha?(docpath1, docpath2)
-    `cat #{docpath1}/index.html | grep "<title>"` != `cat #{docpath2}/index.html | grep "<title>"`
-  end
-  
-  def on_gh_pages(&block)
-    `git branch -m gh-pages orig-gh-pages > /dev/null 2>&1`
-    `git checkout -b gh-pages origin/gh-pages`
-    `git pull`
-    yield
-  ensure
-    `git checkout master`
-    `git branch -D gh-pages`
-    `git branch -m orig-gh-pages gh-pages > /dev/null 2>&1`
-  end
-end
-
-task :cruise do
-  sh "garlic clean && garlic all"
-  Rake::Task['doc:push'].invoke
-  puts "The build is GOOD"
-end
+require 'spec/rspec_generator_task'
