@@ -37,7 +37,7 @@ namespace :spec do
             gem 'sqlite3-ruby'
             gem 'rspec', '~>2.0.0.beta.20'
             gem 'rspec-rails', '~>2.0.0.beta.20'
-            gem 'resources_controller', :git => '../../../resources_controller/'
+            gem 'resources_controller', :git => "#{File.expand_path('../../../..', __FILE__)}"
           EOD
         end
         system "bundle"
