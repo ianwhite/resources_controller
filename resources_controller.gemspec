@@ -1,16 +1,16 @@
 # -*- encoding: utf-8 -*-
 
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
-VERSION = "2.0.0"
+version = "2.0.0"
 
 Gem::Specification.new do |s|
   s.name        = "resources_controller"
-  s.version     = VERSION
+  s.version     = version
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Ian White"]
   s.email       = "ian.w.white@gmail.com"
   s.homepage    = "http://github.com/ianwhite/resources_controller"
-  s.summary     = "resources_controller-#{VERSION}"
+  s.summary     = "resources_controller-#{version}"
   s.description = "rc makes RESTful controllers fun"
 
   s.rubygems_version   = "1.3.7"
