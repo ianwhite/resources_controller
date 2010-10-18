@@ -11,7 +11,7 @@ module LoadEnclosingResourcesSpecHelper
 
   def setup_common
     @controller = @klass.new
-    @controller.stub!(:request_path).and_return('')
+    @controller.stub!(:path_of_request).and_return('')
     # stub :load_enclosing_resource_from_specification, increase enclosing_resources by one, and return a mock resource
     @controller.stub!(:load_enclosing_resource_from_specification).and_return do |name, _|
       mock("resource: #{name}").tap do |resource|

@@ -15,61 +15,61 @@ module RequestPathIntrospectionSpec
       @controller.stub!(:request).and_return(mock('request', :path => '/forums'))
     end
     
-    describe "#request_path" do
+    describe "#path_of_request" do
       it "should default to request.path" do
-        @controller.send(:request_path).should == '/forums'
+        @controller.send(:path_of_request).should == '/forums'
       end
       
       it " should be params[:resource_path], when set" do
         @controller.params[:resource_path] = '/foo'
-        @controller.send(:request_path).should == '/foo'
+        @controller.send(:path_of_request).should == '/foo'
       end
     end
     
-    describe "#nesting_request_path" do
+    describe "#nesting_path_of_request" do
       it "should remove the controller_name segment" do
-        @controller.stub!(:request_path).and_return('/users/1/forums/2')
-        @controller.send(:nesting_request_path).should == '/users/1'
+        @controller.stub!(:path_of_request).and_return('/users/1/forums/2')
+        @controller.send(:nesting_path_of_request).should == '/users/1'
       end
       
       it "when resource_specification present, whould remove taht segment" do
         @controller.stub!(:resource_specification).and_return(Ardes::ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :segment => 'foromas'))
-        @controller.stub!(:request_path).and_return('/users/1/foromas/2')
-        @controller.send(:nesting_request_path).should == '/users/1'
+        @controller.stub!(:path_of_request).and_return('/users/1/foromas/2')
+        @controller.send(:nesting_path_of_request).should == '/users/1'
       end
       
       it "should remove only the controller_name segment, when nesting is same name" do
-        @controller.stub!(:request_path).and_return('/forums/1/forums/2')
-        @controller.send(:nesting_request_path).should == '/forums/1'
+        @controller.stub!(:path_of_request).and_return('/forums/1/forums/2')
+        @controller.send(:nesting_path_of_request).should == '/forums/1'
       end
 
       it "should remove the controller_name segment, even when id matches controller name" do
-        @controller.stub!(:request_path).and_return('/forums/1/forums/forums.atom')
-        @controller.send(:nesting_request_path).should == '/forums/1'
+        @controller.stub!(:path_of_request).and_return('/forums/1/forums/forums.atom')
+        @controller.send(:nesting_path_of_request).should == '/forums/1'
       end
 
       it "should remove only the controller_name segment even when nesting is same name" do
         @controller.stub!(:resource_specification).and_return(Ardes::ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :singleton => true))
-        @controller.stub!(:request_path).and_return('/users/1/forum/forum.atom')
-        @controller.send(:nesting_request_path).should == '/users/1/forum'
+        @controller.stub!(:path_of_request).and_return('/users/1/forum/forum.atom')
+        @controller.send(:nesting_path_of_request).should == '/users/1/forum'
       end
       
       it "should remove any controller namespace" do
         @controller.stub!(:controller_path).and_return('some/name/space/forums')
-        @controller.stub!(:request_path).and_return('/some/name/space/users/1/secret/forums')
-        @controller.send(:nesting_request_path).should == '/users/1/secret'
+        @controller.stub!(:path_of_request).and_return('/some/name/space/users/1/secret/forums')
+        @controller.send(:nesting_path_of_request).should == '/users/1/secret'
       end
     end
     
-    it "#namespace_segments should return [] segments if NOT present in request_path" do
+    it "#namespace_segments should return [] segments if NOT present in path_of_request" do
       @controller.stub!(:controller_path).and_return('some/name/space/forums')
-      @controller.stub!(:request_path).and_return('/SAM/name/space/users/1/secret/forums')
+      @controller.stub!(:path_of_request).and_return('/SAM/name/space/users/1/secret/forums')
       @controller.send(:namespace_segments).should == []
     end
     
-    it "#namespace_segments should return namespace segments if present in request_path" do
+    it "#namespace_segments should return namespace segments if present in path_of_request" do
       @controller.stub!(:controller_path).and_return('some/name/space/forums')
-      @controller.stub!(:request_path).and_return('/some/name/space/users/1/secret/forums')
+      @controller.stub!(:path_of_request).and_return('/some/name/space/users/1/secret/forums')
       @controller.send(:namespace_segments).should == ['some', 'name', 'space']
     end
     

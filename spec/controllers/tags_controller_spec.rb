@@ -9,7 +9,7 @@ describe TagsController do
       @tag.stub!(:to_param).and_return('2')
       Tag.stub!(:find).and_return(@tag)
     
-      @controller.stub!(:request_path).and_return('/tags/2')
+      @controller.stub!(:path_of_request).and_return('/tags/2')
       get :show, :id => "2"
     end
   
@@ -67,7 +67,7 @@ describe TagsController do
     end
   
     def do_get
-      @controller.stub!(:request_path).and_return('/tags/index')
+      @controller.stub!(:path_of_request).and_return('/tags/index')
       get :index
     end
 

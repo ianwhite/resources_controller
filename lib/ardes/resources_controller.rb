@@ -849,7 +849,7 @@ end_str
       def raise_resource_mismatch(controller) #:nodoc:
         raise ResourceMismatch, <<-end_str
 resources_controller can't match the route to the resource specification
-  path:         #{controller.send(:request_path)}
+  path:         #{controller.send(:path_of_request)}
   specification: enclosing: [#{controller.specifications.collect{|s| s.is_a?(Specification) ? ":#{s.segment}" : s}.join(', ')}], resource :#{controller.resource_specification.segment}
   
 the successfully loaded enclosing resources are: #{controller.enclosing_resources.join(', ')}

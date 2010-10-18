@@ -25,7 +25,7 @@ describe TagsController do
       @tag.stub!(:to_param).and_return('2')
       @info_tags.stub!(:find).and_return(@tag)
     
-      @controller.stub!(:request_path).and_return('/account/info/tags/2')
+      @controller.stub!(:path_of_request).and_return('/account/info/tags/2')
       get :show, :id => 2
     end
   
@@ -68,7 +68,7 @@ describe TagsController do
       @other_tag = Tag.create
     
       @controller.instance_variable_set('@current_user', @account)
-      @controller.stub!(:request_path).and_return('/account/info/tags')
+      @controller.stub!(:path_of_request).and_return('/account/info/tags')
       get :index
       @resource_service = controller.send :resource_service
     end
@@ -105,7 +105,7 @@ describe TagsController do
     end
   
     def do_get
-      @controller.stub!(:request_path).and_return('/account/info/tags')
+      @controller.stub!(:path_of_request).and_return('/account/info/tags')
       get :index
     end
 

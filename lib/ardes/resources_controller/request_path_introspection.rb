@@ -6,17 +6,17 @@ module Ardes
     # these methods are aware of resource specifications specified either by map_enclosing_resource.
     module RequestPathIntrospection
     protected
-      def request_path
-        @request_path ||= params[:resource_path] || request.path
+      def path_of_request
+        @path_of_request ||= params[:resource_path] || request.path
       end
       
-      def nesting_request_path
-        @nesting_request_path ||= remove_namespace(remove_current_segment(request_path))
+      def nesting_path_of_request
+        @nesting_path_of_request ||= remove_namespace(remove_current_segment(path_of_request))
       end
       
       # returns an array of hashes like {:segment => 'forum', :singleton => false}
       def nesting_segments
-        @nesting_segments ||= segments_for_path_and_keys(nesting_request_path, param_keys)
+        @nesting_segments ||= segments_for_path_and_keys(nesting_path_of_request, param_keys)
       end
       
       # returns an array of segments correspopnding to the namespace of the controller.
@@ -25,7 +25,7 @@ module Ardes
       def namespace_segments
         unless @namespace_segments
           namespace = controller_path.sub(%r(#{controller_name}$), '')
-          @namespace_segments = (request_path =~ %r(^/#{namespace}) ? namespace.split('/') : [])
+          @namespace_segments = (path_of_request =~ %r(^/#{namespace}) ? namespace.split('/') : [])
         end
         @namespace_segments
       end

@@ -27,7 +27,7 @@ describe TagsController do
       @tag.stub!(:to_param).and_return('3')
       @post_tags.stub!(:find).and_return(@tag)
     
-      @controller.stub!(:request_path).and_return('/forums/1/posts/1/tags/3')
+      @controller.stub!(:path_of_request).and_return('/forums/1/posts/1/tags/3')
       get :show, :forum_id => "1", :post_id => "2", :id => "3"
     end
   
@@ -69,7 +69,7 @@ describe TagsController do
       @other_post  = Post.create :forum_id => @forum.id
       @other_tag   = Tag.create :taggable_id => @other_post.id, :taggable_type => 'Post'
     
-      @controller.stub!(:request_path).and_return("/forums/:id/posts/:id/tags")
+      @controller.stub!(:path_of_request).and_return("/forums/:id/posts/:id/tags")
       get :index, :forum_id => @forum.id, :post_id => @post.id
       @resource_service = controller.send :resource_service
     end
@@ -106,7 +106,7 @@ describe TagsController do
     end
   
     def do_get
-      @controller.stub!(:request_path).and_return("/forums/1/posts/2/tags")
+      @controller.stub!(:path_of_request).and_return("/forums/1/posts/2/tags")
       get :index, :forum_id => '1', :post_id => '2'
     end
 

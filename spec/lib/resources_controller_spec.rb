@@ -22,7 +22,7 @@ describe "ResourcesController#enclosing_resource_name" do
     @controller = TagsController.new
     info = mock_model(Info, :tags => [])
     @controller.stub!(:current_user).and_return(mock_model(User, :info => info))
-    @controller.stub!(:request_path).and_return('/account/info/tags')
+    @controller.stub!(:path_of_request).and_return('/account/info/tags')
     @controller.stub!(:params).and_return({})
     @controller.send :load_enclosing_resources
   end
