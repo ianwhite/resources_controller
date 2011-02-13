@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.rdoc_options     = ["--charset=UTF-8"]
   s.require_path     = "lib"
 
-  s.add_runtime_dependency "rails", '~> 3.0.0'
+  s.add_runtime_dependency "rails", '>= 3.0.0'
   s.add_development_dependency "rspec", '~> 2.0.0.beta.20'
   s.add_development_dependency "rspec-rails", '~> 2.0.0.beta.20'
 end
