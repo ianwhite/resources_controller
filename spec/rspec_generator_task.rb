@@ -9,7 +9,7 @@ namespace :spec do
         migrate_up
         make_resources_controller :author
         puts "** Running generated controller specs"
-        sh "rake spec:controllers"
+        sh "bundle exec rake spec:controllers"
       ensure
         migrate_down
         cleanup_resource :author
@@ -26,6 +26,7 @@ namespace :spec do
   
   file 'tmp/test_app' do
     puts "Generating test app"
+    mkdir_p "tmp"
     cd 'tmp' do
       system "rails new test_app"
       
@@ -40,7 +41,7 @@ namespace :spec do
             gem 'resources_controller', :git => "#{File.expand_path('../../../..', __FILE__)}"
           EOD
         end
-        system "bundle"
+        system "bundle install"
         system "rails g rspec:install"
       end
     end
