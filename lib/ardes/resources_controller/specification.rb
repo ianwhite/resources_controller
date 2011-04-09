@@ -53,13 +53,7 @@ module Ardes#:nodoc:
         @segment     = (options[:segment] && options[:segment].to_s) || name.pluralize
         @source      = (options[:source] && options[:source].to_s) || name.pluralize
         @name_prefix = options[:name_prefix] || (options[:name_prefix] == false ? '' : "#{name}_")
-        
-        begin
-          @klass = options[:class] || ((source && source.classify) || name.camelize).constantize
-        rescue NameError => e
-          raise NoClassFoundError, "Cound't find class for #{spec_name} #{options.inspect}: #{e.message}"
-        end
-        
+        @klass       = options[:class] || infer_class
         @key         = (options[:key] && options[:key].to_s) || name.foreign_key
         @as          = options[:as]
       end
@@ -84,6 +78,13 @@ module Ardes#:nodoc:
       def find_resource(controller)
         (controller.enclosing_resource ? controller.enclosing_resource.send(source) : klass).find controller.params[key]
       end
+    
+    private
+      def infer_class
+        ((source && source.classify) || name.camelize).constantize
+      rescue NameError => e
+        raise NoClassFoundError, "Cound't find class for name: #{name.inspect}, source: #{source.inspect}: #{e.message}"
+      end
     end
   
     # A Singleton Specification
@@ -96,12 +97,6 @@ module Ardes#:nodoc:
       def initialize(spec_name, options = {}, &block)
         options[:segment] ||= spec_name.to_s
         options[:source]  ||= spec_name.to_s
-        
-        begin
-          options[:class] ||= (options[:source] || spec_name).to_s.camelize.constantize
-        rescue NameError => e
-          raise NoClassFoundError, "Cound't find class for #{spec_name} #{options.inspect}: #{e.message}"
-        end
         
         super(spec_name, options, &block)
       end

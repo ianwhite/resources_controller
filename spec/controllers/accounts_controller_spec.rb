@@ -28,6 +28,12 @@ describe AccountsController do
     end    
   end
 
+  describe AccountsController, " requesting garbage url" do
+    it "should raise Ardes::ResourcesController::Specification::NoClassFoundError" do
+      lambda { get :show, :resource_path => "/crayzeee" }.should raise_error(Ardes::ResourcesController::Specification::NoClassFoundError)
+    end
+  end
+  
   describe AccountsController, "#resource_service" do
     include AccountsControllerSpecHelper
   
