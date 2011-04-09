@@ -152,7 +152,7 @@ end_str
 
   describe ForumsController, " requesting garbage url" do
     it "should raise ResourceMismatch" do
-      lambda { get :index, :resource_path => "/forums/\ncrayzeee" }.should raise_error(Ardes::ResourcesController::ResourceMismatch)
+      lambda { get :index, :resource_path => "/forums/\ncrayzeee" }.should raise_error(Ardes::ResourcesController::Specification::NoClassFoundError)
     end
   end
 
