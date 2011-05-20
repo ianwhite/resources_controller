@@ -1,3 +1,5 @@
+* Make overriding ResourceMethods more sane.  Thanks to Tom Stuart for the nudge.
+
 * upgraded to Rails 3 and RSpec 2. Thanks to Andrew Bloomgarden for making this happen.
 
   No BC with rails 2 - use the 2-3-stable branch for that.

@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
-version = "2.0.1"
+version = "2.0.2"
 
 Gem::Specification.new do |s|
   s.name        = "resources_controller"
