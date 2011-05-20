@@ -130,18 +130,8 @@ module ResourceMethodsSpec
       "my destroy_resource"
     end
   end
-  
-  class MyControllerWithMyResourceMethods < ActionController::Base
-    resources_controller_for :users
-    include MyResourceMethods
-  end
 
-  describe "A controller with resource methods mixed in after resources_controller_for" do
-    before do
-      @controller = MyControllerWithMyResourceMethods.new
-      @controller.resource_service = User
-    end
-    
+  shared_examples_for "A controller with its own resource methods" do
     it "#new_resource should call MyResourceMethods#new_resource" do
       @controller.send(:new_resource, {}).should == 'my new_resource'
     end
@@ -157,5 +147,57 @@ module ResourceMethodsSpec
     it "#destroy_resource should call MyResourceMethods#destroy_resource" do
       @controller.send(:destroy_resource, 1).should == 'my destroy_resource'
     end
+  end
+  
+  class MyControllerWithMyResourceMethodsMixedIn < ActionController::Base
+    resources_controller_for :users
+    include MyResourceMethods
+  end
+  
+  describe "A controller with resource methods mixed in after resources_controller_for" do
+    before do
+      @controller = MyControllerWithMyResourceMethodsMixedIn.new
+      @controller.resource_service = User
+      @controller.stub!(:params).and_return({})
+    end
+    
+    it_should_behave_like "A controller with its own resource methods"
+  end
+  
+  class MyAbstractControllerWithOwnResourceMethods < ActionController::Base
+    include MyResourceMethods
+  end
+  
+  class InhertedMyAbstractControllerWithOwnResourceMethods < MyAbstractControllerWithOwnResourceMethods
+    resources_controller_for :users, :resource_methods => false
+  end
+  
+  describe "A controller inheriting resource methods which declares :resource_methods => false" do
+    before do
+      @controller = InhertedMyAbstractControllerWithOwnResourceMethods.new
+      @controller.resource_service = User
+      @controller.stub!(:params).and_return({})
+    end
+    
+    it_should_behave_like "A controller with its own resource methods"
+  end
+  
+  class MyAbstractControllerWithResourceMethodsOverridden < ActionController::Base
+    include Ardes::ResourcesController::ResourceMethods
+    include MyResourceMethods
+  end
+  
+  class InhertedMyAbstractControllerWithResourceMethodsOverridden < MyAbstractControllerWithResourceMethodsOverridden
+    resources_controller_for :users
+  end
+  
+  describe "A controller inheriting from a controller which mixes in ResourceMethods, and overrides them" do
+    before do
+      @controller = InhertedMyAbstractControllerWithResourceMethodsOverridden.new
+      @controller.resource_service = User
+      @controller.stub!(:params).and_return({})
+    end
+    
+    it_should_behave_like "A controller with its own resource methods"
   end
 end

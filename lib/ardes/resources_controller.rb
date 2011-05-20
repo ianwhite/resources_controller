@@ -440,7 +440,7 @@ module Ardes#:nodoc:
     #     resources_controller_for :awesomenesses # includes MyAwesomeActions by default
     #   end
     def resources_controller_for(name, options = {}, &block)
-      options.assert_valid_keys(:class, :source, :singleton, :actions, :in, :find, :load_enclosing, :route, :segment, :as, :only, :except)
+      options.assert_valid_keys(:class, :source, :singleton, :actions, :in, :find, :load_enclosing, :route, :segment, :as, :only, :except, :resource_methods)
       when_options = {:only => options.delete(:only), :except => options.delete(:except)}
       
       unless included_modules.include? ResourcesController::InstanceMethods
@@ -449,17 +449,13 @@ module Ardes#:nodoc:
         extend  ResourcesController::ClassMethods
         helper  ResourcesController::Helper
         include ResourcesController::InstanceMethods, ResourcesController::NamedRouteHelper
-        include ResourcesController::ResourceMethods unless included_modules.include?(ResourcesController::ResourceMethods)
+        include ResourcesController::ResourceMethods unless options.delete(:resource_methods) == false || included_modules.include?(ResourcesController::ResourceMethods) 
       end
 
       before_filter(:load_enclosing_resources, when_options) unless load_enclosing_resources_filter_exists?
       
       write_inheritable_attribute(:specifications, [])
       specifications << '*' unless options.delete(:load_enclosing) == false
-      
-      unless (options.delete(:resource_methods) == false)
-        include ResourcesController::ResourceMethods
-      end
       
       unless (actions = options.delete(:actions)) == false
         actions ||= options[:singleton] ? Ardes::ResourcesController.singleton_actions : Ardes::ResourcesController.actions
