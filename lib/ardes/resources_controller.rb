@@ -383,8 +383,8 @@ module Ardes#:nodoc:
     
     def self.extended(base)
       base.class_eval do
-        class_inheritable_reader :resource_specification_map
-        write_inheritable_attribute(:resource_specification_map, {})
+        class_attribute :resource_specification_map
+        self.resource_specification_map = {}
       end
     end
     
@@ -453,7 +453,7 @@ module Ardes#:nodoc:
       when_options = {:only => options.delete(:only), :except => options.delete(:except)}
       
       unless included_modules.include? ResourcesController::InstanceMethods
-        class_inheritable_reader :specifications, :route_name
+        class_attribute :specifications, :route_name
         hide_action :specifications, :route_name
         extend  ResourcesController::ClassMethods
         helper  ResourcesController::Helper
@@ -463,7 +463,7 @@ module Ardes#:nodoc:
 
       before_filter(:load_enclosing_resources, when_options.dup) unless load_enclosing_resources_filter_exists?
       
-      write_inheritable_attribute(:specifications, [])
+      self.specifications = []
       specifications << '*' unless options.delete(:load_enclosing) == false
       
       unless (actions = options.delete(:actions)) == false
@@ -473,11 +473,12 @@ module Ardes#:nodoc:
       
       route = (options.delete(:route) || name).to_s
       name = options[:singleton] ? name.to_s : name.to_s.singularize
-      write_inheritable_attribute :route_name, options[:singleton] ? route : route.singularize
+      self.route_name = options[:singleton] ? route : route.singularize
       
       nested_in(*options.delete(:in)) if options[:in]
       
-      write_inheritable_attribute(:resource_specification, Specification.new(name, options, &block))
+      class_attribute :resource_specification, :instance_writer => false
+      self.resource_specification = Specification.new(name, options, &block)
     end
     
     # Creates a resource specification mapping.  Use this to specify how to find an enclosing resource that
@@ -535,11 +536,6 @@ module Ardes#:nodoc:
           ensure_sane_wildcard if name == '*'
           specifications << (name.to_s =~ /^(\*|\?(.*))$/ ? name.to_s : Specification.new(name, options, &block))
         end
-      end
-      
-      # return the class resource_specification
-      def resource_specification
-        read_inheritable_attribute(:resource_specification)
       end
       
     private
