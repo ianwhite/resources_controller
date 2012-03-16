@@ -2,8 +2,9 @@
 
 module ResourcesControllerTest
   class Application < Rails::Application
-    paths.config.database = File.expand_path('../app/database.yml', __FILE__)
-    paths.log = File.expand_path('../../../tmp/log', __FILE__)
+    config.active_support.deprecation = :stderr
+    paths['config/database'] = File.expand_path('../app/database.yml', __FILE__)
+    paths['log'] = File.expand_path('../../../tmp/log', __FILE__)
   end
 end
 
@@ -15,66 +16,64 @@ ResourcesControllerTest::Application.initialize!
 
 Rails.application
 Rails.application.routes.clear!
-Rails.application.routes.draw do |map|
+Rails.application.routes.draw do
   # this tests :resource_path (or :erp), for named routes that map to resources
-  map.root :controller => 'forums', :action => 'index', :resource_path => '/forums'
-  map.create_forum 'create_forum', :controller => 'forums', :action => 'create', :resource_path => '/forums', :resource_method => :post
+  root :controller => 'forums', :action => 'index', :resource_path => '/forums'
+  match 'create_forum', :controller => 'forums', :action => 'create', :resource_path => '/forums', :resource_method => :post
 
-  map.namespace :admin do |admin|
-    admin.resources :forums do |forum|
-      forum.resources :interests
+  namespace :admin do
+    resources :forums do
+      resources :interests
     end
-    admin.namespace :superduper do |superduper|
-      superduper.resources :forums
-    end
-  end
-  
-  map.resources :users do |user|
-    user.resources :interests
-    user.resources :posts, :controller => 'user_posts'
-    user.resources :comments, :controller => 'user_comments'
-    user.resources :addresses do |address|
-      address.resources :tags
+    namespace :superduper do
+      resources :forums
     end
   end
   
-  map.resources :forums do |forum|
-    forum.resources :interests
-    forum.resources :posts, :controller => 'forum_posts' do |post|
-      post.resources :comments do |comment|
-        comment.resources :tags
+  resources :users do
+    resources :posts, :controller => 'user_posts'
+    resources :comments, :controller => 'user_comments'
+    resources :addresses do
+      resources :tags
+    end
+  end
+  
+  resources :forums do
+    resources :interests
+    resources :posts, :controller => 'forum_posts' do
+      resources :comments do
+        resources :tags
       end
-      post.resources :tags
+      resources :tags
     end
-    forum.resource :owner do |owner|
-      owner.resources :posts do |post|
-        post.resources :tags
+    resource :owner do
+      resources :posts do
+        resources :tags
       end
     end
-    forum.resources :tags
+    resources :tags
   end
   
-  map.resource :account do |account|
-    account.resources :posts
-    account.resource :info do |info|
-      info.resources :tags
+  resource :account do
+    resources :posts
+    resource :info do
+      resources :tags
     end
   end
   
-  map.resources :tags
+  resources :tags
 
-  map.with_options :path_prefix => ":tag_id", :name_prefix => "tag_" do |tag|
-    tag.resources :forums
+  with_options :path_prefix => ":tag_id", :name_prefix => "tag_" do
+    resources :forums
   end
   
   # the following routes are for testing errors
-  map.resources :posts, :controller => 'forum_posts'
-  map.resources :foos do |foo|
-    foo.resources :bars, :controller => 'forum_posts'
+  resources :posts, :controller => 'forum_posts'
+  resources :foos do
+    resources :bars, :controller => 'forum_posts'
   end
   
-  map.default ':controller/:action/:id' # naming this so we can test missing segment errors
-  map.connect ':controller/:action/:id.:format'
+  match ':controller/:action/:id(.:format)' # naming this so we can test missing segment errors
 end
 
 
@@ -249,7 +248,7 @@ class OwnersController < ApplicationController
 end
 
 class PostsAbstractController < ApplicationController
-  include Ardes::ResourcesController::ResourceMethods
+  include ResourcesController::ResourceMethods
   attr_accessor :filter_trace
   
   # for testing filter load order

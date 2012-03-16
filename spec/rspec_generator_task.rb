@@ -34,11 +34,11 @@ namespace :spec do
         File.open('Gemfile', 'w+') do |file|
           file << <<-EOD
             source :rubygems
-            gem 'rails', '3.0.0'
-            gem 'sqlite3-ruby'
-            gem 'rspec', '~>2.0.0.beta.20'
-            gem 'rspec-rails', '~>2.0.0.beta.20'
-            gem 'resources_controller', :git => "#{File.expand_path('../../../..', __FILE__)}"
+            gem 'rails'
+            gem 'sqlite3'
+            gem 'rspec'
+            gem 'rspec-rails'
+            gem 'rc_rails', :git => "#{File.expand_path('../../../..', __FILE__)}"
           EOD
         end
         system "bundle install"

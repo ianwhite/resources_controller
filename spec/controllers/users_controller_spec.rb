@@ -1,5 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
-require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
+require 'spec_helper'
 
 describe UsersController, "routing" do
 
@@ -157,7 +156,7 @@ end
 
 describe UsersController, "handling GET /users/new" do
   it "should be unknown action" do
-    lambda{ get :new }.should raise_error(ActionController::UnknownAction)
+    lambda{ get :new }.should raise_error(ActionView::MissingTemplate)
   end
 end
 
@@ -195,7 +194,7 @@ end
 
 describe UsersController, "handling POST /users" do
   it "should be unknown action" do
-    lambda{ post :create }.should raise_error(ActionController::UnknownAction)
+    lambda{ post :create }.should raise_error(ActionController::RoutingError)
   end
 end
 
@@ -244,6 +243,6 @@ end
 
 describe UsersController, "handling DELETE /users/dave" do
   it "should be unknown action" do
-    lambda{ delete :destroy, :id => "dave" }.should raise_error(ActionController::UnknownAction)
+    lambda{ delete :destroy, :id => "dave" }.should raise_error(::AbstractController::ActionNotFound)
   end
 end

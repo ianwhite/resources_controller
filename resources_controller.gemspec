@@ -1,10 +1,11 @@
 # -*- encoding: utf-8 -*-
 
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
-version = "2.1.0"
+require 'resources_controller/version'
+version = ResourcesController::VERSION
 
 Gem::Specification.new do |s|
-  s.name        = "resources_controller"
+  s.name        = "rc_rails"
   s.version     = version
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Ian White"]
@@ -22,10 +23,7 @@ Gem::Specification.new do |s|
   s.require_path     = "lib"
 
   s.add_runtime_dependency "rails", '>= 3.1.0'
-  s.add_development_dependency "rspec", '>= 2.5.0'
-  s.add_development_dependency "rspec-rails", '>= 2.5.0'
-  s.add_development_dependency 'sqlite3-ruby'
-  s.add_development_dependency "rspec-rails", '>= 2.5.0'
-  s.add_development_dependency 'rcov'
-  s.add_development_dependency 'yard'
+  s.add_development_dependency "rspec", '>= 2.8.0'
+  s.add_development_dependency "rspec-rails", '>= 2.8.0'
+  s.add_development_dependency 'sqlite3'
 end                            

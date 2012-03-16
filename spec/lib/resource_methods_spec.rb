@@ -1,5 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
-require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
+require 'spec_helper'
 
 module ResourceMethodsSpec
   class MyController < ActionController::Base
@@ -185,7 +184,7 @@ module ResourceMethodsSpec
   end
   
   class MyAbstractControllerWithResourceMethodsOverridden < ActionController::Base
-    include Ardes::ResourcesController::ResourceMethods
+    include ResourcesController::ResourceMethods
     include MyResourceMethods
   end
   

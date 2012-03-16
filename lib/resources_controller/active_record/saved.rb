@@ -1,4 +1,4 @@
-module Ardes
+module ResourcesController
   module ActiveRecord
     module Saved
       # returns true if this record is not new, and has no errors

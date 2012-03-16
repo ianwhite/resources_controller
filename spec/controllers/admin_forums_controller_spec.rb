@@ -1,5 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
-require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
+require 'spec_helper'
 
 describe Admin::ForumsController do
   describe "Routing shortcuts for Admin::Forums should map" do
@@ -116,7 +115,7 @@ describe Admin::ForumsController do
     end
 
     it "resource_users_path should raise informative CantMapRoute" do
-      lambda{ controller.resource_users_path }.should raise_error(Ardes::ResourcesController::CantMapRoute, <<-end_str
+      lambda{ controller.resource_users_path }.should raise_error(ResourcesController::CantMapRoute, <<-end_str
 Tried to map :resource_users_path to :admin_forum_users_path,
 which doesn't exist. You may not have defined the route in config/routes.rb.
 
@@ -125,10 +124,10 @@ to explicictly set the :route option in resources_controller_for, and set
 the :name_prefix option on your enclosing resources.
 
 Currently:
-  :route is 'forum'
-  generated name_prefix is 'admin_'
+:route is 'forum'
+generated name_prefix is 'admin_'
 end_str
-      )
+    )
     end
   
     it "enclosing_resource_path should raise informative NoMethodError" do

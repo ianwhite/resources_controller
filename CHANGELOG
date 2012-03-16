@@ -1,3 +1,11 @@
+= 2.1.0
+
+  * Gemify resources_controller and friends (thanks Josh Goebel)
+    gem name is `rc_rails`, see also `response_for_rails`, and `response_for_rc_rails`
+  * Remove Ardes namespace (BC preserved)
+
+= Prior to gem release
+
 * Make overriding ResourceMethods more sane.  Thanks to Tom Stuart for the nudge.
 
 * upgraded to Rails 3 and RSpec 2. Thanks to Andrew Bloomgarden for making this happen.
