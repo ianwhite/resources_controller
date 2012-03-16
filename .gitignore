@@ -3,3 +3,5 @@ doc/*
 .rvmrc
 tmp/*
 .yardoc
+pkg/
+Gemfile.lock
