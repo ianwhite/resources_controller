@@ -75,16 +75,9 @@ module ResourcesController
     def form_for_resource(*args, &block)
       options = args.extract_options!
       resource = args[0] || self.resource
-      form_for(resource_name, resource, form_for_resource_options(resource, options), &block)
+      form_for(resource, form_for_resource_options(resource, resource_name, options), &block)
     end
 
-    # same API as form_for_resource
-    def remote_form_for_resource(*args, &block)
-      options = args.extract_options!
-      resource = args[0] || self.resource
-      remote_form_for(resource_name, resource, form_for_resource_options(resource, options), &block)
-    end
-  
     # print the error messages for the current resource
     def error_messages_for_resource
       error_messages_for resource_name
@@ -107,10 +100,11 @@ module ResourcesController
     end
   
   private
-    def form_for_resource_options(resource, options)
+    def form_for_resource_options(resource, resource_name, options)
       options.dup.tap do |options|
         options[:html] ||= {}
         options[:html][:method] ||= resource.new_record? ? :post : :put
+        options[:as] = resource_name
         args = options[:url_options] ? [options.delete(:url_options)] : []
         options[:url] ||= if resource.new_record?
           controller.resource_specification.singleton? ? resource_path(*args) : resources_path(*args)
