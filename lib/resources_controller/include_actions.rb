@@ -26,9 +26,10 @@ module ResourcesController
     
     def action_methods_to_remove(options = {})
       if options[:only]
-        instance_methods - Array(options[:only]).map(&:to_s)
+        # instance_methods contains Strings in < 1.9, and Symbols in >= 1.9
+        instance_methods.map(&:to_s) - Array(options[:only]).map(&:to_s)
       elsif options[:except]
-        Array(options[:except]).map(&:to_s) & instance_methods
+        Array(options[:except]).map(&:to_s) & instance_methods.map(&:to_s)
       else
         []
       end
