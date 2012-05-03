@@ -489,7 +489,7 @@ module ResourcesController
   # See Specification#new for details of how to call this
   def map_enclosing_resource(name, options = {}, &block)
     spec = Specification.new(name, options, &block)
-    resource_specification_map[spec.segment] = spec
+    self.resource_specification_map = resource_specification_map.merge spec.segment => spec
   end
   
   # this will be deprecated soon as it's badly named - use map_enclosing_resource
