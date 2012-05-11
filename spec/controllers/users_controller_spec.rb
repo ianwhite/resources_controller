@@ -156,7 +156,7 @@ end
 
 describe UsersController, "handling GET /users/new" do
   it "should be unknown action" do
-    lambda{ get :new }.should raise_error(ActionView::MissingTemplate)
+    lambda{ get :new }.should raise_error(::AbstractController::ActionNotFound)
   end
 end
 
@@ -194,7 +194,7 @@ end
 
 describe UsersController, "handling POST /users" do
   it "should be unknown action" do
-    lambda{ post :create }.should raise_error(ActionController::RoutingError)
+    lambda{ post :create }.should raise_error(::AbstractController::ActionNotFound)
   end
 end
 

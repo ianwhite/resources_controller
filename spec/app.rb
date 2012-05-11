@@ -31,6 +31,7 @@ Rails.application.routes.draw do
   end
   
   resources :users do
+    resources :interests
     resources :posts, :controller => 'user_posts'
     resources :comments, :controller => 'user_comments'
     resources :addresses do

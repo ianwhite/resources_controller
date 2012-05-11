@@ -52,27 +52,28 @@ module ResourceMethodsSpec
     describe "when an enclosing resource is added (a forum)" do
       before do
         @forum = Forum.create!
+        @forum.stub(:users).and_return(@users = double)
         @controller.send :add_enclosing_resource, @forum
       end
   
-      it "#find_resource(<id>) should call forum.users.find(<id>)" do
-        @forum.users.should_receive(:find).with("42")
-        @controller.send(:find_resource, "42")
+      it "#find_resource(<id>) should find the forum user" do
+        @users.should_receive(:find).with("42").and_return(user = double)
+        @controller.send(:find_resource, "42").should == user
       end
   
-      it "#find_resources should call forum.users.find(:all)" do
-        @forum.users.should_receive(:all)
-        @controller.send(:find_resources)
+      it "#find_resources should return the forum users" do
+        @users.should_receive(:all).and_return(users = double)
+        @controller.send(:find_resources).should == users
       end
 
       it "#new_resource({}) should call forum.users.build({})" do
-        @forum.users.should_receive(:build).with({})
-        @controller.send :new_resource, {}
+        @users.should_receive(:build).with({}).and_return(user = double)
+        @controller.send(:new_resource, {}).should == user
       end
 
-      it "#destroy_resource(<id>) should call forum.users.find(<id>) and forum.users.destroy(<id>)" do
-        @forum.users.should_receive(:find).with("42").and_return(user = mock)
-        @forum.users.should_receive(:destroy).with("42").and_return(useless_array = mock)
+      it "#destroy_resource(<id>) should call forum.users.find(<id>) and forum.users.destroy(<id>) and return the resource" do
+        @users.should_receive(:find).with("42").and_return(user = double)
+        @users.should_receive(:destroy).with("42")
         @controller.send(:destroy_resource, "42").should == user
       end
     end
