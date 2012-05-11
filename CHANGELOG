@@ -1,4 +1,4 @@
-= 2.1.1 (edge)
+= 2.1.1
 
   * Stop modifying resource_specification_map in place [Joel Chippendale]
   * Handle instance_methods containing Symbols in Ruby >= 1.9 [Lewis Marshall]
