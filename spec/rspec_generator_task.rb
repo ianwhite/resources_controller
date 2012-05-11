@@ -28,17 +28,14 @@ namespace :spec do
     puts "Generating test app"
     mkdir_p "tmp"
     cd 'tmp' do
-      system "rails new test_app"
+      system "rails new test_app --skip-gemfile --skip-bundle --skip-git --skip-test-unit"
       
       cd 'test_app' do
         File.open('Gemfile', 'w+') do |file|
-          file << <<-EOD
-            source :rubygems
-            gem 'rc_rails', :git => "#{File.expand_path('../../../..', __FILE__)}"
-          EOD
+          file << %Q{gem 'rc_rails', :git => "#{File.expand_path('../../../..', __FILE__)}"}
         end
         system "bundle install"
-        system "rails g rspec:install"
+        system "rails generate rspec:install"
         system "rake -T"
       end
     end
