@@ -9,7 +9,8 @@ namespace :spec do
         migrate_up
         make_resources_controller :author
         puts "** Running generated controller specs"
-        sh "bundle exec rake spec"
+        sh "rake db:test:prepare"
+        sh "bundle exec rspec"
       ensure
         migrate_down
         cleanup_resource :author
@@ -34,9 +35,8 @@ namespace :spec do
         File.open('Gemfile', 'w+') do |file|
           file << %Q{gem 'rc_rails', :git => "#{File.expand_path('../../../..', __FILE__)}"}
         end
-        system "bundle install"
+        system "bundle install--quiet"
         system "rails generate rspec:install"
-        system "rake -T"
       end
     end
   end
