@@ -35,7 +35,8 @@ To get set up for development, do the following:
   cd resources_controller
   cp Gemfile.lock.development Gemfile.lock
   bundle
-  rake
+  rake spec
+  rake spec:rspec_generated_specs
 
 == Contributors
 
