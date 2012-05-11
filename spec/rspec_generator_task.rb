@@ -35,7 +35,7 @@ namespace :spec do
         File.open('Gemfile', 'w+') do |file|
           file << %Q{gem 'rc_rails', :git => "#{File.expand_path('../../../..', __FILE__)}"}
         end
-        system "bundle install--quiet"
+        system "bundle install --quiet"
         system "rails generate rspec:install"
       end
     end
