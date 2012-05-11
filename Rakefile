@@ -25,7 +25,7 @@ Bundler::GemHelper.install_tasks
 require 'rspec/core/rake_task'
 require File.expand_path('../spec/rspec_generator_task', __FILE__) # for spec:generate task
 
-task :default => [:spec]
+task :default => [:spec, 'spec:rspec_generated_specs']
 
 desc "Run the specs"
 RSpec::Core::RakeTask.new(:spec => []) do |t|

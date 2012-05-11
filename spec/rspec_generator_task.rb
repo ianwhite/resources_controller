@@ -1,6 +1,6 @@
 namespace :spec do
   desc "Run rspec's generated specs against RC'd controllers"
-  task :generate => 'tmp/test_app' do
+  task :rspec_generated_specs => 'tmp/test_app' do
     require 'active_support/all'
 
     cd 'tmp/test_app' do
