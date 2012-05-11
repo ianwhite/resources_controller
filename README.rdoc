@@ -25,7 +25,9 @@ Add this to your Gemfile
 
 use the rails2 branch: http://github.com/ianwhite/resources_controller/tree/rails2
 
-== Run the specs
+== How to contribute
+
+If you have found a bug, or have a new feature, then spec'd code is great.
 
 To get set up for development, do the following:
 
@@ -33,24 +35,13 @@ To get set up for development, do the following:
   cd resources_controller
   cp Gemfile.lock.development Gemfile.lock
   bundle
-  rake spec:generate
-  rake spec
-
-== How to contribute
-
-If you have found a bug, or have a new feature, then spec'd code is great.
-
-To get set up and run the tests
-
-  git clone git://github.com/ianwhite/resources_controller
-  cd resources_controller
-  bundle
-  rake spec:all
+  rake
 
 == Contributors
 
 The following people have made contributions to resources_controller.  Please let me know if I've missed you out.
 
+* Lewis Marshall
 * Josh Goebel
 * Andrew Bloomgarden
 * Chris Hapgood

@@ -1,9 +1,9 @@
 = 2.1.1 (edge)
 
-  2 bugfixes:
-  
   * Stop modifying resource_specification_map in place [Joel Chippendale]
-  * Handle instance_methods containing Symbols in Ruby >= 1.9
+  * Handle instance_methods containing Symbols in Ruby >= 1.9 [Lewis Marshall]
+  * Fix failing specs since 2.1.0 [Ian White]
+  * Add travis ci [Ian White]
   
   
 = 2.1.0
