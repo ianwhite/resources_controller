@@ -123,8 +123,8 @@ generated name_prefix is '#{name_prefix}'
       name_prefix = method.to_s.sub(/^.*_for_/,'')
       if resource_method =~ /enclosing_resource/
         route, route_method = *route_and_method_from_enclosing_resource_method_and_name_prefix(resource_method, name_prefix)
-        required_args = (route.segment_keys - [:format]).size
-      
+        required_args = (route.segment_keys - [:format, :locale]).size
+
         self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
           def #{method}(*args)
             options = args.extract_options!
@@ -134,10 +134,10 @@ generated name_prefix is '#{name_prefix}'
             send :#{route_method}, *args
           end
         end_eval
-                
+
       else
         route, route_method = *route_and_method_from_resource_method_and_name_prefix(resource_method, name_prefix)
-        required_args = (route.segment_keys - [:format]).size
+        required_args = (route.segment_keys - [:format, :locale]).size
 
         self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
           def #{method}(*args)
