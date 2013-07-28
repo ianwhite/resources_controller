@@ -12,21 +12,21 @@ require 'resources_controller/specification'
 
 # With resources_controller you can quickly add
 # an ActiveResource compliant controller for your your RESTful models.
-# 
+#
 # = Examples
 # Here are some examples - for more on how to use  RC go to the Usage section at the bottom,
 # for syntax head to resources_controller_for
 #
 # ==== Example 1: Super simple usage
 # Here's a simple example of how it works with a Forums has many Posts model:
-# 
+#
 #   class ForumsController < ApplicationController
 #     resources_controller_for :forums
 #   end
 #
 # Your controller will get the standard CRUD actions, @forum will be set in member actions, @forums in
 # index.
-# 
+#
 # ==== Example 2: Specifying enclosing resources
 #   class PostsController < ApplicationController
 #     resources_controller_for :posts, :in => :forum
@@ -56,7 +56,7 @@ require 'resources_controller/specification'
 #
 #             /users/2/posts/1          This won't work as the controller specified
 #                                       that :posts are :in => :forum
-#                                       
+#
 #
 # It is up to you which routes to open to the controller (in config/routes.rb).  When
 # you do, RC will use the route segments to drill down to the specified resource.  This means
@@ -96,12 +96,12 @@ require 'resources_controller/specification'
 # (in PostsController)
 #
 #   map_enclosing_resource :account, :singleton => true, :class => User, :find => :current_user
-# 
+#
 # Now, if :account apears in any part of a route (for PostsController) it will be mapped to
 # (in this case) the current_user method of teh PostsController.
 #
 # To make the :account mapping available to all, just chuck it in ApplicationController
-# 
+#
 # This will work for any resource which can't be inferred from its route segment name
 #
 #   map_enclosing_resource :users, :segment => :peeps, :key => 'peep_id'
@@ -115,7 +115,7 @@ require 'resources_controller/specification'
 #   end
 #
 # When invoked with /users/3/image RC will find @user, and use @user.image to find the resource, and
-# @user.build_image, to create a new resource. 
+# @user.build_image, to create a new resource.
 #
 # ==== Example 6: :resource_path (equivalent resource path): aliasing a named route to a RESTful route
 #
@@ -135,7 +135,7 @@ require 'resources_controller/specification'
 # An exmaple app
 #
 # config/routes.rb:
-#  
+#
 #  map.resource :account do |account|
 #    account.resource :image
 #    account.resources :posts
@@ -164,7 +164,7 @@ require 'resources_controller/specification'
 #  class ForumsController < AplicationController
 #    resources_controller_for :forums
 #  end
-#    
+#
 #  class PostsController < AplicationController
 #    resources_controller_for :posts
 #  end
@@ -184,22 +184,22 @@ require 'resources_controller/specification'
 # This is how the app will handle the following routes:
 #
 #  PATH                   CONTROLLER    WHICH WILL DO:
-#  
+#
 #  /forums                forums        @forums = Forum.find(:all)
-#  
+#
 #  /forums/2/posts        posts         @forum = Forum.find(2)
 #                                       @posts = @forum.forums.find(:all)
 #
 #  /forums/2/image        image         @forum = Forum.find(2)
-#                                       @image = @forum.image   
-#  
+#                                       @image = @forum.image
+#
 #  /image                       <no route>
 #
 #  /posts                       <no route>
 #
 #  /users/2/posts/3       posts         @user = User.find(2)
 #                                       @post = @user.posts.find(3)
-#  
+#
 #  /users/2/image POST    image         @user = User.find(2)
 #                                       @image = @user.build_image(params[:image])
 #
@@ -214,7 +214,7 @@ require 'resources_controller/specification'
 #
 # === Views
 #
-# Ok - so how do I write the views?  
+# Ok - so how do I write the views?
 #
 # For most cases, just in exactly the way you would expect to.  RC sets the instance variables
 # to what they should be.
@@ -223,7 +223,7 @@ require 'resources_controller/specification'
 #
 #   /users/1/posts    =>  @user, @posts
 #   /forums/2/posts   =>  @forum, @posts
-# 
+#
 # Here are some options (all are appropriate for different circumstances):
 # * test for the existence of @user or @forum in the view, and display it differently
 # * have two different controllers UserPostsController and ForumPostsController, with different views
@@ -279,12 +279,12 @@ require 'resources_controller/specification'
 # map_enclosing_resource <name>, <options>, <&block>
 #
 # === Customising finding and creating
-# If you want to implement something like query params you can override *find_resources*.  If you want to change the 
+# If you want to implement something like query params you can override *find_resources*.  If you want to change the
 # way your new resources are created you can override *new_resource*.
 #
 #   class PostsController < ApplicationController
 #     resources_controller_for :posts
-# 
+#
 #     def find_resources
 #       resource_service.find :all, :order => params[:sort_by]
 #     end
@@ -382,14 +382,14 @@ module ResourcesController
   mattr_accessor :actions, :singleton_actions
   self.actions = ResourcesController::Actions
   self.singleton_actions = ResourcesController::SingletonActions
-  
+
   def self.extended(base)
     base.class_eval do
       class_attribute :resource_specification_map
       self.resource_specification_map = {}
     end
   end
-  
+
   # Specifies that this controller is a REST style controller for the named resource
   #
   # Enclosing resources are loaded automatically by default, you can turn this off with
@@ -402,7 +402,7 @@ module ResourcesController
   # * <tt>:find:</tt> (default null) set this to a symbol or Proc to specify how to find the resource.
   #   Use this if the resource is found in an unconventional way.  Passing a block has the same effect as
   #   setting :find => a Proc
-  # * <tt>:in:</tt> specify the enclosing resources, by name.  ClassMethods#nested_in can be used to 
+  # * <tt>:in:</tt> specify the enclosing resources, by name.  ClassMethods#nested_in can be used to
   #   specify this more fully.
   # * <tt>:load_enclosing:</tt> (default true) loads enclosing resources automatically.
   # * <tt>:actions:</tt> (default nil) set this to false if you don't want the default RC actions.  Set this
@@ -422,7 +422,7 @@ module ResourcesController
   # The default behavior is to set up before filters that load the enclosing resource, and to use associations on
   # that model to find and create the resources.  See ClassMethods#nested_in for more details on this, and
   # customising the default behaviour.
-  # 
+  #
   # === load_enclosing_resources
   # By default, a before_filter is added by resources_controller called :load_enclosing_resources - which
   # does all the work of loading the enclosing resources.  You can use ActionControllers standard filter
@@ -453,36 +453,36 @@ module ResourcesController
   def resources_controller_for(name, options = {}, &block)
     options.assert_valid_keys(:class, :source, :singleton, :actions, :in, :find, :load_enclosing, :route, :segment, :as, :only, :except, :resource_methods)
     when_options = {:only => options.delete(:only), :except => options.delete(:except)}
-    
+
     unless included_modules.include? ResourcesController::InstanceMethods
       class_attribute :specifications, :route_name
       hide_action :specifications, :route_name
       extend  ResourcesController::ClassMethods
       helper  ResourcesController::Helper
       include ResourcesController::InstanceMethods, ResourcesController::NamedRouteHelper
-      include ResourcesController::ResourceMethods unless options.delete(:resource_methods) == false || included_modules.include?(ResourcesController::ResourceMethods) 
+      include ResourcesController::ResourceMethods unless options.delete(:resource_methods) == false || included_modules.include?(ResourcesController::ResourceMethods)
     end
 
     before_filter(:load_enclosing_resources, when_options.dup) unless load_enclosing_resources_filter_exists?
-    
+
     self.specifications = []
     specifications << '*' unless options.delete(:load_enclosing) == false
-    
+
     unless (actions = options.delete(:actions)) == false
       actions ||= options[:singleton] ? ResourcesController.singleton_actions : ResourcesController.actions
       include_actions actions, when_options
     end
-    
+
     route = (options.delete(:route) || name).to_s
     name = options[:singleton] ? name.to_s : name.to_s.singularize
     self.route_name = options[:singleton] ? route : route.singularize
-    
+
     nested_in(*options.delete(:in)) if options[:in]
-    
+
     class_attribute :resource_specification, :instance_writer => false
     self.resource_specification = Specification.new(name, options, &block)
   end
-  
+
   # Creates a resource specification mapping.  Use this to specify how to find an enclosing resource that
   # does not obey usual rails conventions.  Most commonly this would be a singleton resource.
   #
@@ -491,12 +491,12 @@ module ResourcesController
     spec = Specification.new(name, options, &block)
     self.resource_specification_map = resource_specification_map.merge spec.segment => spec
   end
-  
+
   # this will be deprecated soon as it's badly named - use map_enclosing_resource
   def map_resource(*args, &block)
     map_enclosing_resource(*args, &block)
   end
-  
+
   # Include the specified module, optionally specifying which public methods to include, for example:
   #  include_actions ActionMixin, :only => :index
   #  include_actions ActionMixin, :except => [:create, :new]
@@ -524,22 +524,22 @@ private
     def nested_in(*names, &block)
       options = names.extract_options!
       raise ArgumentError, "when giving more than one nesting, you may not specify options or a block" if names.length > 1 and (block_given? or options.length > 0)
-      
+
       # convert :polymorphic option to '?'
       if options.delete(:polymorphic)
         raise ArgumentError, "when specifying :polymorphic => true, no block or other options may be given" if block_given? or options.length > 0
-        names = ["?#{names.first}"] 
+        names = ["?#{names.first}"]
       end
 
       # ignore first '*' if it has already been specified by :load_enclosing == true
       names.shift if specifications == ['*'] && names.first == '*'
-      
+
       names.each do |name|
         ensure_sane_wildcard if name == '*'
         specifications << (name.to_s =~ /^(\*|\?(.*))$/ ? name.to_s : Specification.new(name, options, &block))
       end
     end
-    
+
   private
     # ensure that specifications array is determinate w.r.t route matching
     def ensure_sane_wildcard
@@ -554,40 +554,40 @@ private
       true
     end
   end
-  
+
   module InstanceMethods
     def self.included(controller)
       controller.send :hide_action, *instance_methods
     end
-    
+
     def resource_service=(service)
       @resource_service = service
     end
-    
+
     def name_prefix
       @name_prefix ||= ''
     end
-    
+
     # name of the singular resource
     def resource_name
       resource_specification.name
     end
-    
+
     # name of the resource collection
     def resources_name
       @resources_name ||= resource_specification.name.pluralize
     end
-    
+
     # returns the controller's resource class
     def resource_class
       resource_specification.klass
     end
-    
+
     # returns the controller's current resource.
     def resource
       instance_variable_get("@#{resource_name}")
     end
-    
+
     # sets the controller's current resource, and
     # decorates the object with a save hook, so we know if it's been saved
     def resource=(record)
@@ -598,33 +598,33 @@ private
     def resources
       instance_variable_get("@#{resources_name}")
     end
-    
+
     # sets the controller's current resource collection
     def resources=(collection)
       instance_variable_set("@#{resources_name}", collection)
     end
-    
+
     # returns the immediately enclosing resource
     def enclosing_resource
       enclosing_resources.last
     end
-    
+
     # returns the name of the immediately enclosing resource
     def enclosing_resource_name
       @enclosing_resource_name
     end
-    
+
     # returns the resource service for the controller - this will be lazilly created
     # to a ResourceService, or a SingletonResourceService (if :singleton => true)
     def resource_service
       @resource_service ||= resource_specification.singleton? ? SingletonResourceService.new(self) : ResourceService.new(self)
     end
-    
+
     # returns the instance resource_specification
     def resource_specification
       self.class.resource_specification
     end
-    
+
     # returns an array of the controller's enclosing (nested in) resources
     def enclosing_resources
       @enclosing_resources ||= []
@@ -634,7 +634,7 @@ private
     def enclosing_collection_resources
       @enclosing_collection_resources ||= []
     end
-    
+
     # NOTE: This method is overly complicated and unecessary.  It's much clearer just to keep
     # track of record saves yourself, this is here for BC.  For an example of how it should be
     # done look at the actions module in http://github.com/ianwhite/response_for_rc
@@ -650,7 +650,7 @@ private
       @resource_saved = resource.saved? if @resource_saved.nil?
       @resource_saved
     end
-    
+
     # NOTE: it's clearer to just keep track of record saves yourself, this is here for BC
     # See the comment on #resource_saved?
     #
@@ -660,7 +660,7 @@ private
     def save_resource
       @resource_saved = resource.save
     end
-    
+
   private
     # this is the before_filter that loads all specified and wildcard resources
     def load_enclosing_resources
@@ -673,17 +673,17 @@ private
         end
       end
     end
-    
+
     # load a wildcard resource by either
     # * matching the segment to mapped resource specification, or
     # * creating one using the segment name
     # Optionally takes a variable name to set the instance variable as (for polymorphic use)
     def load_wildcard(as = nil)
       seg = nesting_segments[enclosing_resources.size] or ResourcesController.raise_resource_mismatch(self)
-      
+
       segment = seg[:segment]
       singleton = seg[:singleton]
-      
+
       if resource_specification_map[segment]
         spec = resource_specification_map[segment]
         spec = spec.dup.tap {|s| s.as = as} if as
@@ -692,7 +692,7 @@ private
       end
       load_enclosing_resource_from_specification(spec)
     end
-    
+
     # loads a series of wildcard resources, from the specified specification idx
     #
     # To do this, we need to figure out where the next specified resource is
@@ -701,24 +701,24 @@ private
     def load_wildcards_from(start)
       specs = specifications.slice(start..-1)
       encls = nesting_segments.slice(enclosing_resources.size..-1)
-      
+
       if spec = specs.find {|s| s.is_a?(Specification)}
         spec_seg = encls.index({:segment => spec.segment, :singleton => spec.singleton?}) or ResourcesController.raise_resource_mismatch(self)
         number_of_wildcards = spec_seg - (specs.index(spec) -1)
       else
         number_of_wildcards = encls.length - (specs.length - 1)
-      end        
+      end
 
       number_of_wildcards.times { load_wildcard }
     end
-       
+
     def load_enclosing_resource_from_specification(spec)
       spec.segment == nesting_segments[enclosing_resources.size][:segment] or ResourcesController.raise_resource_mismatch(self)
       spec.find_from(self).tap do |resource|
         add_enclosing_resource(resource, :name => spec.name, :name_prefix => spec.name_prefix, :is_singleton => spec.singleton?, :as => spec.as)
       end
     end
-    
+
     def add_enclosing_resource(resource, options = {})
       name = options[:name] || resource.class.name.underscore
       update_name_prefix(options[:name_prefix] || (options[:name_prefix] == false ? '' : "#{name}_"))
@@ -728,7 +728,7 @@ private
       instance_variable_set("@#{name}", resource)
       instance_variable_set("@#{options[:as]}", resource) if options[:as]
     end
-    
+
     # The name prefix is used for forwarding urls and will be different depending on
     # which route the controller was invoked by.  The resource specifications build
     # up the name prefix as the resources are loaded.
@@ -736,30 +736,30 @@ private
       @name_prefix = "#{@name_prefix}#{name_prefix}"
     end
   end
-  
+
   # Proxy class to provide a consistent API for resource_service.  This is mostly
   # required for Singleton resources. Also allows decoration of the resource service with custom finders
-  class ResourceService < ActiveSupport::BasicObject
+  class ResourceService < ActiveSupport::ProxyObject
     attr_reader :controller
     delegate :resource_specification, :resource_class, :enclosing_resource, :to => :controller
-    
+
     def initialize(controller)
       @controller = controller
     end
-          
+
     def method_missing(*args, &block)
       service.send(*args, &block)
     end
-    
+
     def find(*args, &block)
       resource_specification.find ? resource_specification.find_custom(controller) : super
     end
-    
+
     # build association on the enclosing resource if there is one, otherwise call new
     def new(*args, &block)
       enclosing_resource ? service.build(*args, &block) : service.new(*args, &block)
     end
-    
+
     # find the resource
     # If we have a resource service, we call destroy on it with the reosurce id, so that any callbacks can be triggered
     # Otherwise, just call destroy on the resource
@@ -772,16 +772,16 @@ private
         resource.destroy
       end
     end
-      
+
     def respond_to?(method, include_private = false)
       super || service.respond_to?(method)
     end
-  
+
     def service
       @service ||= enclosing_resource ? enclosing_resource.send(resource_specification.source) : resource_class
     end
   end
-  
+
   class SingletonResourceService < ResourceService
     def find(*args)
       if resource_specification.find
@@ -792,7 +792,7 @@ private
         ::ResourcesController.raise_cant_find_singleton(controller.resource_name, controller.resource_class)
       end
     end
-      
+
     # build association on the enclosing resource if there is one, otherwise call new
     def new(*args, &block)
       enclosing_resource ? enclosing_resource.send("build_#{resource_specification.source}", *args, &block) : service.new(*args, &block)
@@ -801,15 +801,15 @@ private
     def destroy(*args)
       find.destroy
     end
-    
+
     def service
       resource_class
     end
   end
-  
+
   class CantFindSingleton < RuntimeError #:nodoc:
   end
-  
+
   class ResourceMismatch < RuntimeError #:nodoc:
   end
 
@@ -826,7 +826,7 @@ nested_in :#{name}, :singleton => true do
   #{klass.name}.find(<.. your find args here ..>)
 end
 
-Or: 
+Or:
 nested_in :#{name}, :singleton => true, :find => <.. method name or lambda ..>
 
 Or, you may be relying on the route to load the resource, in which case you need to give RC some
@@ -835,7 +835,7 @@ help.  Do this by mapping the route segment to a resource in the controller, or 
 map_enclosing_resource :#{name}, :segment => ..., :singleton => true <.. as above ..>
 end_str
     end
-    
+
     def raise_resource_mismatch(controller) #:nodoc:
       raise ResourceMismatch, <<-end_str
 resources_controller can't match the route to the resource specification
