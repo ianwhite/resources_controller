@@ -67,7 +67,7 @@ module ResourcesController
       else
         return false
       end
-      respond_to_without_named_route_helper?(route_method) || (raise_error && raise_resource_url_mapping_error(resource_method, route_method))
+      respond_to_without_named_route_helper?(route_method, true) || (raise_error && raise_resource_url_mapping_error(resource_method, route_method))
     end
 
   private
