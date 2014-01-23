@@ -1,5 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
-require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
+require 'spec_helper'
 
 module ForumPostsSpecHelper
   def setup_mocks
@@ -97,11 +96,11 @@ describe ForumPostsController do
   describe ForumPostsController, " errors" do
   
     it "should raise ResourceMismatch for /posts" do
-      lambda{ get :index }.should raise_error(Ardes::ResourcesController::ResourceMismatch)
+      lambda{ get :index }.should raise_error(ResourcesController::ResourceMismatch)
     end
 
     it "should raise ResourceMismatch, when route does not contain the resource segment" do
-      lambda{ get :index, :foo_id => 1}.should raise_error(Ardes::ResourcesController::ResourceMismatch)
+      lambda{ get :index, :foo_id => 1}.should raise_error(ResourcesController::ResourceMismatch)
     end
   end
 

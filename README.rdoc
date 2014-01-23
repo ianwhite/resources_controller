@@ -1,20 +1,18 @@
 = resources_controller
 
+{<img src="https://secure.travis-ci.org/ianwhite/resources_controller.png?branch=master" alt="Build Status" />}[http://travis-ci.org/ianwhite/resources_controller]
+
 is a plugin to facilitate inheritance and DRYness in your resources controllers.  It introduces some abstraction to help
 you override the default RESTful funtionality in a clean and simple manner.
 
-See History.txt for recent changes.
+The gem name is *rc_rails*
 
 == Rails 3 version
 
 Add this to your Gemfile
 
-  gem 'resources_controller', :git => 'git://github.com/ianwhite/resources_controller'
+  gem 'rc_rails'
   
-Or install as a plugin
-
-  rails plugin install git://github.com/ianwhite/resources_controller
-
 == Resources
 
 <b>Github</b> for code: http://github.com/ianwhite/resources_controller
@@ -23,37 +21,31 @@ Or install as a plugin
 
 <b>Google group</b> for questions: http://groups.google.com/group/resources_controller
 
-<b>Lighthouse</b> for bugs: http://ianwhite.lighthouseapp.com/projects/10598-resources_controller
-
-<b>Blog</b> articles: http://blog.ardes.com/resources_controller
-
 <b>RailsConfEurope</b> presentation files: http://en.oreilly.com/railseurope2008/public/schedule/detail/3536
 
 == for rails 2.x
 
 use the rails2 branch: http://github.com/ianwhite/resources_controller/tree/rails2
 
-== Specs and Coverage
-
-* The SPECDOC lists the specifications
-* Coverage is 100% (C0), and the spec suite is quite comprehensive
-* Rspec's generated rspec_scaffold controller specs are tested against a simple rc controller (see rake spec:generate)
-
 == How to contribute
 
 If you have found a bug, or have a new feature, then spec'd code is great.
 
-To get set up and run the tests
+To get set up for development, do the following:
 
   git clone git://github.com/ianwhite/resources_controller
   cd resources_controller
+  cp Gemfile.lock.development Gemfile.lock
   bundle
-  rake spec:all
+  rake spec
+  rake spec:rspec_generated_specs
 
 == Contributors
 
 The following people have made contributions to resources_controller.  Please let me know if I've missed you out.
 
+* Lewis Marshall
+* Josh Goebel
 * Andrew Bloomgarden
 * Chris Hapgood
 * Jason Lee

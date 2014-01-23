@@ -1,5 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
-require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
+require 'spec_helper'
 
 module AccountsControllerSpecHelper
   def setup_mocks
@@ -28,6 +27,12 @@ describe AccountsController do
     end    
   end
 
+  describe AccountsController, " requesting garbage url" do
+    it "should raise ResourcesController::Specification::NoClassFoundError" do
+      lambda { get :show, :resource_path => "/crayzeee" }.should raise_error(ResourcesController::Specification::NoClassFoundError)
+    end
+  end
+  
   describe AccountsController, "#resource_service" do
     include AccountsControllerSpecHelper
   
@@ -49,13 +54,14 @@ describe AccountsController do
   
     it ".find should call whatever is in resource_specification @find" do
       @controller.should_receive(:lambda_called).once.and_return(@current_user)
-      @controller.send(:resource_specification).stub!(:find).and_return(lambda { lambda_called })
+      resource_specification = @controller.send(:resource_specification)
+      resource_specification.stub(:find).and_return(lambda { lambda_called })
       @resource_service.find
     end
   
     it ".find should raise CantFindSingleton when no custom finder (and no enclosing resource)" do
       @controller.send(:resource_specification).stub!(:find).and_return nil
-      lambda{ @resource_service.find }.should raise_error(Ardes::ResourcesController::CantFindSingleton)
+      lambda{ @resource_service.find }.should raise_error(ResourcesController::CantFindSingleton)
     end
   
     it ".foo should call foo on User" do

@@ -1,4 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
+require 'spec_helper'
 
 module RequestPathIntrospectionSpec
   class Forum < ActiveRecord::Base; end
@@ -33,7 +33,7 @@ module RequestPathIntrospectionSpec
       end
       
       it "when resource_specification present, whould remove taht segment" do
-        @controller.stub!(:resource_specification).and_return(Ardes::ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :segment => 'foromas'))
+        @controller.stub!(:resource_specification).and_return(ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :segment => 'foromas'))
         @controller.stub!(:request_path).and_return('/users/1/foromas/2')
         @controller.send(:nesting_request_path).should == '/users/1'
       end
@@ -49,7 +49,7 @@ module RequestPathIntrospectionSpec
       end
 
       it "should remove only the controller_name segment even when nesting is same name" do
-        @controller.stub!(:resource_specification).and_return(Ardes::ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :singleton => true))
+        @controller.stub!(:resource_specification).and_return(ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :singleton => true))
         @controller.stub!(:request_path).and_return('/users/1/forum/forum.atom')
         @controller.send(:nesting_request_path).should == '/users/1/forum'
       end

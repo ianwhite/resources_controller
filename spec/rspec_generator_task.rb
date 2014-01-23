@@ -1,6 +1,6 @@
 namespace :spec do
   desc "Run rspec's generated specs against RC'd controllers"
-  task :generate => 'tmp/test_app' do
+  task :rspec_generated_specs => 'tmp/test_app' do
     require 'active_support/all'
 
     cd 'tmp/test_app' do
@@ -9,7 +9,8 @@ namespace :spec do
         migrate_up
         make_resources_controller :author
         puts "** Running generated controller specs"
-        sh "rake spec:controllers"
+        sh "rake db:test:prepare"
+        sh "bundle exec rspec"
       ensure
         migrate_down
         cleanup_resource :author
@@ -26,22 +27,16 @@ namespace :spec do
   
   file 'tmp/test_app' do
     puts "Generating test app"
+    mkdir_p "tmp"
     cd 'tmp' do
-      system "rails new test_app"
+      system "rails new test_app --skip-gemfile --skip-bundle --skip-git --skip-test-unit"
       
       cd 'test_app' do
         File.open('Gemfile', 'w+') do |file|
-          file << <<-EOD
-            source :rubygems
-            gem 'rails', '3.0.0'
-            gem 'sqlite3-ruby'
-            gem 'rspec', '~>2.0.0.beta.20'
-            gem 'rspec-rails', '~>2.0.0.beta.20'
-            gem 'resources_controller', :git => "#{File.expand_path('../../../..', __FILE__)}"
-          EOD
+          file << %Q{gem 'rc_rails', :git => "#{File.expand_path('../../../..', __FILE__)}"}
         end
-        system "bundle"
-        system "rails g rspec:install"
+        system "bundle install --quiet"
+        system "rails generate rspec:install"
       end
     end
   end

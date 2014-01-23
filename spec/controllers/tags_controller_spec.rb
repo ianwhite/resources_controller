@@ -1,5 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
-require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
+require 'spec_helper'
 
 describe TagsController do
   describe "Routing shortcuts for Tags should map" do

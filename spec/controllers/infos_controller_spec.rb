@@ -1,5 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
-require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
+require 'spec_helper'
 
 module InfosControllerSpecHelper
   def setup_mocks
@@ -57,16 +56,16 @@ describe InfosController do
       response.should be_redirect
     end
   
-    it "GET /account/info/new should raise UnknownAction" do
-      lambda { get :new }.should raise_error(ActionController::UnknownAction)
+    it "GET /account/info/new should raise ActionNotFound" do
+      lambda { get :new }.should raise_error(::AbstractController::ActionNotFound)
     end
   
-    it "POST /account/info should raise UnknownAction" do
-      lambda { post :create }.should raise_error(ActionController::UnknownAction)
+    it "POST /account/info should raise ActionNotFound" do
+      lambda { post :create }.should raise_error(::AbstractController::ActionNotFound)
     end
 
-    it "DELETE /account/info/new should raise UnknownAction" do
-      lambda { delete :destroy }.should raise_error(ActionController::UnknownAction)
+    it "DELETE /account/info/new should raise ActionNotFound" do
+      lambda { delete :destroy }.should raise_error(::AbstractController::ActionNotFound)
     end
   end
 end

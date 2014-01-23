@@ -2,8 +2,10 @@
 
 module ResourcesControllerTest
   class Application < Rails::Application
-    paths.config.database = File.expand_path('../app/database.yml', __FILE__)
-    paths.log = File.expand_path('../../../tmp/log', __FILE__)
+    config.secret_key_base = "1234567890-12345678912345678923456789"
+    config.active_support.deprecation = :stderr
+    paths['config/database'] = File.expand_path('../app/database.yml', __FILE__)
+    paths['log'] = File.expand_path('../../../tmp/log', __FILE__)
   end
 end
 
@@ -15,66 +17,65 @@ ResourcesControllerTest::Application.initialize!
 
 Rails.application
 Rails.application.routes.clear!
-Rails.application.routes.draw do |map|
+Rails.application.routes.draw do
   # this tests :resource_path (or :erp), for named routes that map to resources
-  map.root :controller => 'forums', :action => 'index', :resource_path => '/forums'
-  map.create_forum 'create_forum', :controller => 'forums', :action => 'create', :resource_path => '/forums', :resource_method => :post
+  root :controller => 'forums', :action => 'index', :resource_path => '/forums'
+  get 'create_forum', :controller => 'forums', :action => 'create', :resource_path => '/forums', :resource_method => :post
 
-  map.namespace :admin do |admin|
-    admin.resources :forums do |forum|
-      forum.resources :interests
+  namespace :admin do
+    resources :forums do
+      resources :interests
     end
-    admin.namespace :superduper do |superduper|
-      superduper.resources :forums
-    end
-  end
-  
-  map.resources :users do |user|
-    user.resources :interests
-    user.resources :posts, :controller => 'user_posts'
-    user.resources :comments, :controller => 'user_comments'
-    user.resources :addresses do |address|
-      address.resources :tags
+    namespace :superduper do
+      resources :forums
     end
   end
-  
-  map.resources :forums do |forum|
-    forum.resources :interests
-    forum.resources :posts, :controller => 'forum_posts' do |post|
-      post.resources :comments do |comment|
-        comment.resources :tags
-      end
-      post.resources :tags
-    end
-    forum.resource :owner do |owner|
-      owner.resources :posts do |post|
-        post.resources :tags
-      end
-    end
-    forum.resources :tags
-  end
-  
-  map.resource :account do |account|
-    account.resources :posts
-    account.resource :info do |info|
-      info.resources :tags
-    end
-  end
-  
-  map.resources :tags
 
-  map.with_options :path_prefix => ":tag_id", :name_prefix => "tag_" do |tag|
-    tag.resources :forums
+  resources :users do
+    resources :interests
+    resources :posts, :controller => 'user_posts'
+    resources :comments, :controller => 'user_comments'
+    resources :addresses do
+      resources :tags
+    end
   end
-  
+
+  resources :forums do
+    resources :interests
+    resources :posts, :controller => 'forum_posts' do
+      resources :comments do
+        resources :tags
+      end
+      resources :tags
+    end
+    resource :owner do
+      resources :posts do
+        resources :tags
+      end
+    end
+    resources :tags
+  end
+
+  resource :account do
+    resources :posts
+    resource :info do
+      resources :tags
+    end
+  end
+
+  resources :tags
+
+  with_options :path_prefix => ":tag_id", :name_prefix => "tag_" do
+    resources :forums
+  end
+
   # the following routes are for testing errors
-  map.resources :posts, :controller => 'forum_posts'
-  map.resources :foos do |foo|
-    foo.resources :bars, :controller => 'forum_posts'
+  resources :posts, :controller => 'forum_posts'
+  resources :foos do
+    resources :bars, :controller => 'forum_posts'
   end
-  
-  map.default ':controller/:action/:id' # naming this so we can test missing segment errors
-  map.connect ':controller/:action/:id.:format'
+
+  get ':controller/:action/:id(.:format)' # naming this so we can test missing segment errors
 end
 
 
@@ -87,7 +88,7 @@ ActiveRecord::Migration.suppress_messages do
     create_table :users, :force => true do |t|
       t.string :login
     end
-    
+
     create_table :infos, :force => true do |t|
       t.column "user_id", :integer
     end
@@ -95,7 +96,7 @@ ActiveRecord::Migration.suppress_messages do
     create_table :addresses, :force => true do |t|
       t.column "user_id", :integer
     end
-    
+
     create_table :forums, :force => true do |t|
       t.column "owner_id", :integer
     end
@@ -109,12 +110,12 @@ ActiveRecord::Migration.suppress_messages do
       t.column "post_id", :integer
       t.column "user_id", :integer
     end
-    
+
     create_table :interests, :force => true do |t|
       t.column "interested_in_id", :integer
       t.column "interested_in_type", :string
     end
-    
+
     create_table :tags, :force => true do |t|
       t.column "taggable_id", :integer
       t.column "taggable_type", :string
@@ -141,7 +142,7 @@ class User < ActiveRecord::Base
   has_many :interests, :as => :interested_in
   has_many :addresses
   has_one :info
-  
+
   def to_param
     login
   end
@@ -174,7 +175,7 @@ end
 
 class Comment < ActiveRecord::Base
   validates_presence_of :user, :post
-  
+
   belongs_to :user
   belongs_to :post
   has_many :tags, :as => :taggable
@@ -190,7 +191,7 @@ class ApplicationController < ActionController::Base
   map_enclosing_resource :user do
     User.find_by_login(params[:user_id])
   end
-    
+
 protected
   def current_user
     @current_user
@@ -201,17 +202,17 @@ module Admin
   class ForumsController < ApplicationController
     resources_controller_for :forums
   end
-  
+
   class InterestsController < ApplicationController
     resources_controller_for :interests
   end
-  
+
   module NotANamespace
     class ForumsController < ApplicationController
       resources_controller_for :forums
     end
   end
-  
+
   module Superduper
     class ForumsController < ApplicationController
       resources_controller_for :forums
@@ -233,7 +234,7 @@ end
 
 class UsersController < ApplicationController
   resources_controller_for :users, :except => [:new, :create, :destroy]
-  
+
 protected
   def find_resource(id = params[:id])
     resource_service.find_by_login(id)
@@ -249,9 +250,9 @@ class OwnersController < ApplicationController
 end
 
 class PostsAbstractController < ApplicationController
-  include Ardes::ResourcesController::ResourceMethods
+  include ResourcesController::ResourceMethods
   attr_accessor :filter_trace
-  
+
   # for testing filter load order
   before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :abstract}
 
@@ -265,10 +266,10 @@ end
 class PostsController < PostsAbstractController
   # for testing filter load order
   before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :posts}
-  
+
   # example of providing options to resources_controller_for
   resources_controller_for :posts, :class => Post, :route => 'posts'
-  
+
   def load_enclosing_resources_with_trace(*args)
     self.filter_trace ||= []; self.filter_trace << :load_enclosing
     load_enclosing_resources_without_trace(*args)
@@ -279,7 +280,7 @@ end
 class UserPostsController < PostsController
   # for testing filter load order
   before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :user_posts}
-  
+
   # example of providing options to nested in
   nested_in :user, :class => User, :key => 'user_id', :name_prefix => 'user_'
 end
@@ -294,7 +295,7 @@ class ForumPostsController < PostsController
 
   # test override resources_controller_for use
   resources_controller_for :posts
-  
+
   # example of providing a custom finder for the nesting resource
   # also example of :as option, which allows you to assign an alias
   # for an enclosing resource
@@ -310,7 +311,7 @@ end
 class InterestsController < ApplicationController
   resources_controller_for :interests
   nested_in :interested_in, :polymorphic => true
-  
+
   # the above two lines are the same as:
   #   resources_controller_for :interests, :in => '?interested_in'
 end

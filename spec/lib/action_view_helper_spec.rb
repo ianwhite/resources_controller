@@ -1,8 +1,7 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
-require File.expand_path(File.join(File.dirname(__FILE__), '../app'))
+require 'spec_helper'
 
 class ViewWithResourcesControllerHelper < ActionView::Base
-  include Ardes::ResourcesController::Helper
+  include ResourcesController::Helper
 end
 
 describe "ActionView with resources_controller Helper" do
