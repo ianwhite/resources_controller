@@ -466,7 +466,7 @@ module ResourcesController
     before_filter(:load_enclosing_resources, when_options.dup) unless load_enclosing_resources_filter_exists?
 
     self.specifications = []
-    specifications << '*' unless options.delete(:load_enclosing) == false || options[:in]
+    specifications << '*' unless options.delete(:load_enclosing) == false
 
     unless (actions = options.delete(:actions)) == false
       actions ||= options[:singleton] ? ResourcesController.singleton_actions : ResourcesController.actions
@@ -536,9 +536,7 @@ private
 
       names.each do |name|
         ensure_sane_wildcard if name == '*'
-        # try to see if there is already an existing specification with this name
-        specification = resource_specification_map.values.select {|s| s.name.to_s == name.to_s}.first
-        specifications << (name.to_s =~ /^(\*|\?(.*))$/ ? name.to_s : (specification || Specification.new(name, options, &block)))
+        specifications << (name.to_s =~ /^(\*|\?(.*))$/ ? name.to_s : Specification.new(name, options, &block))
       end
     end
 
