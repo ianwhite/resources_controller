@@ -3,16 +3,16 @@ require 'spec_helper'
 module TagsViaUserAddressSpecHelper
   def setup_mocks
     @user = mock_model(User)
-    User.stub!(:find_by_login).and_return(@user)
-    @user.stub!(:to_param).and_return('dave')
-    @user_addresses = mock('user_addresses assoc')
-    @user.stub!(:addresses).and_return(@user_addresses)
+    User.stub(:find_by_login).and_return(@user)
+    @user.stub(:to_param).and_return('dave')
+    @user_addresses = double('user_addresses assoc')
+    @user.stub(:addresses).and_return(@user_addresses)
     
     @address = mock_model(Address)
-    @user_addresses.stub!(:find).and_return(@address)
-    @address.stub!(:to_param).and_return('2')
-    @address_tags = mock('address_tags assoc')
-    @address.stub!(:tags).and_return(@address_tags)
+    @user_addresses.stub(:find).and_return(@address)
+    @address.stub(:to_param).and_return('2')
+    @address_tags = double('address_tags assoc')
+    @address.stub(:tags).and_return(@address_tags)
   end
 end
 
@@ -23,8 +23,8 @@ describe TagsController do
     before(:each) do
       setup_mocks
       @tag = mock_model(Tag)
-      @tag.stub!(:to_param).and_return('3')
-      @address_tags.stub!(:find).and_return(@tag)
+      @tag.stub(:to_param).and_return('3')
+      @address_tags.stub(:find).and_return(@tag)
     
       get :show, :user_id => "dave", :address_id => "2", :id => "3"
     end
@@ -98,8 +98,8 @@ describe TagsController do
 
     before(:each) do
       setup_mocks
-      @tags = mock('Tags')
-      @address_tags.stub!(:all).and_return(@tags)
+      @tags = double('Tags')
+      @address_tags.stub(:all).and_return(@tags)
     end
   
     def do_get

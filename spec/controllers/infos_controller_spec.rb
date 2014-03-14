@@ -2,12 +2,12 @@ require 'spec_helper'
 
 module InfosControllerSpecHelper
   def setup_mocks
-    @current_user = mock('user')
-    @current_user.stub!(:id).and_return('1')
-    @controller.stub!(:current_user).and_return(@current_user)
-    @info = mock('info')
-    @info.stub!(:id).and_return('3')
-    @current_user.stub!(:info).and_return(@info)
+    @current_user = double('user')
+    @current_user.stub(:id).and_return('1')
+    @controller.stub(:current_user).and_return(@current_user)
+    @info = double('info')
+    @info.stub(:id).and_return('3')
+    @current_user.stub(:info).and_return(@info)
   end
 end
 
@@ -51,7 +51,7 @@ describe InfosController do
     end
   
     it "PUT /account/info should be successful" do
-      @info.stub!(:update_attributes).and_return(true)
+      @info.stub(:update_attributes).and_return(true)
       put :update
       response.should be_redirect
     end

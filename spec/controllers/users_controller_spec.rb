@@ -36,7 +36,7 @@ describe UsersController, "handling GET /users" do
 
   before do
     @user = mock_model(User)
-    User.stub!(:all).and_return([@user])
+    User.stub(:all).and_return([@user])
   end
   
   def do_get
@@ -68,7 +68,7 @@ describe UsersController, "handling GET /users.xml" do
 
   before do
     @user = mock_model(User, :to_xml => "XML")
-    User.stub!(:all).and_return(@user)
+    User.stub(:all).and_return(@user)
   end
   
   def do_get
@@ -97,7 +97,7 @@ describe UsersController, "handling GET /users/dave" do
 
   before do
     @user = mock_model(User)
-    User.stub!(:find_by_login).and_return(@user)
+    User.stub(:find_by_login).and_return(@user)
   end
   
   def do_get
@@ -129,7 +129,7 @@ describe UsersController, "handling GET /users/dave.xml" do
 
   before do
     @user = mock_model(User, :to_xml => "XML")
-    User.stub!(:find_by_login).and_return(@user)
+    User.stub(:find_by_login).and_return(@user)
   end
   
   def do_get
@@ -164,7 +164,7 @@ describe UsersController, "handling GET /users/dave/edit" do
 
   before do
     @user = mock_model(User)
-    User.stub!(:find_by_login).and_return(@user)
+    User.stub(:find_by_login).and_return(@user)
   end
   
   def do_get
@@ -202,7 +202,7 @@ describe UsersController, "handling PUT /users/dave" do
 
   before do
     @user = mock_model(User, :to_param => "dave")
-    User.stub!(:find_by_login).and_return(@user)
+    User.stub(:find_by_login).and_return(@user)
   end
   
   def put_with_successful_update

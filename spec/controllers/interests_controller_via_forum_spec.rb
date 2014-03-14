@@ -2,11 +2,11 @@ require 'spec_helper'
 
 module InterestsViaForumSpecHelper
   def setup_mocks
-    @forum = mock('Forum')
-    @forum_interests = mock('forum_interests assoc')
-    Forum.stub!(:find).and_return(@forum)
-    @forum.stub!(:interests).and_return(@forum_interests)
-    @forum.stub!(:to_param).and_return('1')
+    @forum = double('Forum')
+    @forum_interests = double('forum_interests assoc')
+    Forum.stub(:find).and_return(@forum)
+    @forum.stub(:interests).and_return(@forum_interests)
+    @forum.stub(:to_param).and_return('1')
   end
 end
 
@@ -16,9 +16,9 @@ describe InterestsController do
   
     before(:each) do
       setup_mocks
-      @interest = mock('Interest')
-      @interest.stub!(:to_param).and_return('2')
-      @forum_interests.stub!(:find).and_return(@interest)
+      @interest = double('Interest')
+      @interest.stub(:to_param).and_return('2')
+      @forum_interests.stub(:find).and_return(@interest)
     
       get :show, :forum_id => "1", :id => "2"
     end
@@ -53,8 +53,8 @@ describe InterestsController do
 
     before(:each) do
       setup_mocks
-      @interests = mock('Interests')
-      @forum_interests.stub!(:all).and_return(@interests)
+      @interests = double('Interests')
+      @forum_interests.stub(:all).and_return(@interests)
     end
   
     def do_get

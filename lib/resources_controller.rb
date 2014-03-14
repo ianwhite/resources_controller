@@ -39,20 +39,20 @@ require 'resources_controller/specification'
 #
 #              PATH                     RESOURCES CONTROLLER WILL DO:
 #
-#  Example 1  /forums                   @forums = Forum.find(:all)
+#  Example 1  /forums                   @forums = Forum.all
 #
 #             /users/2/forums           @user = User.find(2)
-#                                       @forums = @user.forums.find(:all)
+#                                       @forums = @user.forums.all
 #
 #  Example 2  /posts                    This won't work as the controller specified
 #                                       that :posts are :in => :forum
 #
 #             /forums/2/posts           @forum = Forum.find(2)
-#                                       @posts = @forum.posts.find(:all)
+#                                       @posts = @forum.posts.all
 #
 #             /sites/4/forums/3/posts   @site = Site.find(4)
 #                                       @forum = @site.forums.find(3)
-#                                       @posts = @forum.posts.find(:all)
+#                                       @posts = @forum.posts.all
 #
 #             /users/2/posts/1          This won't work as the controller specified
 #                                       that :posts are :in => :forum
@@ -185,10 +185,10 @@ require 'resources_controller/specification'
 #
 #  PATH                   CONTROLLER    WHICH WILL DO:
 #
-#  /forums                forums        @forums = Forum.find(:all)
+#  /forums                forums        @forums = Forum.all
 #
 #  /forums/2/posts        posts         @forum = Forum.find(2)
-#                                       @posts = @forum.forums.find(:all)
+#                                       @posts = @forum.forums.all
 #
 #  /forums/2/image        image         @forum = Forum.find(2)
 #                                       @image = @forum.image
@@ -286,7 +286,7 @@ require 'resources_controller/specification'
 #     resources_controller_for :posts
 #
 #     def find_resources
-#       resource_service.find :all, :order => params[:sort_by]
+#       resource_service.order(params[:sort_by])
 #     end
 #
 #     # you can call super to help yourself to the existing implementation

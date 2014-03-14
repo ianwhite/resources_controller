@@ -2,9 +2,9 @@ require 'spec_helper'
 
 module AccountsControllerSpecHelper
   def setup_mocks
-    @current_user = mock('user')
-    @current_user.stub!(:id).and_return('1')
-    User.stub!(:find).and_return(@current_user)
+    @current_user = double('user')
+    @current_user.stub(:id).and_return('1')
+    User.stub(:find).and_return(@current_user)
     @controller.instance_variable_set('@current_user', @current_user)
   end
 end
@@ -60,7 +60,7 @@ describe AccountsController do
     end
   
     it ".find should raise CantFindSingleton when no custom finder (and no enclosing resource)" do
-      @controller.send(:resource_specification).stub!(:find).and_return nil
+      @controller.send(:resource_specification).stub(:find).and_return nil
       lambda{ @resource_service.find }.should raise_error(ResourcesController::CantFindSingleton)
     end
   
@@ -70,7 +70,7 @@ describe AccountsController do
     end
   
     it ".respond_to?(:foo) should call respond_to?(:foo) on User" do
-      User.stub!(:foo)
+      User.stub(:foo)
       @resource_service.respond_to?(:foo).should be_true
     end
   end

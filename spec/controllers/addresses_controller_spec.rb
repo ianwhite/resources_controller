@@ -2,12 +2,12 @@ require 'spec_helper'
 
 module AddressesSpecHelper
   def setup_mocks
-    @user = mock('User')
-    @user_addresses = mock('Assoc: user_addresses')
-    @user.stub!(:addresses).and_return(@user_addresses)
-    @user.stub!(:to_param).and_return("dave")
+    @user = double('User')
+    @user_addresses = double('Assoc: user_addresses')
+    @user.stub(:addresses).and_return(@user_addresses)
+    @user.stub(:to_param).and_return("dave")
     
-    User.stub!(:find_by_login).and_return(@user)
+    User.stub(:find_by_login).and_return(@user)
   end
 end
 
@@ -17,9 +17,9 @@ describe AddressesController do
 
     before(:each) do
       setup_mocks
-      @address = mock('Address')
-      @address.stub!(:to_param).and_return('1')
-      @user_addresses.stub!(:find).and_return(@address)
+      @address = double('Address')
+      @address.stub(:to_param).and_return('1')
+      @user_addresses.stub(:find).and_return(@address)
   
       get :show, :user_id => "dave", :id => "1"
     end
@@ -87,8 +87,8 @@ describe AddressesController do
   
     before(:each) do
       setup_mocks
-      @addresses = mock('Addresses')
-      @user_addresses.stub!(:all).and_return(@addresses)
+      @addresses = double('Addresses')
+      @user_addresses.stub(:all).and_return(@addresses)
     end
   
     def do_get
@@ -117,8 +117,8 @@ describe AddressesController do
 
     before(:each) do
       setup_mocks
-      @addresses = mock('Addresses')
-      @user_addresses.stub!(:all).and_return(@addresses)
+      @addresses = double('Addresses')
+      @user_addresses.stub(:all).and_return(@addresses)
     end
   
     def do_get
@@ -151,8 +151,8 @@ describe AddressesController do
 
     before(:each) do
       setup_mocks
-      @address = mock('a address')
-      @user_addresses.stub!(:find).and_return(@address)
+      @address = double('a address')
+      @user_addresses.stub(:find).and_return(@address)
     end
   
     def do_get
@@ -185,8 +185,8 @@ describe AddressesController do
 
     before(:each) do
       setup_mocks
-      @address = mock('new Address')
-      @user_addresses.stub!(:build).and_return(@address)
+      @address = double('new Address')
+      @user_addresses.stub(:build).and_return(@address)
     end
   
     def do_get
@@ -224,8 +224,8 @@ describe AddressesController do
 
     before(:each) do
       setup_mocks
-      @address = mock('Address')
-      @user_addresses.stub!(:find).and_return(@address)
+      @address = double('Address')
+      @user_addresses.stub(:find).and_return(@address)
     end
  
     def do_get
@@ -258,10 +258,10 @@ describe AddressesController do
 
     before(:each) do
       setup_mocks
-      @address = mock('Address')
-      @address.stub!(:save).and_return(true)
-      @address.stub!(:to_param).and_return("1")
-      @user_addresses.stub!(:build).and_return(@address)
+      @address = double('Address')
+      @address.stub(:save).and_return(true)
+      @address.stub(:to_param).and_return("1")
+      @user_addresses.stub(:build).and_return(@address)
     end
   
     def do_post
@@ -285,9 +285,9 @@ describe AddressesController do
 
     before(:each) do
       setup_mocks
-      @address = mock('Address').as_null_object
-      @address.stub!(:to_param).and_return("1")
-      @user_addresses.stub!(:find).and_return(@address)
+      @address = double('Address').as_null_object
+      @address.stub(:to_param).and_return("1")
+      @user_addresses.stub(:find).and_return(@address)
     end
   
     def do_update
@@ -321,9 +321,9 @@ describe AddressesController do
 
     before(:each) do
       setup_mocks
-      @address = mock('Address', :id => "1").as_null_object
-      @user_addresses.stub!(:find).and_return(@address)
-      @user_addresses.stub!(:destroy)
+      @address = double('Address', :id => "1").as_null_object
+      @user_addresses.stub(:find).and_return(@address)
+      @user_addresses.stub(:destroy)
     end
   
     def do_delete

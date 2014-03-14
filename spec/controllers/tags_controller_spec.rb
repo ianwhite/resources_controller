@@ -4,11 +4,11 @@ describe TagsController do
   describe "Routing shortcuts for Tags should map" do
   
     before(:each) do
-      @tag = mock('Tag')
-      @tag.stub!(:to_param).and_return('2')
-      Tag.stub!(:find).and_return(@tag)
+      @tag = double('Tag')
+      @tag.stub(:to_param).and_return('2')
+      Tag.stub(:find).and_return(@tag)
     
-      @controller.stub!(:request_path).and_return('/tags/2')
+      @controller.stub(:request_path).and_return('/tags/2')
       get :show, :id => "2"
     end
   
@@ -61,12 +61,12 @@ describe TagsController do
   describe "Requesting /tags/index" do
 
     before(:each) do
-      @tags = mock('Tags')
-      Tag.stub!(:all).and_return(@tags)
+      @tags = double('Tags')
+      Tag.stub(:all).and_return(@tags)
     end
   
     def do_get
-      @controller.stub!(:request_path).and_return('/tags/index')
+      @controller.stub(:request_path).and_return('/tags/index')
       get :index
     end
 

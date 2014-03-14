@@ -2,11 +2,11 @@ require 'spec_helper'
 
 module TagsViaForumSpecHelper
   def setup_mocks
-    @forum = mock('Forum')
-    @forum_tags = mock('forum_tags assoc')
-    Forum.stub!(:find).and_return(@forum)
-    @forum.stub!(:tags).and_return(@forum_tags)
-    @forum.stub!(:to_param).and_return('1')
+    @forum = double('Forum')
+    @forum_tags = double('forum_tags assoc')
+    Forum.stub(:find).and_return(@forum)
+    @forum.stub(:tags).and_return(@forum_tags)
+    @forum.stub(:to_param).and_return('1')
   end
 end
 
@@ -16,9 +16,9 @@ describe TagsController do
   
     before(:each) do
       setup_mocks
-      @tag = mock('Tag')
-      @tag.stub!(:to_param).and_return('2')
-      @forum_tags.stub!(:find).and_return(@tag)
+      @tag = double('Tag')
+      @tag.stub(:to_param).and_return('2')
+      @forum_tags.stub(:find).and_return(@tag)
     
       get :show, :forum_id => "1", :id => "2"
     end
@@ -91,8 +91,8 @@ describe TagsController do
 
     before(:each) do
       setup_mocks
-      @tags = mock('Tags')
-      @forum_tags.stub!(:all).and_return(@tags)
+      @tags = double('Tags')
+      @forum_tags.stub(:all).and_return(@tags)
     end
   
     def do_get
@@ -121,8 +121,8 @@ describe TagsController do
 
     before(:each) do
       setup_mocks
-      @tag = mock('Tag')
-      @forum_tags.stub!(:build).and_return(@tag)
+      @tag = double('Tag')
+      @forum_tags.stub(:build).and_return(@tag)
     end
   
     def do_get

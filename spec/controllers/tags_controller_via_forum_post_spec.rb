@@ -2,17 +2,17 @@ require 'spec_helper'
 
 module TagsViaForumPostSpecHelper
   def setup_mocks
-    @forum = mock('Forum')
-    Forum.stub!(:find).and_return(@forum)
-    @forum.stub!(:to_param).and_return('1')
-    @forum_posts = mock('forum_posts assoc')
-    @forum.stub!(:posts).and_return(@forum_posts)
+    @forum = double('Forum')
+    Forum.stub(:find).and_return(@forum)
+    @forum.stub(:to_param).and_return('1')
+    @forum_posts = double('forum_posts assoc')
+    @forum.stub(:posts).and_return(@forum_posts)
     
-    @post = mock('Post')
-    @forum_posts.stub!(:find).and_return(@post)
-    @post.stub!(:to_param).and_return('2')
-    @post_tags = mock('post_tags assoc')
-    @post.stub!(:tags).and_return(@post_tags)
+    @post = double('Post')
+    @forum_posts.stub(:find).and_return(@post)
+    @post.stub(:to_param).and_return('2')
+    @post_tags = double('post_tags assoc')
+    @post.stub(:tags).and_return(@post_tags)
   end
 end
 
@@ -22,11 +22,11 @@ describe TagsController do
   
     before(:each) do
       setup_mocks
-      @tag = mock('Tag')
-      @tag.stub!(:to_param).and_return('3')
-      @post_tags.stub!(:find).and_return(@tag)
+      @tag = double('Tag')
+      @tag.stub(:to_param).and_return('3')
+      @post_tags.stub(:find).and_return(@tag)
     
-      @controller.stub!(:request_path).and_return('/forums/1/posts/1/tags/3')
+      @controller.stub(:request_path).and_return('/forums/1/posts/1/tags/3')
       get :show, :forum_id => "1", :post_id => "2", :id => "3"
     end
   
@@ -68,7 +68,7 @@ describe TagsController do
       @other_post  = Post.create :forum_id => @forum.id
       @other_tag   = Tag.create :taggable_id => @other_post.id, :taggable_type => 'Post'
     
-      @controller.stub!(:request_path).and_return("/forums/:id/posts/:id/tags")
+      @controller.stub(:request_path).and_return("/forums/:id/posts/:id/tags")
       get :index, :forum_id => @forum.id, :post_id => @post.id
       @resource_service = controller.send :resource_service
     end
@@ -100,12 +100,12 @@ describe TagsController do
 
     before(:each) do
       setup_mocks
-      @tags = mock('Tags')
-      @post_tags.stub!(:all).and_return(@tags)
+      @tags = double('Tags')
+      @post_tags.stub(:all).and_return(@tags)
     end
   
     def do_get
-      @controller.stub!(:request_path).and_return("/forums/1/posts/2/tags")
+      @controller.stub(:request_path).and_return("/forums/1/posts/2/tags")
       get :index, :forum_id => '1', :post_id => '2'
     end
 

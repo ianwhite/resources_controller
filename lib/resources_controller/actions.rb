@@ -17,7 +17,7 @@ module ResourcesController
   # Instead of this:
   #   @post = Post.find(params[:id])
   #   @post = Post.new
-  #   @posts = Post.find(:all)
+  #   @posts = Post.all
   #
   # do this:
   #   self.resource = find_resource

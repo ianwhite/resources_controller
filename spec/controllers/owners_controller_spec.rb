@@ -2,12 +2,12 @@ require 'spec_helper'
 
 module OwnersControllerSpecHelper
   def setup_mocks
-    @forum = mock('forum')
-    @forum.stub!(:id).and_return(2)
-    @forum.stub!(:to_param).and_return('2')
-    Forum.stub!(:find).and_return(@forum)
+    @forum = double('forum')
+    @forum.stub(:id).and_return(2)
+    @forum.stub(:to_param).and_return('2')
+    Forum.stub(:find).and_return(@forum)
     @owner = mock_model(User)
-    @forum.stub!(:owner).and_return(@owner)    
+    @forum.stub(:owner).and_return(@owner)    
   end
 end
 
@@ -120,7 +120,7 @@ describe OwnersController do
 
     before(:each) do
       setup_mocks
-      @forum.stub!(:build_owner).and_return(@owner)
+      @forum.stub(:build_owner).and_return(@owner)
     end
   
     def do_get
@@ -175,9 +175,9 @@ describe OwnersController do
 
     before(:each) do
       setup_mocks
-      @owner.stub!(:save).and_return(true)
-      @owner.stub!(:to_param).and_return("1")
-      @forum.stub!(:build_owner).and_return(@owner)
+      @owner.stub(:save).and_return(true)
+      @owner.stub(:to_param).and_return("1")
+      @forum.stub(:build_owner).and_return(@owner)
     end
   
     def do_post
@@ -201,7 +201,7 @@ describe OwnersController do
     end
   
     it "should render new when post unsuccesful" do
-      @owner.stub!(:save).and_return(false)
+      @owner.stub(:save).and_return(false)
       do_post
       response.should render_template('new')
     end
@@ -213,7 +213,7 @@ describe OwnersController do
 
     before(:each) do
       setup_mocks
-      @owner.stub!(:update_attributes).and_return(true)
+      @owner.stub(:update_attributes).and_return(true)
     end
   
     def do_update
@@ -247,7 +247,7 @@ describe OwnersController do
 
     before(:each) do
       setup_mocks
-      @owner.stub!(:destroy).and_return(@owner)
+      @owner.stub(:destroy).and_return(@owner)
     end
   
     def do_delete

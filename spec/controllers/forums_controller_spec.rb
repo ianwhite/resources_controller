@@ -4,9 +4,9 @@ describe ForumsController do
   describe "Routing shortcuts for Forums should map" do
   
     before(:each) do
-      @forum = mock('Forum')
-      @forum.stub!(:to_param).and_return('2')
-      Forum.stub!(:find).and_return(@forum)
+      @forum = double('Forum')
+      @forum.stub(:to_param).and_return('2')
+      Forum.stub(:find).and_return(@forum)
       get :show, :id => "2"
     end
   
@@ -161,8 +161,8 @@ end_str
     end
   
     before(:each) do
-      @mock_forums = mock('forums')
-      Forum.stub!(:all).and_return(@mock_forums)
+      @mock_forums = double('forums')
+      Forum.stub(:all).and_return(@mock_forums)
     end
   
     def do_get
@@ -196,10 +196,10 @@ end_str
     end
   
     before(:each) do
-      @mock_forum = mock('Forum')
-      @mock_forum.stub!(:save).and_return(true)
-      @mock_forum.stub!(:to_param).and_return("1")
-      Forum.stub!(:new).and_return(@mock_forum)
+      @mock_forum = double('Forum')
+      @mock_forum.stub(:save).and_return(true)
+      @mock_forum.stub(:to_param).and_return("1")
+      Forum.stub(:new).and_return(@mock_forum)
     end
   
     def do_post
@@ -227,8 +227,8 @@ end_str
   describe "Requesting /forums using GET" do
 
     before(:each) do
-      @mock_forums = mock('forums')
-      Forum.stub!(:all).and_return(@mock_forums)
+      @mock_forums = double('forums')
+      Forum.stub(:all).and_return(@mock_forums)
     end
   
     def do_get
@@ -259,9 +259,9 @@ end_str
   describe "Requesting /forums.xml using GET" do
 
     before(:each) do
-      @mock_forums = mock('forums')
-      @mock_forums.stub!(:to_xml).and_return("XML")
-      Forum.stub!(:all).and_return(@mock_forums)
+      @mock_forums = double('forums')
+      @mock_forums.stub(:to_xml).and_return("XML")
+      Forum.stub(:all).and_return(@mock_forums)
     end
   
     def do_get
@@ -289,8 +289,8 @@ end_str
   describe "Requesting /forums using XHR GET" do
 
     before(:each) do
-      @mock_forums = mock('forums')
-      Forum.stub!(:all).and_return(@mock_forums)
+      @mock_forums = double('forums')
+      Forum.stub(:all).and_return(@mock_forums)
     end
   
     def do_get
@@ -317,8 +317,8 @@ end_str
   describe "Requesting /forums/1 using GET" do
 
     before(:each) do
-      @mock_forum = mock('Forum')
-      Forum.stub!(:find).and_return(@mock_forum)
+      @mock_forum = double('Forum')
+      Forum.stub(:find).and_return(@mock_forum)
     end
   
     def do_get
@@ -349,9 +349,9 @@ end_str
   describe "Requesting /forums/1.xml using GET" do
 
     before(:each) do
-      @mock_forum = mock('Forum')
-      @mock_forum.stub!(:to_xml).and_return("XML")
-      Forum.stub!(:find).and_return(@mock_forum)
+      @mock_forum = double('Forum')
+      @mock_forum.stub(:to_xml).and_return("XML")
+      Forum.stub(:find).and_return(@mock_forum)
     end
   
     def do_get
@@ -379,8 +379,8 @@ end_str
   describe "Requesting /forums/1 using XHR GET" do
 
     before(:each) do
-      @mock_forum = mock('Forum')
-      Forum.stub!(:find).and_return(@mock_forum)
+      @mock_forum = double('Forum')
+      Forum.stub(:find).and_return(@mock_forum)
     end
   
     def do_get
@@ -411,8 +411,8 @@ end_str
   describe "Requesting /forums/new using GET" do
 
     before(:each) do
-      @mock_forum = mock('Forum')
-      Forum.stub!(:new).and_return(@mock_forum)
+      @mock_forum = double('Forum')
+      Forum.stub(:new).and_return(@mock_forum)
     end
   
     def do_get
@@ -448,8 +448,8 @@ end_str
   describe "Requesting /forums/1/edit using GET" do
 
     before(:each) do
-      @mock_forum = mock('Forum')
-      Forum.stub!(:find).and_return(@mock_forum)
+      @mock_forum = double('Forum')
+      Forum.stub(:find).and_return(@mock_forum)
     end
   
     def do_get
@@ -480,10 +480,10 @@ end_str
   describe "Requesting /forums using POST" do
 
     before(:each) do
-      @mock_forum = mock('Forum')
-      @mock_forum.stub!(:save).and_return(true)
-      @mock_forum.stub!(:to_param).and_return("1")
-      Forum.stub!(:new).and_return(@mock_forum)
+      @mock_forum = double('Forum')
+      @mock_forum.stub(:save).and_return(true)
+      @mock_forum.stub(:to_param).and_return("1")
+      Forum.stub(:new).and_return(@mock_forum)
     end
   
     def do_post
@@ -510,10 +510,10 @@ end_str
   describe "Requesting /forums using XHR POST" do
 
     before(:each) do
-      @mock_forum = mock('Forum')
-      @mock_forum.stub!(:save).and_return(true)
-      @mock_forum.stub!(:to_param).and_return("1")
-      Forum.stub!(:new).and_return(@mock_forum)
+      @mock_forum = double('Forum')
+      @mock_forum.stub(:save).and_return(true)
+      @mock_forum.stub(:to_param).and_return("1")
+      Forum.stub(:new).and_return(@mock_forum)
     end
   
     def do_post
@@ -536,7 +536,7 @@ end_str
     end
   
     it "should render new.rjs if unsuccesful" do
-      @mock_forum.stub!(:save).and_return(false)
+      @mock_forum.stub(:save).and_return(false)
       do_post
       response.should render_template('new')
     end
@@ -545,9 +545,9 @@ end_str
   describe "Requesting /forums/1 using PUT" do
 
     before(:each) do
-      @mock_forum = mock('Forum').as_null_object
-      @mock_forum.stub!(:to_param).and_return("1")
-      Forum.stub!(:find).and_return(@mock_forum)
+      @mock_forum = double('Forum').as_null_object
+      @mock_forum.stub(:to_param).and_return("1")
+      Forum.stub(:find).and_return(@mock_forum)
     end
   
     def do_update
@@ -585,9 +585,9 @@ end_str
   describe "Requesting /forums/1 using XHR PUT" do
 
     before(:each) do
-      @mock_forum = mock('Forum').as_null_object
-      @mock_forum.stub!(:to_param).and_return("1")
-      Forum.stub!(:find).and_return(@mock_forum)
+      @mock_forum = double('Forum').as_null_object
+      @mock_forum.stub(:to_param).and_return("1")
+      Forum.stub(:find).and_return(@mock_forum)
     end
   
     def do_update
@@ -621,7 +621,7 @@ end_str
     end
   
     it "should render edit.rjs, on unsuccessful save" do
-      @mock_forum.stub!(:update_attributes).and_return(false)
+      @mock_forum.stub(:update_attributes).and_return(false)
       do_update
       response.should render_template('edit')
     end
@@ -630,8 +630,8 @@ end_str
   describe "Requesting /forums/1 using DELETE" do
 
     before(:each) do
-      @mock_forum = mock('Forum').as_null_object
-      Forum.stub!(:find).and_return(@mock_forum)
+      @mock_forum = double('Forum').as_null_object
+      Forum.stub(:find).and_return(@mock_forum)
     end
   
     def do_delete
@@ -663,8 +663,8 @@ end_str
   describe "Requesting /forums/1 using XHR DELETE" do
 
     before(:each) do
-      @mock_forum = mock('Forum').as_null_object
-      Forum.stub!(:find).and_return(@mock_forum)
+      @mock_forum = double('Forum').as_null_object
+      Forum.stub(:find).and_return(@mock_forum)
     end
   
     def do_delete

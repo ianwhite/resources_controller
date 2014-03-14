@@ -2,11 +2,11 @@ require 'spec_helper'
 
 module InterestsViaUserSpecHelper
   def setup_mocks
-    @user = mock('User')
-    @user_interests = mock('user_interests assoc')
-    User.stub!(:find_by_login).and_return(@user)
-    @user.stub!(:interests).and_return(@user_interests)
-    @user.stub!(:to_param).and_return('dave')
+    @user = double('User')
+    @user_interests = double('user_interests assoc')
+    User.stub(:find_by_login).and_return(@user)
+    @user.stub(:interests).and_return(@user_interests)
+    @user.stub(:to_param).and_return('dave')
   end
 end
 
@@ -16,9 +16,9 @@ describe InterestsController do
   
     before(:each) do
       setup_mocks
-      @interest = mock('Interest')
-      @interest.stub!(:to_param).and_return('2')
-      @user_interests.stub!(:find).and_return(@interest)
+      @interest = double('Interest')
+      @interest.stub(:to_param).and_return('2')
+      @user_interests.stub(:find).and_return(@interest)
     
       get :show, :user_id => "dave", :id => "2"
     end
@@ -87,8 +87,8 @@ describe InterestsController do
 
     before(:each) do
       setup_mocks
-      @interests = mock('Interests')
-      @user_interests.stub!(:all).and_return(@interests)
+      @interests = double('Interests')
+      @user_interests.stub(:all).and_return(@interests)
     end
   
     def do_get

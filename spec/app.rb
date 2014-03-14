@@ -4,6 +4,8 @@ module ResourcesControllerTest
   class Application < Rails::Application
     config.secret_key_base = "1234567890-12345678912345678923456789"
     config.active_support.deprecation = :stderr
+    config.eager_load = false
+    config.action_controller.permit_all_parameters = true
     paths['config/database'] = File.expand_path('../app/database.yml', __FILE__)
     paths['log'] = File.expand_path('../../../tmp/log', __FILE__)
   end

@@ -2,18 +2,18 @@ require 'spec_helper'
 
 module CommentsSpecHelper
   def setup_mocks
-    @forum = mock('Forum')
-    @forum_posts = mock('Assoc: forum_posts')
-    @forum.stub!(:posts).and_return(@forum_posts)
-    @forum.stub!(:to_param).and_return("3")
+    @forum = double('Forum')
+    @forum_posts = double('Assoc: forum_posts')
+    @forum.stub(:posts).and_return(@forum_posts)
+    @forum.stub(:to_param).and_return("3")
     
-    @post = mock('Post')
-    @post_comments = mock('Assoc: post_comments')
-    @post.stub!(:comments).and_return(@post_comments)
-    @post.stub!(:to_param).and_return("2")
+    @post = double('Post')
+    @post_comments = double('Assoc: post_comments')
+    @post.stub(:comments).and_return(@post_comments)
+    @post.stub(:to_param).and_return("2")
         
-    Forum.stub!(:find).and_return(@forum)
-    @forum_posts.stub!(:find).and_return(@post)
+    Forum.stub(:find).and_return(@forum)
+    @forum_posts.stub(:find).and_return(@post)
   end
 end
 
@@ -23,9 +23,9 @@ describe CommentsController do
   
     before(:each) do
       setup_mocks
-      @comment = mock('Comment')
-      @comment.stub!(:to_param).and_return("1")
-      @post_comments.stub!(:find).and_return(@comment)
+      @comment = double('Comment')
+      @comment.stub(:to_param).and_return("1")
+      @post_comments.stub(:find).and_return(@comment)
       get :show, :forum_id => "3", :post_id => "2", :id => "1"
     end
   
@@ -109,8 +109,8 @@ describe CommentsController do
   
     before(:each) do
       setup_mocks
-      @comments = mock('Comments')
-      @post_comments.stub!(:all).and_return(@comments)
+      @comments = double('Comments')
+      @post_comments.stub(:all).and_return(@comments)
     end
   
     def do_get
@@ -150,8 +150,8 @@ describe CommentsController do
 
     before(:each) do
       setup_mocks
-      @comments = mock('Comments')
-      @post_comments.stub!(:all).and_return(@comments)
+      @comments = double('Comments')
+      @post_comments.stub(:all).and_return(@comments)
     end
   
     def do_get
@@ -184,8 +184,8 @@ describe CommentsController do
 
     before(:each) do
       setup_mocks
-      @comment = mock('a post')
-      @post_comments.stub!(:find).and_return(@comment)
+      @comment = double('a post')
+      @post_comments.stub(:find).and_return(@comment)
     end
   
     def do_get
@@ -218,8 +218,8 @@ describe CommentsController do
 
     before(:each) do
       setup_mocks
-      @comment = mock('new Comment')
-      @post_comments.stub!(:build).and_return(@comment)
+      @comment = double('new Comment')
+      @post_comments.stub(:build).and_return(@comment)
     end
   
     def do_get
@@ -257,8 +257,8 @@ describe CommentsController do
 
     before(:each) do
       setup_mocks
-      @comment = mock('Comment')
-      @post_comments.stub!(:find).and_return(@comment)
+      @comment = double('Comment')
+      @post_comments.stub(:find).and_return(@comment)
     end
  
     def do_get
@@ -291,10 +291,10 @@ describe CommentsController do
 
     before(:each) do
       setup_mocks
-      @comment = mock('Comment')
-      @comment.stub!(:save).and_return(true)
-      @comment.stub!(:to_param).and_return("1")
-      @post_comments.stub!(:build).and_return(@comment)
+      @comment = double('Comment')
+      @comment.stub(:save).and_return(true)
+      @comment.stub(:to_param).and_return("1")
+      @post_comments.stub(:build).and_return(@comment)
     end
   
     def do_post
@@ -318,9 +318,9 @@ describe CommentsController do
 
     before(:each) do
       setup_mocks
-      @comment = mock('Comment').as_null_object
-      @comment.stub!(:to_param).and_return("1")
-      @post_comments.stub!(:find).and_return(@comment)
+      @comment = double('Comment').as_null_object
+      @comment.stub(:to_param).and_return("1")
+      @post_comments.stub(:find).and_return(@comment)
     end
   
     def do_update
@@ -355,9 +355,9 @@ describe CommentsController do
 
     before(:each) do
       setup_mocks
-      @comment = mock('Comment', :id => '1').as_null_object
-      @post_comments.stub!(:find).and_return(@comment)
-      @post_comments.stub!(:destroy)
+      @comment = double('Comment', :id => '1').as_null_object
+      @post_comments.stub(:find).and_return(@comment)
+      @post_comments.stub(:destroy)
     end
   
     def do_delete

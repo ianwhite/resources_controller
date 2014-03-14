@@ -10,7 +10,7 @@ module ResourceMethodsSpec
       it "should accept block syntax" do
         c = MyController.new
         c.resource_service = User
-        c.stub!(:params).and_return({})
+        c.stub(:params).and_return({})
         r = c.send(:new_resource) do |u|
           u.login = "Fred"
         end
@@ -23,7 +23,7 @@ module ResourceMethodsSpec
   describe "An rc for collection :users" do
     before do
       @controller = MyController.new
-      @controller.stub!(:params).and_return({})
+      @controller.stub(:params).and_return({})
     end
 
     describe "when no enclosing resource" do
@@ -43,7 +43,7 @@ module ResourceMethodsSpec
       end
 
       it "#destroy_resource(<id>) should call User.find(<id>).destroy" do
-        User.should_receive(:find).with("42").and_return(user = mock)
+        User.should_receive(:find).with("42").and_return(user = double)
         user.should_receive(:destroy).and_return(user)
         @controller.send(:destroy_resource, "42").should == user
       end
@@ -86,7 +86,7 @@ module ResourceMethodsSpec
   describe "An rc for singleton :info" do
     before do
       @controller = MySingletonController.new
-      @controller.stub!(:params).and_return({})
+      @controller.stub(:params).and_return({})
     end
       
     describe "with an enclosing resource (a user)" do
@@ -106,7 +106,7 @@ module ResourceMethodsSpec
       end
 
       it "#destroy_resource should call user.info.destroy" do
-        @user.should_receive(:info).and_return(info = mock)
+        @user.should_receive(:info).and_return(info = double)
         info.should_receive(:destroy)
         @controller.send(:destroy_resource)
       end
@@ -160,7 +160,7 @@ module ResourceMethodsSpec
     before do
       @controller = MyControllerWithMyResourceMethodsMixedIn.new
       @controller.resource_service = User
-      @controller.stub!(:params).and_return({})
+      @controller.stub(:params).and_return({})
     end
     
     it_should_behave_like "A controller with its own resource methods"
@@ -178,7 +178,7 @@ module ResourceMethodsSpec
     before do
       @controller = InhertedMyAbstractControllerWithOwnResourceMethods.new
       @controller.resource_service = User
-      @controller.stub!(:params).and_return({})
+      @controller.stub(:params).and_return({})
     end
     
     it_should_behave_like "A controller with its own resource methods"
@@ -197,7 +197,7 @@ module ResourceMethodsSpec
     before do
       @controller = InhertedMyAbstractControllerWithResourceMethodsOverridden.new
       @controller.resource_service = User
-      @controller.stub!(:params).and_return({})
+      @controller.stub(:params).and_return({})
     end
     
     it_should_behave_like "A controller with its own resource methods"

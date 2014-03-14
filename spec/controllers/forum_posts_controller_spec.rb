@@ -2,12 +2,12 @@ require 'spec_helper'
 
 module ForumPostsSpecHelper
   def setup_mocks
-    @forum = mock('Forum')
-    @forum_posts = mock('Assoc: forum_posts')
-    @forum.stub!(:posts).and_return(@forum_posts)
-    @forum.stub!(:to_param).and_return("2")
+    @forum = double('Forum')
+    @forum_posts = double('Assoc: forum_posts')
+    @forum.stub(:posts).and_return(@forum_posts)
+    @forum.stub(:to_param).and_return("2")
     
-    Forum.stub!(:find).and_return(@forum)
+    Forum.stub(:find).and_return(@forum)
   end
 end
 
@@ -17,9 +17,9 @@ describe ForumPostsController do
 
     before(:each) do
       setup_mocks
-      @post = mock('Post')
-      @post.stub!(:to_param).and_return('1')
-      @forum_posts.stub!(:find).and_return(@post)
+      @post = double('Post')
+      @post.stub(:to_param).and_return('1')
+      @forum_posts.stub(:find).and_return(@post)
   
       get :show, :forum_id => "2", :id => "1"
     end
@@ -151,8 +151,8 @@ describe ForumPostsController do
   
     before(:each) do
       setup_mocks
-      @posts = mock('Posts')
-      @forum_posts.stub!(:find).and_return(@posts)
+      @posts = double('Posts')
+      @forum_posts.stub(:find).and_return(@posts)
     end
   
     def do_get
@@ -186,8 +186,8 @@ describe ForumPostsController do
 
     before(:each) do
       setup_mocks
-      @posts = mock('Posts')
-      @forum_posts.stub!(:find).and_return(@posts)
+      @posts = double('Posts')
+      @forum_posts.stub(:find).and_return(@posts)
     end
   
     def do_get
@@ -220,8 +220,8 @@ describe ForumPostsController do
 
     before(:each) do
       setup_mocks
-      @post = mock('a post')
-      @forum_posts.stub!(:find).and_return(@post)
+      @post = double('a post')
+      @forum_posts.stub(:find).and_return(@post)
     end
   
     def do_get
@@ -254,8 +254,8 @@ describe ForumPostsController do
 
     before(:each) do
       setup_mocks
-      @post = mock('new Post')
-      @forum_posts.stub!(:build).and_return(@post)
+      @post = double('new Post')
+      @forum_posts.stub(:build).and_return(@post)
     end
   
     def do_get
@@ -293,8 +293,8 @@ describe ForumPostsController do
 
     before(:each) do
       setup_mocks
-      @post = mock('Post')
-      @forum_posts.stub!(:find).and_return(@post)
+      @post = double('Post')
+      @forum_posts.stub(:find).and_return(@post)
     end
  
     def do_get
@@ -327,10 +327,10 @@ describe ForumPostsController do
 
     before(:each) do
       setup_mocks
-      @post = mock('Post')
-      @post.stub!(:save).and_return(true)
-      @post.stub!(:to_param).and_return("1")
-      @forum_posts.stub!(:build).and_return(@post)
+      @post = double('Post')
+      @post.stub(:save).and_return(true)
+      @post.stub(:to_param).and_return("1")
+      @forum_posts.stub(:build).and_return(@post)
     end
   
     def do_post
@@ -354,7 +354,7 @@ describe ForumPostsController do
     end
   
     it "should render new when post.save == false" do
-      @post.stub!(:save).and_return(false)
+      @post.stub(:save).and_return(false)
       do_post
       response.should render_template(:new)
     end
@@ -365,9 +365,9 @@ describe ForumPostsController do
 
     before(:each) do
       setup_mocks
-      @post = mock('Post').as_null_object
-      @post.stub!(:to_param).and_return("1")
-      @forum_posts.stub!(:find).and_return(@post)
+      @post = double('Post').as_null_object
+      @post.stub(:to_param).and_return("1")
+      @forum_posts.stub(:find).and_return(@post)
     end
   
     def do_update
@@ -401,9 +401,9 @@ describe ForumPostsController do
 
     before(:each) do
       setup_mocks
-      @post = mock('Post').as_null_object
-      @forum_posts.stub!(:find).and_return(@post)
-      @forum_posts.stub!(:destroy)
+      @post = double('Post').as_null_object
+      @forum_posts.stub(:find).and_return(@post)
+      @forum_posts.stub(:destroy)
     end
   
     def do_delete

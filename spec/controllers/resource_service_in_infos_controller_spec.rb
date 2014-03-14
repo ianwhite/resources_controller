@@ -7,7 +7,7 @@ describe InfosController do
       @account    = User.create!
       @info       = Info.create! :user_id => @account.id
     
-      @controller.stub!(:current_user).and_return(@account)
+      @controller.stub(:current_user).and_return(@account)
     
       get :show, :resource_path => '/account/info'
       @resource_service = controller.send :resource_service

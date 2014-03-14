@@ -2,14 +2,14 @@ require 'spec_helper'
 
 module TagsViaAccountInfoHelper
   def setup_mocks
-    @current_user = mock('user')
-    @current_user.stub!(:id).and_return('1')
-    User.stub!(:find).and_return(@current_user)
-    @info = mock('info')
-    @info.stub!(:id).and_return('3')
-    @current_user.stub!(:info).and_return(@info)
-    @info_tags = mock('info_tags')
-    @info.stub!(:tags).and_return(@info_tags)
+    @current_user = double('user')
+    @current_user.stub(:id).and_return('1')
+    User.stub(:find).and_return(@current_user)
+    @info = double('info')
+    @info.stub(:id).and_return('3')
+    @current_user.stub(:info).and_return(@info)
+    @info_tags = double('info_tags')
+    @info.stub(:tags).and_return(@info_tags)
     @controller.instance_variable_set('@current_user', @current_user)
   end
 end
@@ -20,11 +20,11 @@ describe TagsController do
   
     before(:each) do
       setup_mocks
-      @tag = mock('Tag')
-      @tag.stub!(:to_param).and_return('2')
-      @info_tags.stub!(:find).and_return(@tag)
+      @tag = double('Tag')
+      @tag.stub(:to_param).and_return('2')
+      @info_tags.stub(:find).and_return(@tag)
     
-      @controller.stub!(:request_path).and_return('/account/info/tags/2')
+      @controller.stub(:request_path).and_return('/account/info/tags/2')
       get :show, :id => 2
     end
   
@@ -67,7 +67,7 @@ describe TagsController do
       @other_tag = Tag.create
     
       @controller.instance_variable_set('@current_user', @account)
-      @controller.stub!(:request_path).and_return('/account/info/tags')
+      @controller.stub(:request_path).and_return('/account/info/tags')
       get :index
       @resource_service = controller.send :resource_service
     end
@@ -99,12 +99,12 @@ describe TagsController do
 
     before(:each) do
       setup_mocks
-      @tags = mock('Tags')
-      @info_tags.stub!(:all).and_return(@tags)
+      @tags = double('Tags')
+      @info_tags.stub(:all).and_return(@tags)
     end
   
     def do_get
-      @controller.stub!(:request_path).and_return('/account/info/tags')
+      @controller.stub(:request_path).and_return('/account/info/tags')
       get :index
     end
 

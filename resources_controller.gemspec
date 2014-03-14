@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.summary     = "resources_controller-#{version}"
   s.description = "rc makes RESTful controllers fun"
 
-  s.rubygems_version   = "1.3.7"
+  s.rubygems_version   = "2.0.3"
 
   s.files            = `git ls-files`.split("\n")
   s.test_files       = `git ls-files -- {spec}/*`.split("\n")
@@ -22,8 +22,8 @@ Gem::Specification.new do |s|
   s.rdoc_options     = ["--charset=UTF-8"]
   s.require_path     = "lib"
 
-  s.add_runtime_dependency "rails", '>= 3.1.0'
-  s.add_development_dependency "rspec", '>= 2.8.0'
-  s.add_development_dependency "rspec-rails", '>= 2.8.0'
+  s.add_runtime_dependency "rails", '>= 4.0.3'
+  s.add_development_dependency "rspec", '>= 2.14.1'
+  s.add_development_dependency "rspec-rails", '>= 2.14.1'
   s.add_development_dependency 'sqlite3'
 end                            

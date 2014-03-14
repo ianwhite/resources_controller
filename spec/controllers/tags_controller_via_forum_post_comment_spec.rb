@@ -2,23 +2,23 @@ require 'spec_helper'
 
 module TagsViaForumPostCommentSpecHelper
   def setup_mocks
-    @forum = mock('Forum')
-    Forum.stub!(:find).and_return(@forum)
-    @forum.stub!(:to_param).and_return('1')
-    @forum_posts = mock('forum_posts assoc')
-    @forum.stub!(:posts).and_return(@forum_posts)
+    @forum = double('Forum')
+    Forum.stub(:find).and_return(@forum)
+    @forum.stub(:to_param).and_return('1')
+    @forum_posts = double('forum_posts assoc')
+    @forum.stub(:posts).and_return(@forum_posts)
     
-    @post = mock('Post')
-    @forum_posts.stub!(:find).and_return(@post)
-    @post.stub!(:to_param).and_return('2')
-    @post_comments = mock('post_comments assoc')
-    @post.stub!(:comments).and_return(@post_comments)
+    @post = double('Post')
+    @forum_posts.stub(:find).and_return(@post)
+    @post.stub(:to_param).and_return('2')
+    @post_comments = double('post_comments assoc')
+    @post.stub(:comments).and_return(@post_comments)
     
-    @comment = mock('Comment')
-    @post_comments.stub!(:find).and_return(@comment)
-    @comment.stub!(:to_param).and_return('3')
-    @comment_tags = mock('comment_tags assoc')
-    @comment.stub!(:tags).and_return(@comment_tags)
+    @comment = double('Comment')
+    @post_comments.stub(:find).and_return(@comment)
+    @comment.stub(:to_param).and_return('3')
+    @comment_tags = double('comment_tags assoc')
+    @comment.stub(:tags).and_return(@comment_tags)
   end
 end
 
@@ -28,9 +28,9 @@ describe TagsController do
   
     before(:each) do
       setup_mocks
-      @tag = mock('Tag')
-      @tag.stub!(:to_param).and_return('4')
-      @comment_tags.stub!(:find).and_return(@tag)
+      @tag = double('Tag')
+      @tag.stub(:to_param).and_return('4')
+      @comment_tags.stub(:find).and_return(@tag)
     
       get :show, :forum_id => "1", :post_id => "2", :comment_id => '3', :id => "4"
     end
@@ -105,8 +105,8 @@ describe TagsController do
 
     before(:each) do
       setup_mocks
-      @tags = mock('Tags')
-      @comment_tags.stub!(:all).and_return(@tags)
+      @tags = double('Tags')
+      @comment_tags.stub(:all).and_return(@tags)
     end
   
     def do_get
