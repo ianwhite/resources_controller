@@ -20,16 +20,17 @@ module Ardes
         action_methods_to_remove(options).each {|a| mixin.remove_action_method(a) }
         controller.send :include, mixin
       end
-      
+
       def remove_action_method(action)
         undef_method action
       end
-      
+
       def action_methods_to_remove(options = {})
         if options[:only]
-          instance_methods - Array(options[:only]).map(&:to_s)
+          # instance_methods contains Strings in < 1.9, and Symbols in >= 1.9
+          instance_methods.map(&:to_s) - Array(options[:only]).map(&:to_s)
         elsif options[:except]
-          Array(options[:except]).map(&:to_s) & instance_methods
+          Array(options[:except]).map(&:to_s) & instance_methods.map(&:to_s)
         else
           []
         end
