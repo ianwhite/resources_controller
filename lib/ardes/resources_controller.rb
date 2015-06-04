@@ -752,7 +752,11 @@ module Ardes#:nodoc:
       def method_missing(*args, &block)
         service.send(*args, &block)
       end
-      
+
+      def map(&block)
+        service.map(&block)
+      end
+
       def find(*args, &block)
         resource_specification.find ? resource_specification.find_custom(controller) : super
       end
