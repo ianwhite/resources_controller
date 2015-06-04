@@ -5,12 +5,16 @@ you override the default RESTful funtionality in a clean and simple manner.
 
 See History.txt for recent changes.
 
+== Why this fork?
+
+We need to make a few changes to the pre Rails 3.1 and above version of this gem, to make it play a bit nicer with Ruby 1.9.3.
+
 == Rails 3 version
 
 Add this to your Gemfile
 
   gem 'resources_controller', :git => 'git://github.com/ianwhite/resources_controller'
-  
+
 Or install as a plugin
 
   rails plugin install git://github.com/ianwhite/resources_controller
