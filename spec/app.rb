@@ -77,7 +77,9 @@ Rails.application.routes.draw do
     resources :bars, :controller => 'forum_posts'
   end
 
-  get ':controller/:action/:id(.:format)' # naming this so we can test missing segment errors
+  # DEPRECATED 
+  # get ':controller/:action/:id(.:format)' # naming this so we can test missing segment errors
+  
 end
 
 
