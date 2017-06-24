@@ -163,7 +163,6 @@ class Address < ActiveRecord::Base
 end
 
 class Forum < ActiveRecord::Base
-  include ActiveModel::Serializers::Xml
   has_many :posts
   has_many :tags, :as => :taggable
   has_many :interests, :as => :interested_in
@@ -201,11 +200,16 @@ protected
   def current_user
     @current_user
   end
+
+  def resource_params
+    params
+  end
 end
 
 module Admin
   class ForumsController < ApplicationController
     resources_controller_for :forums
+
   end
 
   class InterestsController < ApplicationController
@@ -227,6 +231,9 @@ end
 
 class AccountsController < ApplicationController
   resources_controller_for :account, :singleton => true, :source => :user, :find => :current_user
+  def account_params
+    params.fetch(:acount).permit()
+  end
 end
 
 class InfosController < ApplicationController
@@ -244,14 +251,23 @@ protected
   def find_resource(id = params[:id])
     resource_service.find_by_login(id)
   end
+  def user_params 
+    params.fetch(:user, {}).permit(:login)
+  end
 end
 
 class ForumsController < ApplicationController
   resources_controller_for :forums
+  def forum_params 
+    params.fetch(:forum, {}).permit(:title)
+  end
 end
 
 class OwnersController < ApplicationController
   resources_controller_for :owner, :singleton => true, :class => User, :in => :forum
+  def owner_params 
+    params.fetch(:owner, {}).permit(:name)
+  end
 end
 
 class PostsAbstractController < ApplicationController
@@ -280,6 +296,9 @@ class PostsController < PostsAbstractController
     self.filter_trace ||= []; self.filter_trace << :load_enclosing
     super(*args)
   end
+  def post_params 
+    params.fetch(:post, {}).permit(:body)
+  end
 end
 
 class UserPostsController < PostsController
@@ -292,6 +311,9 @@ end
 
 class AddressesController < ApplicationController
   resources_controller_for :addresses
+  def address_params 
+    params.fetch(:address, {}).permit(:user_id, :name)
+  end
 end
 
 class ForumPostsController < PostsController
@@ -307,10 +329,17 @@ class ForumPostsController < PostsController
   nested_in :forum, :as => :other_name_for_forum do
     Forum.find(params[:forum_id])
   end
+
+  def post_params 
+    params.fetch(:post, {}).permit(:user_id, :name)
+  end
 end
 
 class CommentsController < ApplicationController
   resources_controller_for :comments, :in => [:forum, :post], :load_enclosing => false
+  def comment_params 
+    params.fetch(:comment, {}).permit(:user_id)
+  end
 end
 
 class InterestsController < ApplicationController

@@ -213,7 +213,7 @@ describe OwnersController do
 
     before(:each) do
       setup_mocks
-      allow(@owner).to receive(:update_attributes).and_return(true)
+      allow(@owner).to receive(:update).and_return(true)
     end
   
     def do_update
@@ -231,7 +231,7 @@ describe OwnersController do
     end
 
     it "should update the owner" do
-      expect(@owner).to receive(:update_attributes).with('name' => 'Fred')
+      expect(@owner).to receive(:update).with('name' => 'Fred')
       do_update
     end
 

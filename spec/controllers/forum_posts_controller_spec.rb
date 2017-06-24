@@ -380,7 +380,7 @@ describe ForumPostsController do
     end
 
     it "should update the found post" do
-      expect(@post).to receive(:update_attributes)
+      expect(@post).to receive(:update)
       do_update
     end
 

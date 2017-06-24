@@ -333,7 +333,7 @@ describe CommentsController do
     end
 
     it "should update the found comment" do
-      expect(@comment).to receive(:update_attributes).and_return(true)
+      expect(@comment).to receive(:update).and_return(true)
       do_update
     end
 

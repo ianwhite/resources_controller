@@ -35,11 +35,6 @@ GEM
       globalid (>= 0.3.6)
     activemodel (5.1.1)
       activesupport (= 5.1.1)
-    activemodel-serializers-xml (1.0.1)
-      activemodel (> 5.x)
-      activerecord (> 5.x)
-      activesupport (> 5.x)
-      builder (~> 3.1)
     activerecord (5.1.1)
       activemodel (= 5.1.1)
       activesupport (= 5.1.1)
@@ -146,7 +141,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activemodel-serializers-xml
   rails-controller-testing
   rc_rails!
   rspec (>= 3)

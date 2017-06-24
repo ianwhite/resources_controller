@@ -1,6 +1,9 @@
 require 'spec_helper'
 
 describe CommentsController, "without stubs" do
+
+  render_views
+
   before do
     @user = User.create!
     @forum = Forum.create!
@@ -18,11 +21,11 @@ describe CommentsController, "without stubs" do
       expect(assigns[:comments]).to eq([@comment])
     end
 
-    describe "with mime type of xml" do
-      it "should render all comments as xml" do
-        request.env["HTTP_ACCEPT"] = "application/xml"
+    describe "with mime type of json" do
+      it "should render all comments as json" do
+        request.env["HTTP_ACCEPT"] = "application/json"
         do_get
-        expect(response.body).to eq([@comment].to_xml)
+        expect(response.body).to eq([@comment].to_json)
       end
     end
   end
@@ -37,11 +40,11 @@ describe CommentsController, "without stubs" do
       expect(assigns[:comment]).to eq(@comment)
     end
     
-    describe "with mime type of xml" do
-      it "should render the requested comment as xml" do
-        request.env["HTTP_ACCEPT"] = "application/xml"
+    describe "with mime type of json" do
+      it "should render the requested comment as json" do
+        request.env["HTTP_ACCEPT"] = "application/json"
         do_get
-        expect(response.body).to eq(@comment.to_xml)
+        expect(response.body).to eq(@comment.to_json)
       end
     end
   end

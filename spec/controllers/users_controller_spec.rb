@@ -33,6 +33,7 @@ describe UsersController, "routing" do
 end
 
 describe UsersController, "handling GET /users" do
+  render_views
 
   before do
     @user = mock_model(User)
@@ -64,15 +65,16 @@ describe UsersController, "handling GET /users" do
   end
 end
 
-describe UsersController, "handling GET /users.xml" do
+describe UsersController, "handling GET /users.json" do
+  render_views
 
   before do
-    @user = mock_model(User, :to_xml => "XML")
+    @user = mock_model(User, :to_json => "JSON")
     allow(User).to receive(:all).and_return(@user)
   end
   
   def do_get
-    @request.env["HTTP_ACCEPT"] = "application/xml"
+    @request.env["HTTP_ACCEPT"] = "application/json"
     get :index
   end
   
@@ -86,10 +88,10 @@ describe UsersController, "handling GET /users.xml" do
     do_get
   end
   
-  it "should render the found users as xml" do
-    expect(@user).to receive(:to_xml).and_return("XML")
+  it "should render the found users as json" do
+    expect(@user).to receive(:to_json).and_return("JSON")
     do_get
-    expect(response.body).to eq("XML")
+    expect(response.body).to eq("JSON")
   end
 end
 
@@ -125,16 +127,17 @@ describe UsersController, "handling GET /users/dave" do
   end
 end
 
-describe UsersController, "handling GET /users/dave.xml" do
+describe UsersController, "handling GET /users/dave.json" do
+  render_views
 
   before do
-    @user = mock_model(User, :to_xml => "XML")
+    @user = mock_model(User, :to_json => "JSON")
     allow(User).to receive(:find_by_login).and_return(@user)
   end
   
   def do_get
-    @request.env["HTTP_ACCEPT"] = "application/xml"
-    get :show, params: { :id => "dave" }
+    @request.env["HTTP_ACCEPT"] = "application/json"
+    get :show, params: { :id => "dave" }, :format => :json
   end
 
   it "should be successful" do
@@ -147,10 +150,10 @@ describe UsersController, "handling GET /users/dave.xml" do
     do_get
   end
   
-  it "should render the found user as xml" do
-    expect(@user).to receive(:to_xml).and_return("XML")
+  it "should render the found user as json" do
+    expect(@user).to receive(:to_json).and_return("JSON")
     do_get
-    expect(response.body).to eq("XML")
+    expect(response.body).to eq("JSON")
   end
 end
 
@@ -206,12 +209,12 @@ describe UsersController, "handling PUT /users/dave" do
   end
   
   def put_with_successful_update
-    expect(@user).to receive(:update_attributes).and_return(true)
+    expect(@user).to receive(:update).and_return(true)
     put :update, params: { :id => "dave" }
   end
   
   def put_with_failed_update
-    expect(@user).to receive(:update_attributes).and_return(false)
+    expect(@user).to receive(:update).and_return(false)
     put :update, params: { :id => "dave" }
   end
   

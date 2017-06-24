@@ -200,16 +200,17 @@ end_str
     end
   end
 
-  describe "Requesting /admin/forums.xml using GET" do
+  describe "Requesting /admin/forums.json using GET" do
+    render_views
 
     before(:each) do
       @mock_forums = double('forums')
-      allow(@mock_forums).to receive(:to_xml).and_return("XML")
+      allow(@mock_forums).to receive(:to_json).and_return("JSON")
       allow(Forum).to receive(:all).and_return(@mock_forums)
     end
   
     def do_get
-      @request.env["HTTP_ACCEPT"] = "application/xml"
+      @request.env["HTTP_ACCEPT"] = "application/json"
       get :index
     end
   
@@ -223,10 +224,10 @@ end_str
       do_get
     end
   
-    it "should render the found forums as xml" do
-      expect(@mock_forums).to receive(:to_xml).and_return("XML")
+    it "should render the found forums as json" do
+      expect(@mock_forums).to receive(:to_json).and_return("JSON")
       do_get
-      expect(response.body).to eql("XML")
+      expect(response.body).to eql("JSON")
     end
   end
 
@@ -290,16 +291,17 @@ end_str
     end
   end
 
-  describe "Requesting /admin/forums/1.xml using GET" do
+  describe "Requesting /admin/forums/1.json using GET" do
+    render_views
 
     before(:each) do
       @mock_forum = double('Forum')
-      allow(@mock_forum).to receive(:to_xml).and_return("XML")
+      allow(@mock_forum).to receive(:to_json).and_return("JSON")
       allow(Forum).to receive(:find).and_return(@mock_forum)
     end
   
     def do_get
-      @request.env["HTTP_ACCEPT"] = "application/xml"
+      @request.env["HTTP_ACCEPT"] = "application/json"
       get :show, params: { :id => "1" }
     end
 
@@ -313,10 +315,10 @@ end_str
       do_get
     end
   
-    it "should render the found forum as xml" do
-      expect(@mock_forum).to receive(:to_xml).and_return("XML")
+    it "should render the found forum as json" do
+      expect(@mock_forum).to receive(:to_json).and_return("JSON")
       do_get
-      expect(response.body).to eql("XML")
+      expect(response.body).to eql("JSON")
     end
   end
 
@@ -509,7 +511,7 @@ end_str
     end
 
     it "should update the found forum" do
-      expect(@mock_forum).to receive(:update_attributes).and_return(true)
+      expect(@mock_forum).to receive(:update).and_return(true)
       do_update
       expect(assigns(:forum)).to eq(@mock_forum)
     end
@@ -544,7 +546,7 @@ end_str
     end
 
     it "should update the found forum" do
-      expect(@mock_forum).to receive(:update_attributes).and_return(true)
+      expect(@mock_forum).to receive(:update).and_return(true)
       do_update
       expect(assigns(:forum)).to eq(@mock_forum)
     end
@@ -565,7 +567,7 @@ end_str
     end
   
     it "should render edit.rjs, on unsuccessful save" do
-      allow(@mock_forum).to receive(:update_attributes).and_return(false)
+      allow(@mock_forum).to receive(:update).and_return(false)
       do_update
       expect(response).to render_template('edit')
     end

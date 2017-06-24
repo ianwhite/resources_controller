@@ -51,7 +51,7 @@ describe InfosController do
     end
   
     it "PUT /account/info should be successful" do
-      allow(@info).to receive(:update_attributes).and_return(true)
+      allow(@info).to receive(:update).and_return(true)
       put :update
       expect(response).to be_redirect
     end

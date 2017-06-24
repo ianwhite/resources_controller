@@ -11,8 +11,8 @@ describe CommentsController, "#resource_saved" do
 
       it { expect(@controller).not_to be_resource_saved }
 
-      describe "then update_attributes(<valid attrs>)" do
-        before { @controller.resource.update_attributes :user => User.create!, :post => Post.create! }
+      describe "then update(<valid attrs>)" do
+        before { @controller.resource.update :user => User.create!, :post => Post.create! }
         
         it { expect(@controller).to be_resource_saved }
       end
@@ -32,14 +32,14 @@ describe CommentsController, "#resource_saved" do
       expect(@controller).to be_resource_saved
     end
 
-    describe "then update_attributes(<invalid attrs>)" do
-      before { @controller.resource.update_attributes :user => nil }
+    describe "then update(<invalid attrs>)" do
+      before { @controller.resource.update :user => nil }
       
       it { expect(@controller).not_to be_resource_saved }
     end
     
-    describe "then update_attributes(<new valid attrs>)" do
-      before { @controller.resource.update_attributes :user => User.create! }
+    describe "then update(<new valid attrs>)" do
+      before { @controller.resource.update :user => User.create! }
       
       it { expect(@controller).to be_resource_saved }
     end

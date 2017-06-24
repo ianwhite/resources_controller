@@ -300,7 +300,7 @@ describe AddressesController do
     end
 
     it "should update the found address" do
-      expect(@address).to receive(:update_attributes).and_return(true)
+      expect(@address).to receive(:update).and_return(true)
       do_update
     end
 

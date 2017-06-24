@@ -19,7 +19,6 @@ end
 require 'rails-controller-testing'
 Rails::Controller::Testing.install
 require 'rspec/active_model/mocks'
-require 'active_model/serializers'
 
 
 
