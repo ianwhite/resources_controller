@@ -15,14 +15,14 @@ describe CommentsController, "without stubs" do
     
     it "should expose all comments as @comments" do
       do_get
-      assigns[:comments].should == [@comment]
+      expect(assigns[:comments]).to eq([@comment])
     end
 
     describe "with mime type of xml" do
       it "should render all comments as xml" do
         request.env["HTTP_ACCEPT"] = "application/xml"
         do_get
-        response.body.should == [@comment].to_xml
+        expect(response.body).to eq([@comment].to_xml)
       end
     end
   end
@@ -34,14 +34,14 @@ describe CommentsController, "without stubs" do
     
     it "should expose the requested comment as @comment" do
       do_get
-      assigns[:comment].should == @comment
+      expect(assigns[:comment]).to eq(@comment)
     end
     
     describe "with mime type of xml" do
       it "should render the requested comment as xml" do
         request.env["HTTP_ACCEPT"] = "application/xml"
         do_get
-        response.body.should == @comment.to_xml
+        expect(response.body).to eq(@comment.to_xml)
       end
     end
   end
@@ -53,8 +53,8 @@ describe CommentsController, "without stubs" do
   
     it "should expose a new comment as @comment" do
       do_get
-      assigns[:comment].should be_new_record
-      assigns[:comment].post.should == @post
+      expect(assigns[:comment]).to be_new_record
+      expect(assigns[:comment].post).to eq(@post)
     end
   end
 
@@ -65,7 +65,7 @@ describe CommentsController, "without stubs" do
     
     it "should expose the requested comment as @comment" do
       do_get
-      assigns[:comment].should == @comment
+      expect(assigns[:comment]).to eq(@comment)
     end
   end
 
@@ -76,22 +76,22 @@ describe CommentsController, "without stubs" do
       end
       
       it "should create a comment" do
-        lambda { do_post }.should change(Comment, :count).by(1)
+        expect { do_post }.to change(Comment, :count).by(1)
       end
       
       it "should expose the newly created comment as @comment" do
         do_post
-        assigns(:comment).should == Comment.last
+        expect(assigns(:comment)).to eq(Comment.last)
       end
 
       it "should be resource_saved?" do
         do_post
-        @controller.should be_resource_saved
+        expect(@controller).to be_resource_saved
       end
       
       it "should redirect to the created comment" do
         do_post
-        response.should redirect_to(forum_post_comment_url(@forum, @post, Comment.last))
+        expect(response).to redirect_to(forum_post_comment_url(@forum, @post, Comment.last))
       end
     end
     
@@ -101,23 +101,23 @@ describe CommentsController, "without stubs" do
       end
 
       it "should not create a comment" do
-        lambda { do_post }.should_not change(Comment, :count)
+        expect { do_post }.not_to change(Comment, :count)
       end
  
       it "should expose a newly created but unsaved comment as @comment" do
         do_post
-        assigns(:comment).should be_new_record
-        assigns(:comment).post.should == @post
+        expect(assigns(:comment)).to be_new_record
+        expect(assigns(:comment).post).to eq(@post)
       end
 
       it "should not be resource_saved?" do
         do_post
-        @controller.should_not be_resource_saved
+        expect(@controller).not_to be_resource_saved
       end
 
       it "should re-render the 'new' template" do
         do_post
-        response.should render_template('new')
+        expect(response).to render_template('new')
       end
     end
   end
@@ -134,27 +134,27 @@ describe CommentsController, "without stubs" do
 
       it "should update the requested comment" do
         do_put
-        Comment.find(@comment.id).user_id.should == @new_user.id
+        expect(Comment.find(@comment.id).user_id).to eq(@new_user.id)
       end
 
       it "should not contain errors on comment" do
         do_put
-        @comment.errors.should be_empty
+        expect(@comment.errors).to be_empty
       end
       
       it "should be resource_saved?" do
         do_put
-        @controller.should be_resource_saved
+        expect(@controller).to be_resource_saved
       end
       
       it "should expose the requested comment as @comment" do
         do_put
-        assigns[:comment].should == @comment
+        expect(assigns[:comment]).to eq(@comment)
       end
 
       it "should redirect to the comment" do
         do_put
-        response.should redirect_to(forum_post_comment_url(@forum, @post, @comment))
+        expect(response).to redirect_to(forum_post_comment_url(@forum, @post, @comment))
       end
     end
     
@@ -165,22 +165,22 @@ describe CommentsController, "without stubs" do
 
       it "should fail to update the requested comment" do
         do_put
-        Comment.find(@comment.id).user_id.should == @user.id 
+        expect(Comment.find(@comment.id).user_id).to eq(@user.id) 
       end
 
       it "should not be resource_saved?" do
         do_put
-        @controller.should_not be_resource_saved
+        expect(@controller).not_to be_resource_saved
       end
       
       it "should expose the requested comment as @comment" do
         do_put
-        assigns[:comment].should == @comment
+        expect(assigns[:comment]).to eq(@comment)
       end
 
       it "should re-render the 'edit' template" do
         do_put
-        response.should render_template('edit')
+        expect(response).to render_template('edit')
       end
     end
   end
@@ -191,12 +191,12 @@ describe CommentsController, "without stubs" do
     end
     
     it "should delete the requested comment" do
-      lambda { do_delete }.should change(Comment, :count).by(-1)
+      expect { do_delete }.to change(Comment, :count).by(-1)
     end
 
     it "should redirect to the comments list" do
       do_delete
-      response.should redirect_to(forum_post_comments_url(@forum, @post))
+      expect(response).to redirect_to(forum_post_comments_url(@forum, @post))
     end
   end
 end

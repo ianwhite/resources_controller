@@ -4,10 +4,10 @@ module ForumPostsSpecHelper
   def setup_mocks
     @forum = double('Forum')
     @forum_posts = double('Assoc: forum_posts')
-    @forum.stub(:posts).and_return(@forum_posts)
-    @forum.stub(:to_param).and_return("2")
+    allow(@forum).to receive(:posts).and_return(@forum_posts)
+    allow(@forum).to receive(:to_param).and_return("2")
     
-    Forum.stub(:find).and_return(@forum)
+    allow(Forum).to receive(:find).and_return(@forum)
   end
 end
 
@@ -18,89 +18,89 @@ describe ForumPostsController do
     before(:each) do
       setup_mocks
       @post = double('Post')
-      @post.stub(:to_param).and_return('1')
-      @forum_posts.stub(:find).and_return(@post)
+      allow(@post).to receive(:to_param).and_return('1')
+      allow(@forum_posts).to receive(:find).and_return(@post)
   
       get :show, params: { :forum_id => "2", :id => "1" }
     end
   
     it "resources_path to /forums/2/posts" do
-      controller.resources_path.should == '/forums/2/posts'
+      expect(controller.resources_path).to eq('/forums/2/posts')
     end
 
     it "resource_path to /forums/2/posts/1" do
-      controller.resource_path.should == '/forums/2/posts/1'
+      expect(controller.resource_path).to eq('/forums/2/posts/1')
     end
   
     it "resource_path(9) to /forums/2/posts/9" do
-      controller.resource_path(9).should == '/forums/2/posts/9'
+      expect(controller.resource_path(9)).to eq('/forums/2/posts/9')
     end
 
     it "edit_resource_path to /forums/2/posts/1/edit" do
-      controller.edit_resource_path.should == '/forums/2/posts/1/edit'
+      expect(controller.edit_resource_path).to eq('/forums/2/posts/1/edit')
     end
   
     it "edit_resource_path(9) to /forums/2/posts/9/edit" do
-      controller.edit_resource_path(9).should == '/forums/2/posts/9/edit'
+      expect(controller.edit_resource_path(9)).to eq('/forums/2/posts/9/edit')
     end
   
     it "new_resource_path to /forums/2/posts/new" do
-      controller.new_resource_path.should == '/forums/2/posts/new'
+      expect(controller.new_resource_path).to eq('/forums/2/posts/new')
     end
   
     it "resource_tags_path to /forums/2/posts/1/tags" do
-      controller.resource_tags_path.should == "/forums/2/posts/1/tags"
+      expect(controller.resource_tags_path).to eq("/forums/2/posts/1/tags")
     end
 
     it "resource_tags_path(9) to /forums/2/posts/9/tags" do
-      controller.resource_tags_path(9).should == "/forums/2/posts/9/tags" 
+      expect(controller.resource_tags_path(9)).to eq("/forums/2/posts/9/tags") 
     end
   
     it "resource_tag_path(5) to /forums/2/posts/1/tags/5" do
-      controller.resource_tag_path(5).should == "/forums/2/posts/1/tags/5"
+      expect(controller.resource_tag_path(5)).to eq("/forums/2/posts/1/tags/5")
     end
   
     it "resource_tag_path(9,5) to /forums/2/posts/9/tags/5" do
-      controller.resource_tag_path(9,5).should == "/forums/2/posts/9/tags/5"
+      expect(controller.resource_tag_path(9,5)).to eq("/forums/2/posts/9/tags/5")
     end
   
     it "enclosing_resource_path to /forums/2" do
-      controller.enclosing_resource_path.should == '/forums/2'
+      expect(controller.enclosing_resource_path).to eq('/forums/2')
     end
   
     it "enclosing_resource_path(9) to /forums/9" do
-      controller.enclosing_resource_path(9).should == '/forums/9'
+      expect(controller.enclosing_resource_path(9)).to eq('/forums/9')
     end
   
     it "enclosing_resources_path to /forums" do
-      controller.enclosing_resources_path.should == '/forums'
+      expect(controller.enclosing_resources_path).to eq('/forums')
     end
   
     it "new_enclosing_resource_path to /forums/new" do
-      controller.new_enclosing_resource_path.should == '/forums/new'
+      expect(controller.new_enclosing_resource_path).to eq('/forums/new')
     end
   
     it "enclosing_resource_tags_path to /forums/2/tags" do
-      controller.enclosing_resource_tags_path.should == '/forums/2/tags'
+      expect(controller.enclosing_resource_tags_path).to eq('/forums/2/tags')
     end
 
     it "enclosing_resource_tag_path(9) to /forums/2/tags/9" do
-      controller.enclosing_resource_tag_path(9).should == '/forums/2/tags/9'
+      expect(controller.enclosing_resource_tag_path(9)).to eq('/forums/2/tags/9')
     end
 
     it "enclosing_resource_tag_path(8,9) to /forums/8/tags/9" do
-      controller.enclosing_resource_tag_path(8,9).should == '/forums/8/tags/9'
+      expect(controller.enclosing_resource_tag_path(8,9)).to eq('/forums/8/tags/9')
     end
   end
 
   describe ForumPostsController, " errors" do
   
     it "should raise ResourceMismatch for /posts" do
-      lambda{ get :index }.should raise_error(ResourcesController::ResourceMismatch)
+      expect{ get :index }.to raise_error(ResourcesController::ResourceMismatch)
     end
 
     it "should raise ResourceMismatch, when route does not contain the resource segment" do
-      lambda{ get :index, params: { :foo_id => 1} }.should raise_error(ResourcesController::ResourceMismatch)
+      expect{ get :index, params: { :foo_id => 1} }.to raise_error(ResourcesController::ResourceMismatch)
     end
   end
 
@@ -118,22 +118,22 @@ describe ForumPostsController do
   
     it "should build new post with @forum foreign key with new" do
       resource = @resource_service.new
-      resource.should be_kind_of(Post)
-      resource.forum_id.should == @forum.id
+      expect(resource).to be_kind_of(Post)
+      expect(resource.forum_id).to eq(@forum.id)
     end
   
     it "should find @post with find(@post.id)" do
       resource = @resource_service.find(@post.id)
-      resource.should == @post
+      expect(resource).to eq(@post)
     end
   
     it "should raise RecordNotFound with find(@other_post.id)" do
-      lambda{ @resource_service.find(@other_post.id) }.should raise_error(ActiveRecord::RecordNotFound)
+      expect{ @resource_service.find(@other_post.id) }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "should find only posts belonging to @forum with .all" do
       resources = @resource_service.all
-      resources.should be == Post.where(forum_id: @forum.id).all
+      expect(resources).to eq(Post.where(forum_id: @forum.id).all)
     end
   end
 
@@ -143,7 +143,7 @@ describe ForumPostsController do
       get :index, params: { :forum_id => @forum.id }
     end
   
-    it { @controller.filter_trace.should == [:abstract, :posts, :load_enclosing, :forum_posts] }
+    it { expect(@controller.filter_trace).to eq([:abstract, :posts, :load_enclosing, :forum_posts]) }
   end
 
   describe "Requesting /forums/2/posts (testing the before filters)" do
@@ -152,7 +152,7 @@ describe ForumPostsController do
     before(:each) do
       setup_mocks
       @posts = double('Posts')
-      @forum_posts.stub(:order).and_return(@posts)
+      allow(@forum_posts).to receive(:order).and_return(@posts)
     end
   
     def do_get
@@ -160,24 +160,24 @@ describe ForumPostsController do
     end
     
     it "should find the forum" do
-      Forum.should_receive(:find).with('2').and_return(@forum)
+      expect(Forum).to receive(:find).with('2').and_return(@forum)
       do_get
     end
   
     it "should assign the form as other_name_for_forum" do
       do_get
-      assigns[:other_name_for_forum].should == assigns[:forum]
+      expect(assigns[:other_name_for_forum]).to eq(assigns[:forum])
     end
   
     it "should assign the found forum for the view" do
       do_get
-      assigns[:forum].should == @forum
+      expect(assigns[:forum]).to eq(@forum)
     end
   
     it "should assign the forum_posts association as the posts resource_service" do
-      @forum.should_receive(:posts).and_return(@forum_posts)
+      expect(@forum).to receive(:posts).and_return(@forum_posts)
       do_get
-      @controller.resource_service.should == @forum_posts
+      expect(@controller.resource_service).to eq(@forum_posts)
     end 
   end
 
@@ -187,7 +187,7 @@ describe ForumPostsController do
     before(:each) do
       setup_mocks
       @posts = double('Posts')
-      @forum_posts.stub(:order).and_return(@posts)
+      allow(@forum_posts).to receive(:order).and_return(@posts)
     end
   
     def do_get
@@ -196,22 +196,22 @@ describe ForumPostsController do
   
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should render index.rhtml" do
       do_get
-      response.should render_template(:index)
+      expect(response).to render_template(:index)
     end
   
     it "should find all posts, in reverse order (because of AbstractPostsController)" do
-      @forum_posts.should_receive(:order).with('id DESC').and_return(@posts)
+      expect(@forum_posts).to receive(:order).with('id DESC').and_return(@posts)
       do_get
     end
   
     it "should assign the found posts for the view" do
       do_get
-      assigns[:posts].should == @posts
+      expect(assigns[:posts]).to eq(@posts)
     end
   end
 
@@ -221,7 +221,7 @@ describe ForumPostsController do
     before(:each) do
       setup_mocks
       @post = double('a post')
-      @forum_posts.stub(:find).and_return(@post)
+      allow(@forum_posts).to receive(:find).and_return(@post)
     end
   
     def do_get
@@ -230,22 +230,22 @@ describe ForumPostsController do
 
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
   
     it "should render show.rhtml" do
       do_get
-      response.should render_template(:show)
+      expect(response).to render_template(:show)
     end
   
     it "should find the thing requested" do
-      @forum_posts.should_receive(:find).with("1").and_return(@post)
+      expect(@forum_posts).to receive(:find).with("1").and_return(@post)
       do_get
     end
   
     it "should assign the found thing for the view" do
       do_get
-      assigns[:post].should == @post
+      expect(assigns[:post]).to eq(@post)
     end
   end
 
@@ -255,7 +255,7 @@ describe ForumPostsController do
     before(:each) do
       setup_mocks
       @post = double('new Post')
-      @forum_posts.stub(:build).and_return(@post)
+      allow(@forum_posts).to receive(:build).and_return(@post)
     end
   
     def do_get
@@ -264,27 +264,27 @@ describe ForumPostsController do
 
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
   
     it "should render new.rhtml" do
       do_get
-      response.should render_template(:new)
+      expect(response).to render_template(:new)
     end
   
     it "should build an new thing" do
-      @forum_posts.should_receive(:build).and_return(@post)
+      expect(@forum_posts).to receive(:build).and_return(@post)
       do_get
     end
   
     it "should not save the new thing" do
-      @post.should_not_receive(:save)
+      expect(@post).not_to receive(:save)
       do_get
     end
   
     it "should assign the new thing for the view" do
       do_get
-      assigns[:post].should == @post
+      expect(assigns[:post]).to eq(@post)
     end
   end
 
@@ -294,7 +294,7 @@ describe ForumPostsController do
     before(:each) do
       setup_mocks
       @post = double('Post')
-      @forum_posts.stub(:find).and_return(@post)
+      allow(@forum_posts).to receive(:find).and_return(@post)
     end
  
     def do_get
@@ -303,22 +303,22 @@ describe ForumPostsController do
 
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
   
     it "should render edit.rhtml" do
       do_get
-      response.should render_template(:edit)
+      expect(response).to render_template(:edit)
     end
   
     it "should find the thing requested" do
-      @forum_posts.should_receive(:find).with("1").and_return(@post)
+      expect(@forum_posts).to receive(:find).with("1").and_return(@post)
       do_get
     end
   
     it "should assign the found Thing for the view" do
       do_get
-      assigns(:post).should equal(@post)
+      expect(assigns(:post)).to equal(@post)
     end
   end
 
@@ -328,9 +328,9 @@ describe ForumPostsController do
     before(:each) do
       setup_mocks
       @post = double('Post')
-      @post.stub(:save).and_return(true)
-      @post.stub(:to_param).and_return("1")
-      @forum_posts.stub(:build).and_return(@post)
+      allow(@post).to receive(:save).and_return(true)
+      allow(@post).to receive(:to_param).and_return("1")
+      allow(@forum_posts).to receive(:build).and_return(@post)
     end
   
     def do_post
@@ -338,25 +338,25 @@ describe ForumPostsController do
     end
   
     it "should build a new post" do
-      @forum_posts.should_receive(:build).with({'name' => 'Post'}).and_return(@post)
+      expect(@forum_posts).to receive(:build).with({'name' => 'Post'}).and_return(@post)
       do_post
     end
 
     it "should attempt to save the new post" do
-      @post.should_receive(:save).and_return(true)
+      expect(@post).to receive(:save).and_return(true)
       do_post
     end
   
     it "should redirect to the new post.save == true" do
       do_post
-      response.should be_redirect
-      response.redirect_url.should == "http://test.host/forums/2/posts/1"
+      expect(response).to be_redirect
+      expect(response.redirect_url).to eq("http://test.host/forums/2/posts/1")
     end
   
     it "should render new when post.save == false" do
-      @post.stub(:save).and_return(false)
+      allow(@post).to receive(:save).and_return(false)
       do_post
-      response.should render_template(:new)
+      expect(response).to render_template(:new)
     end
   end
 
@@ -366,8 +366,8 @@ describe ForumPostsController do
     before(:each) do
       setup_mocks
       @post = double('Post').as_null_object
-      @post.stub(:to_param).and_return("1")
-      @forum_posts.stub(:find).and_return(@post)
+      allow(@post).to receive(:to_param).and_return("1")
+      allow(@forum_posts).to receive(:find).and_return(@post)
     end
   
     def do_update
@@ -375,24 +375,24 @@ describe ForumPostsController do
     end
   
     it "should find the post requested" do
-      @forum_posts.should_receive(:find).with("1").and_return(@post)
+      expect(@forum_posts).to receive(:find).with("1").and_return(@post)
       do_update
     end
 
     it "should update the found post" do
-      @post.should_receive(:update_attributes)
+      expect(@post).to receive(:update_attributes)
       do_update
     end
 
     it "should assign the found post for the view" do
       do_update
-      assigns(:post).should == @post
+      expect(assigns(:post)).to eq(@post)
     end
 
     it "should redirect to the post" do
       do_update
-      response.should be_redirect
-      response.redirect_url.should == "http://test.host/forums/2/posts/1"
+      expect(response).to be_redirect
+      expect(response.redirect_url).to eq("http://test.host/forums/2/posts/1")
     end
   end
 
@@ -402,8 +402,8 @@ describe ForumPostsController do
     before(:each) do
       setup_mocks
       @post = double('Post').as_null_object
-      @forum_posts.stub(:find).and_return(@post)
-      @forum_posts.stub(:destroy)
+      allow(@forum_posts).to receive(:find).and_return(@post)
+      allow(@forum_posts).to receive(:destroy)
     end
   
     def do_delete
@@ -411,16 +411,16 @@ describe ForumPostsController do
     end
 
     it "should find and destroy the post requested" do
-      @forum_posts.should_receive(:find).with("1").and_return(@post)
-      @forum_posts.should_receive(:destroy).with("1")
+      expect(@forum_posts).to receive(:find).with("1").and_return(@post)
+      expect(@forum_posts).to receive(:destroy).with("1")
       do_delete
-      assigns['post'].should == @post
+      expect(assigns['post']).to eq(@post)
     end
   
     it "should redirect to the things list" do
       do_delete
-      response.should be_redirect
-      response.redirect_url.should == "http://test.host/forums/2/posts"
+      expect(response).to be_redirect
+      expect(response.redirect_url).to eq("http://test.host/forums/2/posts")
     end
   end
 end

@@ -5,117 +5,117 @@ describe ForumsController do
   
     before(:each) do
       @forum = double('Forum')
-      @forum.stub(:to_param).and_return('2')
-      Forum.stub(:find).and_return(@forum)
+      allow(@forum).to receive(:to_param).and_return('2')
+      allow(Forum).to receive(:find).and_return(@forum)
       get :show, params: { :id => "2" }
     end
   
     it "resources_path to /forums" do
-      controller.resources_path.should == '/forums'
+      expect(controller.resources_path).to eq('/forums')
     end
 
     it "resources_path(:foo => 'bar') to /forums?foo=bar" do
-      controller.resources_path(:foo => 'bar').should == '/forums?foo=bar'
+      expect(controller.resources_path(:foo => 'bar')).to eq('/forums?foo=bar')
     end
 
     it "resource_path to /forums/2" do
-      controller.resource_path.should == '/forums/2'
+      expect(controller.resource_path).to eq('/forums/2')
     end
 
     it "resource_path(:foo => 'bar') to /forums/2?foo=bar" do
-      controller.resource_path(:foo => 'bar').should == '/forums/2?foo=bar'
+      expect(controller.resource_path(:foo => 'bar')).to eq('/forums/2?foo=bar')
     end
   
     it "resource_path(9) to /forums/9" do
-      controller.resource_path(9).should == '/forums/9'
+      expect(controller.resource_path(9)).to eq('/forums/9')
     end
 
     it "resource_path(9, :foo => 'bar') to /forums/2?foo=bar" do
-      controller.resource_path(9, :foo => 'bar').should == '/forums/9?foo=bar'
+      expect(controller.resource_path(9, :foo => 'bar')).to eq('/forums/9?foo=bar')
     end
 
     it "edit_resource_path to /forums/2/edit" do
-      controller.edit_resource_path.should == '/forums/2/edit'
+      expect(controller.edit_resource_path).to eq('/forums/2/edit')
     end
   
     it "edit_resource_path(9) to /forums/9/edit" do
-      controller.edit_resource_path(9).should == '/forums/9/edit'
+      expect(controller.edit_resource_path(9)).to eq('/forums/9/edit')
     end
   
     it "new_resource_path to /forums/new" do
-      controller.new_resource_path.should == '/forums/new'
+      expect(controller.new_resource_path).to eq('/forums/new')
     end
   
     it "resources_url to http://test.host/forums" do
-      controller.resources_url.should == 'http://test.host/forums'
+      expect(controller.resources_url).to eq('http://test.host/forums')
     end
 
     it "resource_url to http://test.host/forums/2" do
-      controller.resource_url.should == 'http://test.host/forums/2'
+      expect(controller.resource_url).to eq('http://test.host/forums/2')
     end
   
     it "resource_url(9) to http://test.host/forums/9" do
-      controller.resource_url(9).should == 'http://test.host/forums/9'
+      expect(controller.resource_url(9)).to eq('http://test.host/forums/9')
     end
 
     it "edit_resource_url to http://test.host/forums/2/edit" do
-      controller.edit_resource_url.should == 'http://test.host/forums/2/edit'
+      expect(controller.edit_resource_url).to eq('http://test.host/forums/2/edit')
     end
   
     it "edit_resource_url(9) to http://test.host/forums/9/edit" do
-      controller.edit_resource_url(9).should == 'http://test.host/forums/9/edit'
+      expect(controller.edit_resource_url(9)).to eq('http://test.host/forums/9/edit')
     end
   
     it "new_resource_url to http://test.host/forums/new" do
-      controller.new_resource_url.should == 'http://test.host/forums/new'
+      expect(controller.new_resource_url).to eq('http://test.host/forums/new')
     end
  
     it "resource_interests_path to /forums/2/interests" do
-      controller.resource_interests_path.should == "/forums/2/interests"
+      expect(controller.resource_interests_path).to eq("/forums/2/interests")
     end
   
     it "resource_interests_path(:foo => 'bar') to /forums/2/interests?foo=bar" do
-      controller.resource_interests_path(:foo => 'bar').should == '/forums/2/interests?foo=bar'
+      expect(controller.resource_interests_path(:foo => 'bar')).to eq('/forums/2/interests?foo=bar')
     end
   
     it "resource_interests_path(9) to /forums/9/interests" do
-      controller.resource_interests_path(9).should == "/forums/9/interests"
+      expect(controller.resource_interests_path(9)).to eq("/forums/9/interests")
     end
   
     it "resource_interests_path(9, :foo => 'bar') to /forums/9/interests?foo=bar" do
-      controller.resource_interests_path(9, :foo => 'bar').should == "/forums/9/interests?foo=bar"
+      expect(controller.resource_interests_path(9, :foo => 'bar')).to eq("/forums/9/interests?foo=bar")
     end
 
     it "resource_interest_path(5) to /forums/2/interests/5" do
-      controller.resource_interest_path(5).should == "/forums/2/interests/5"
+      expect(controller.resource_interest_path(5)).to eq("/forums/2/interests/5")
     end
   
     it "resource_interest_path(9,5) to /forums/9/interests/5" do
-      controller.resource_interest_path(9,5).should == "/forums/9/interests/5"
+      expect(controller.resource_interest_path(9,5)).to eq("/forums/9/interests/5")
     end
   
     it "resource_interest_path(9,5, :foo => 'bar') to /forums/9/interests/5?foo=bar" do
-      controller.resource_interest_path(9, 5, :foo => 'bar').should == "/forums/9/interests/5?foo=bar"
+      expect(controller.resource_interest_path(9, 5, :foo => 'bar')).to eq("/forums/9/interests/5?foo=bar")
     end
 
     it 'new_resource_interest_path(9) to /forums/9/interests/new' do
-      controller.new_resource_interest_path(9).should == "/forums/9/interests/new"
+      expect(controller.new_resource_interest_path(9)).to eq("/forums/9/interests/new")
     end
   
     it 'edit_resource_interest_path(5) to /forums/2/interests/5/edit' do
-      controller.edit_resource_interest_path(5).should == "/forums/2/interests/5/edit"
+      expect(controller.edit_resource_interest_path(5)).to eq("/forums/2/interests/5/edit")
     end
   
     it 'edit_resource_interest_path(9,5) to /forums/9/interests/5/edit' do
-      controller.edit_resource_interest_path(9,5).should == "/forums/9/interests/5/edit"
+      expect(controller.edit_resource_interest_path(9,5)).to eq("/forums/9/interests/5/edit")
     end
   
     it "respond_to?(:edit_resource_interest_path) should == true" do
-      controller.should respond_to(:edit_resource_interest_path)
+      expect(controller).to respond_to(:edit_resource_interest_path)
     end
 
     it "resource_users_path should raise informative NoMethodError" do
-      lambda{ controller.resource_users_path }.should raise_error(ResourcesController::CantMapRoute, <<-end_str
+      expect{ controller.resource_users_path }.to raise_error(ResourcesController::CantMapRoute, <<-end_str
 Tried to map :resource_users_path to :forum_users_path,
 which doesn't exist. You may not have defined the route in config/routes.rb.
 
@@ -131,15 +131,15 @@ end_str
     end
   
     it "enclosing_resource_path should raise informative NoMethodError" do
-      lambda{ controller.enclosing_resource_path }.should raise_error(NoMethodError, "Tried to map :enclosing_resource_path but there is no enclosing_resource for this controller")
+      expect{ controller.enclosing_resource_path }.to raise_error(NoMethodError, "Tried to map :enclosing_resource_path but there is no enclosing_resource for this controller")
     end
   
     it "any_old_missing_method should raise NoMethodError" do
-      lambda{ controller.any_old_missing_method }.should raise_error(NoMethodError)
+      expect{ controller.any_old_missing_method }.to raise_error(NoMethodError)
     end
   
     it "respond_to?(:resource_users_path) should == false" do
-      controller.should_not respond_to(:resource_users_path)
+      expect(controller).not_to respond_to(:resource_users_path)
     end
   end
 
@@ -152,18 +152,18 @@ end_str
 
   describe ForumsController, " requesting garbage url" do
     it "should raise ResourcesController::Specification::NoClassFoundError" do
-      lambda { get :index, params: { :resource_path => "/forums/\ncrayzeee" } }.should raise_error(ResourcesController::Specification::NoClassFoundError)
+      expect { get :index, params: { :resource_path => "/forums/\ncrayzeee" } }.to raise_error(ResourcesController::Specification::NoClassFoundError)
     end
   end
 
   describe ForumsController, " requesting / (testing resource_path)" do
     it "should route to { :controller => 'forums', :action => 'index', :resource_path => '/forums' } from GET /" do
-      {:get => "/"}.should route_to(:controller => 'forums', :action => 'index', :resource_path => '/forums')
+      expect({:get => "/"}).to route_to(:controller => 'forums', :action => 'index', :resource_path => '/forums')
     end
   
     before(:each) do
       @mock_forums = double('forums')
-      Forum.stub(:all).and_return(@mock_forums)
+      allow(Forum).to receive(:all).and_return(@mock_forums)
     end
   
     def do_get
@@ -172,35 +172,35 @@ end_str
   
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should render index.rhtml" do
       do_get
-      response.should render_template(:index)
+      expect(response).to render_template(:index)
     end
   
     it "should find all forums" do
-      Forum.should_receive(:all).and_return(@mock_forums)
+      expect(Forum).to receive(:all).and_return(@mock_forums)
       do_get
     end
   
     it "should assign the found forums for the view" do
       do_get
-      assigns[:forums].should == @mock_forums
+      expect(assigns[:forums]).to eq(@mock_forums)
     end
   end
 
   describe ForumsController, " requesting /create_forum (testing resource_method)" do
     it "should generate params { :controller => 'forums', :action => 'create', :resource_path => '/forums', :resource_method => :post } from GET /create_forum" do
-      {:get => "/create_forum"}.should route_to(:controller => 'forums', :action => 'create', :resource_path => '/forums', :resource_method => :post)
+      expect({:get => "/create_forum"}).to route_to(:controller => 'forums', :action => 'create', :resource_path => '/forums', :resource_method => :post)
     end
   
     before(:each) do
       @mock_forum = double('Forum')
-      @mock_forum.stub(:save).and_return(true)
-      @mock_forum.stub(:to_param).and_return("1")
-      Forum.stub(:new).and_return(@mock_forum)
+      allow(@mock_forum).to receive(:save).and_return(true)
+      allow(@mock_forum).to receive(:to_param).and_return("1")
+      allow(Forum).to receive(:new).and_return(@mock_forum)
     end
   
     def do_post
@@ -209,19 +209,19 @@ end_str
     end
   
     it "should create a new forum" do
-      Forum.should_receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
+      expect(Forum).to receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
       do_post
     end
 
     it "should set the flash notice" do
       do_post
-      flash[:notice].should == "Forum was successfully created."
+      expect(flash[:notice]).to eq("Forum was successfully created.")
     end
 
     it "should redirect to the new forum" do
       do_post
-      response.should be_redirect
-      response.redirect_url.should == "http://test.host/forums/1"
+      expect(response).to be_redirect
+      expect(response.redirect_url).to eq("http://test.host/forums/1")
     end
   end
 
@@ -229,7 +229,7 @@ end_str
 
     before(:each) do
       @mock_forums = double('forums')
-      Forum.stub(:all).and_return(@mock_forums)
+      allow(Forum).to receive(:all).and_return(@mock_forums)
     end
   
     def do_get
@@ -238,22 +238,22 @@ end_str
   
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should render index.rhtml" do
       do_get
-      response.should render_template(:index)
+      expect(response).to render_template(:index)
     end
   
     it "should find all forums" do
-      Forum.should_receive(:all).and_return(@mock_forums)
+      expect(Forum).to receive(:all).and_return(@mock_forums)
       do_get
     end
   
     it "should assign the found forums for the view" do
       do_get
-      assigns[:forums].should == @mock_forums
+      expect(assigns[:forums]).to eq(@mock_forums)
     end
   end
 
@@ -261,8 +261,8 @@ end_str
 
     before(:each) do
       @mock_forums = double('forums')
-      @mock_forums.stub(:to_xml).and_return("XML")
-      Forum.stub(:all).and_return(@mock_forums)
+      allow(@mock_forums).to receive(:to_xml).and_return("XML")
+      allow(Forum).to receive(:all).and_return(@mock_forums)
     end
   
     def do_get
@@ -272,18 +272,18 @@ end_str
   
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should find all forums" do
-      Forum.should_receive(:all).and_return(@mock_forums)
+      expect(Forum).to receive(:all).and_return(@mock_forums)
       do_get
     end
   
     it "should render the found forums as xml" do
-      @mock_forums.should_receive(:to_xml).and_return("XML")
+      expect(@mock_forums).to receive(:to_xml).and_return("XML")
       do_get
-      response.body.should eql("XML")
+      expect(response.body).to eql("XML")
     end
   end
 
@@ -291,7 +291,7 @@ end_str
 
     before(:each) do
       @mock_forums = double('forums')
-      Forum.stub(:all).and_return(@mock_forums)
+      allow(Forum).to receive(:all).and_return(@mock_forums)
     end
   
     def do_get
@@ -301,17 +301,17 @@ end_str
   
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should find all forums" do
-      Forum.should_receive(:all).and_return(@mock_forums)
+      expect(Forum).to receive(:all).and_return(@mock_forums)
       do_get
     end
   
     it "should render index.rjs" do
       do_get
-      response.should render_template('index')
+      expect(response).to render_template('index')
     end
   end
 
@@ -319,7 +319,7 @@ end_str
 
     before(:each) do
       @mock_forum = double('Forum')
-      Forum.stub(:find).and_return(@mock_forum)
+      allow(Forum).to receive(:find).and_return(@mock_forum)
     end
   
     def do_get
@@ -328,22 +328,22 @@ end_str
 
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
   
     it "should render show.rhtml" do
       do_get
-      response.should render_template(:show)
+      expect(response).to render_template(:show)
     end
   
     it "should find the forum requested" do
-      Forum.should_receive(:find).with("1").and_return(@mock_forum)
+      expect(Forum).to receive(:find).with("1").and_return(@mock_forum)
       do_get
     end
   
     it "should assign the found forum for the view" do
       do_get
-      assigns[:forum].should == @mock_forum
+      expect(assigns[:forum]).to eq(@mock_forum)
     end
   end
 
@@ -351,8 +351,8 @@ end_str
 
     before(:each) do
       @mock_forum = double('Forum')
-      @mock_forum.stub(:to_xml).and_return("XML")
-      Forum.stub(:find).and_return(@mock_forum)
+      allow(@mock_forum).to receive(:to_xml).and_return("XML")
+      allow(Forum).to receive(:find).and_return(@mock_forum)
     end
   
     def do_get
@@ -362,18 +362,18 @@ end_str
 
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
   
     it "should find the forum requested" do
-      Forum.should_receive(:find).with("1").and_return(@mock_forum)
+      expect(Forum).to receive(:find).with("1").and_return(@mock_forum)
       do_get
     end
   
     it "should render the found forum as xml" do
-      @mock_forum.should_receive(:to_xml).and_return("XML")
+      expect(@mock_forum).to receive(:to_xml).and_return("XML")
       do_get
-      response.body.should eql("XML")
+      expect(response.body).to eql("XML")
     end
   end
 
@@ -381,7 +381,7 @@ end_str
 
     before(:each) do
       @mock_forum = double('Forum')
-      Forum.stub(:find).and_return(@mock_forum)
+      allow(Forum).to receive(:find).and_return(@mock_forum)
     end
   
     def do_get
@@ -390,22 +390,22 @@ end_str
 
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
   
     it "should render show.rjs" do
       do_get
-      response.should render_template('show')
+      expect(response).to render_template('show')
     end
   
     it "should find the forum requested" do
-      Forum.should_receive(:find).with("1").and_return(@mock_forum)
+      expect(Forum).to receive(:find).with("1").and_return(@mock_forum)
       do_get
     end
   
     it "should assign the found forum for the view" do
       do_get
-      assigns[:forum].should == @mock_forum
+      expect(assigns[:forum]).to eq(@mock_forum)
     end
   end
 
@@ -413,7 +413,7 @@ end_str
 
     before(:each) do
       @mock_forum = double('Forum')
-      Forum.stub(:new).and_return(@mock_forum)
+      allow(Forum).to receive(:new).and_return(@mock_forum)
     end
   
     def do_get
@@ -422,27 +422,27 @@ end_str
 
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
   
     it "should render new.rhtml" do
       do_get
-      response.should render_template(:new)
+      expect(response).to render_template(:new)
     end
   
     it "should create an new forum" do
-      Forum.should_receive(:new).and_return(@mock_forum)
+      expect(Forum).to receive(:new).and_return(@mock_forum)
       do_get
     end
   
     it "should not save the new forum" do
-      @mock_forum.should_not_receive(:save)
+      expect(@mock_forum).not_to receive(:save)
       do_get
     end
   
     it "should assign the new forum for the view" do
       do_get
-      assigns[:forum].should == @mock_forum
+      expect(assigns[:forum]).to eq(@mock_forum)
     end
   end
 
@@ -450,7 +450,7 @@ end_str
 
     before(:each) do
       @mock_forum = double('Forum')
-      Forum.stub(:find).and_return(@mock_forum)
+      allow(Forum).to receive(:find).and_return(@mock_forum)
     end
   
     def do_get
@@ -459,22 +459,22 @@ end_str
 
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
   
     it "should render edit.rhtml" do
       do_get
-      response.should render_template(:edit)
+      expect(response).to render_template(:edit)
     end
   
     it "should find the forum requested" do
-      Forum.should_receive(:find).and_return(@mock_forum)
+      expect(Forum).to receive(:find).and_return(@mock_forum)
       do_get
     end
   
     it "should assign the found Forum for the view" do
       do_get
-      assigns(:forum).should equal(@mock_forum)
+      expect(assigns(:forum)).to equal(@mock_forum)
     end
   end
 
@@ -482,9 +482,9 @@ end_str
 
     before(:each) do
       @mock_forum = double('Forum')
-      @mock_forum.stub(:save).and_return(true)
-      @mock_forum.stub(:to_param).and_return("1")
-      Forum.stub(:new).and_return(@mock_forum)
+      allow(@mock_forum).to receive(:save).and_return(true)
+      allow(@mock_forum).to receive(:to_param).and_return("1")
+      allow(Forum).to receive(:new).and_return(@mock_forum)
     end
   
     def do_post
@@ -492,19 +492,19 @@ end_str
     end
   
     it "should create a new forum" do
-      Forum.should_receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
+      expect(Forum).to receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
       do_post
     end
 
     it "should set the flash notice" do
       do_post
-      flash[:notice].should == "Forum was successfully created."
+      expect(flash[:notice]).to eq("Forum was successfully created.")
     end
 
     it "should redirect to the new forum" do
       do_post
-      response.should be_redirect
-      response.redirect_url.should == "http://test.host/forums/1"
+      expect(response).to be_redirect
+      expect(response.redirect_url).to eq("http://test.host/forums/1")
     end
   end
 
@@ -512,9 +512,9 @@ end_str
 
     before(:each) do
       @mock_forum = double('Forum')
-      @mock_forum.stub(:save).and_return(true)
-      @mock_forum.stub(:to_param).and_return("1")
-      Forum.stub(:new).and_return(@mock_forum)
+      allow(@mock_forum).to receive(:save).and_return(true)
+      allow(@mock_forum).to receive(:to_param).and_return("1")
+      allow(Forum).to receive(:new).and_return(@mock_forum)
     end
   
     def do_post
@@ -522,24 +522,24 @@ end_str
     end
   
     it "should create a new forum" do
-      Forum.should_receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
+      expect(Forum).to receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
       do_post
     end
 
     it "should not set the flash notice" do
       do_post
-      flash[:notice].should == nil
+      expect(flash[:notice]).to eq(nil)
     end
 
     it "should render create.rjs" do
       do_post
-      response.should render_template('create')
+      expect(response).to render_template('create')
     end
   
     it "should render new.rjs if unsuccesful" do
-      @mock_forum.stub(:save).and_return(false)
+      allow(@mock_forum).to receive(:save).and_return(false)
       do_post
-      response.should render_template('new')
+      expect(response).to render_template('new')
     end
   end
 
@@ -547,8 +547,8 @@ end_str
 
     before(:each) do
       @mock_forum = double('Forum').as_null_object
-      @mock_forum.stub(:to_param).and_return("1")
-      Forum.stub(:find).and_return(@mock_forum)
+      allow(@mock_forum).to receive(:to_param).and_return("1")
+      allow(Forum).to receive(:find).and_return(@mock_forum)
     end
   
     def do_update
@@ -556,30 +556,30 @@ end_str
     end
   
     it "should find the forum requested" do
-      Forum.should_receive(:find).with("1").and_return(@mock_forum)
+      expect(Forum).to receive(:find).with("1").and_return(@mock_forum)
       do_update
     end
 
     it "should set the flash notice" do
       do_update
-      flash[:notice].should == "Forum was successfully updated."
+      expect(flash[:notice]).to eq("Forum was successfully updated.")
     end
 
     it "should update the found forum" do
-      @mock_forum.should_receive(:update_attributes)
+      expect(@mock_forum).to receive(:update_attributes)
       do_update
-      assigns(:forum).should == @mock_forum
+      expect(assigns(:forum)).to eq(@mock_forum)
     end
 
     it "should assign the found forum for the view" do
       do_update
-      assigns(:forum).should == @mock_forum
+      expect(assigns(:forum)).to eq(@mock_forum)
     end
 
     it "should redirect to the forum" do
       do_update
-      response.should be_redirect
-      response.redirect_url.should == "http://test.host/forums/1"
+      expect(response).to be_redirect
+      expect(response.redirect_url).to eq("http://test.host/forums/1")
     end
   end
 
@@ -587,8 +587,8 @@ end_str
 
     before(:each) do
       @mock_forum = double('Forum').as_null_object
-      @mock_forum.stub(:to_param).and_return("1")
-      Forum.stub(:find).and_return(@mock_forum)
+      allow(@mock_forum).to receive(:to_param).and_return("1")
+      allow(Forum).to receive(:find).and_return(@mock_forum)
     end
   
     def do_update
@@ -596,35 +596,35 @@ end_str
     end
   
     it "should find the forum requested" do
-      Forum.should_receive(:find).with("1").and_return(@mock_forum)
+      expect(Forum).to receive(:find).with("1").and_return(@mock_forum)
       do_update
     end
 
     it "should update the found forum" do
-      @mock_forum.should_receive(:update_attributes)
+      expect(@mock_forum).to receive(:update_attributes)
       do_update
-      assigns(:forum).should == @mock_forum
+      expect(assigns(:forum)).to eq(@mock_forum)
     end
 
     it "should not set the flash notice" do
       do_update
-      flash[:notice].should == nil
+      expect(flash[:notice]).to eq(nil)
     end
 
     it "should assign the found forum for the view" do
       do_update
-      assigns(:forum).should == @mock_forum
+      expect(assigns(:forum)).to eq(@mock_forum)
     end
 
     it "should render update.rjs" do
       do_update
-      response.should render_template('update')
+      expect(response).to render_template('update')
     end
   
     it "should render edit.rjs, on unsuccessful save" do
-      @mock_forum.stub(:update_attributes).and_return(false)
+      allow(@mock_forum).to receive(:update_attributes).and_return(false)
       do_update
-      response.should render_template('edit')
+      expect(response).to render_template('edit')
     end
   end
 
@@ -632,7 +632,7 @@ end_str
 
     before(:each) do
       @mock_forum = double('Forum').as_null_object
-      Forum.stub(:find).and_return(@mock_forum)
+      allow(Forum).to receive(:find).and_return(@mock_forum)
     end
   
     def do_delete
@@ -640,24 +640,24 @@ end_str
     end
 
     it "should find the forum requested" do
-      Forum.should_receive(:find).with("1").and_return(@mock_forum)
+      expect(Forum).to receive(:find).with("1").and_return(@mock_forum)
       do_delete
     end
   
     it "should call destroy on the found forum" do
-      @mock_forum.should_receive(:destroy)
+      expect(@mock_forum).to receive(:destroy)
       do_delete
     end
   
     it "should set the flash notice" do
       do_delete
-      flash[:notice].should == 'Forum was successfully destroyed.'
+      expect(flash[:notice]).to eq('Forum was successfully destroyed.')
     end
   
     it "should redirect to the forums list" do
       do_delete
-      response.should be_redirect
-      response.redirect_url.should == "http://test.host/forums"
+      expect(response).to be_redirect
+      expect(response.redirect_url).to eq("http://test.host/forums")
     end
   end
 
@@ -665,7 +665,7 @@ end_str
 
     before(:each) do
       @mock_forum = double('Forum').as_null_object
-      Forum.stub(:find).and_return(@mock_forum)
+      allow(Forum).to receive(:find).and_return(@mock_forum)
     end
   
     def do_delete
@@ -673,23 +673,23 @@ end_str
     end
 
     it "should find the forum requested" do
-      Forum.should_receive(:find).with("1").and_return(@mock_forum)
+      expect(Forum).to receive(:find).with("1").and_return(@mock_forum)
       do_delete
     end
   
     it "should not set the flash notice" do
       do_delete
-      flash[:notice].should == nil
+      expect(flash[:notice]).to eq(nil)
     end
   
     it "should call destroy on the found forum" do
-      @mock_forum.should_receive(:destroy)
+      expect(@mock_forum).to receive(:destroy)
       do_delete
     end
   
     it "should render destroy.rjs" do
       do_delete
-      response.should render_template('destroy')
+      expect(response).to render_template('destroy')
     end
   end
 end

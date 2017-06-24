@@ -10,12 +10,12 @@ module ResourceMethodsSpec
       it "should accept block syntax" do
         c = MyController.new
         c.resource_service = User
-        c.stub(:params).and_return({})
+        allow(c).to receive(:params).and_return({})
         r = c.send(:new_resource) do |u|
           u.login = "Fred"
         end
-        r.should be_kind_of User
-        r.login.should == "Fred"
+        expect(r).to be_kind_of User
+        expect(r.login).to eq("Fred")
       end
     end
   end
@@ -23,58 +23,58 @@ module ResourceMethodsSpec
   describe "An rc for collection :users" do
     before do
       @controller = MyController.new
-      @controller.stub(:params).and_return({})
+      allow(@controller).to receive(:params).and_return({})
     end
 
     describe "when no enclosing resource" do
       it "#find_resource(<id>) should call User.find(<id>)" do
-        User.should_receive(:find).with("42")
+        expect(User).to receive(:find).with("42")
         @controller.send(:find_resource, "42")
       end
     
       it "#find_resources should call User.find(:all)" do
-        User.should_receive(:all)
+        expect(User).to receive(:all)
         @controller.send(:find_resources)
       end
 
       it "#new_resource({}) should call User.new({})" do
-        User.should_receive(:new).with({})
+        expect(User).to receive(:new).with({})
         @controller.send(:new_resource, {})
       end
 
       it "#destroy_resource(<id>) should call User.find(<id>).destroy" do
-        User.should_receive(:find).with("42").and_return(user = double)
-        user.should_receive(:destroy).and_return(user)
-        @controller.send(:destroy_resource, "42").should == user
+        expect(User).to receive(:find).with("42").and_return(user = double)
+        expect(user).to receive(:destroy).and_return(user)
+        expect(@controller.send(:destroy_resource, "42")).to eq(user)
       end
     end
       
     describe "when an enclosing resource is added (a forum)" do
       before do
         @forum = Forum.create!
-        @forum.stub(:users).and_return(@users = double)
+        allow(@forum).to receive(:users).and_return(@users = double)
         @controller.send :add_enclosing_resource, @forum
       end
   
       it "#find_resource(<id>) should find the forum user" do
-        @users.should_receive(:find).with("42").and_return(user = double)
-        @controller.send(:find_resource, "42").should == user
+        expect(@users).to receive(:find).with("42").and_return(user = double)
+        expect(@controller.send(:find_resource, "42")).to eq(user)
       end
   
       it "#find_resources should return the forum users" do
-        @users.should_receive(:all).and_return(users = double)
-        @controller.send(:find_resources).should == users
+        expect(@users).to receive(:all).and_return(users = double)
+        expect(@controller.send(:find_resources)).to eq(users)
       end
 
       it "#new_resource({}) should call forum.users.build({})" do
-        @users.should_receive(:build).with({}).and_return(user = double)
-        @controller.send(:new_resource, {}).should == user
+        expect(@users).to receive(:build).with({}).and_return(user = double)
+        expect(@controller.send(:new_resource, {})).to eq(user)
       end
 
       it "#destroy_resource(<id>) should call forum.users.find(<id>) and forum.users.destroy(<id>) and return the resource" do
-        @users.should_receive(:find).with("42").and_return(user = double)
-        @users.should_receive(:destroy).with("42")
-        @controller.send(:destroy_resource, "42").should == user
+        expect(@users).to receive(:find).with("42").and_return(user = double)
+        expect(@users).to receive(:destroy).with("42")
+        expect(@controller.send(:destroy_resource, "42")).to eq(user)
       end
     end
   end
@@ -86,7 +86,7 @@ module ResourceMethodsSpec
   describe "An rc for singleton :info" do
     before do
       @controller = MySingletonController.new
-      @controller.stub(:params).and_return({})
+      allow(@controller).to receive(:params).and_return({})
     end
       
     describe "with an enclosing resource (a user)" do
@@ -96,18 +96,18 @@ module ResourceMethodsSpec
       end
   
       it "#find_resource should call user.info" do
-        @user.should_receive(:info)
+        expect(@user).to receive(:info)
         @controller.send(:find_resource)
       end
 
       it "#new_resource({}) should call user.build_info({})" do
-        @user.should_receive(:build_info).with({})
+        expect(@user).to receive(:build_info).with({})
         @controller.send :new_resource, {}
       end
 
       it "#destroy_resource should call user.info.destroy" do
-        @user.should_receive(:info).and_return(info = double)
-        info.should_receive(:destroy)
+        expect(@user).to receive(:info).and_return(info = double)
+        expect(info).to receive(:destroy)
         @controller.send(:destroy_resource)
       end
     end
@@ -135,19 +135,19 @@ module ResourceMethodsSpec
 
   shared_examples_for "A controller with its own resource methods" do
     it "#new_resource should call MyResourceMethods#new_resource" do
-      @controller.send(:new_resource, {}).should == 'my new_resource'
+      expect(@controller.send(:new_resource, {})).to eq('my new_resource')
     end
 
     it "#find_resource should call MyResourceMethods#find_resource" do
-      @controller.send(:find_resource, 1).should == 'my find_resource'
+      expect(@controller.send(:find_resource, 1)).to eq('my find_resource')
     end
 
     it "#find_resources should call MyResourceMethods#new_resource" do
-      @controller.send(:find_resources).should == 'my find_resources'
+      expect(@controller.send(:find_resources)).to eq('my find_resources')
     end
     
     it "#destroy_resource should call MyResourceMethods#destroy_resource" do
-      @controller.send(:destroy_resource, 1).should == 'my destroy_resource'
+      expect(@controller.send(:destroy_resource, 1)).to eq('my destroy_resource')
     end
   end
   
@@ -160,7 +160,7 @@ module ResourceMethodsSpec
     before do
       @controller = MyControllerWithMyResourceMethodsMixedIn.new
       @controller.resource_service = User
-      @controller.stub(:params).and_return({})
+      allow(@controller).to receive(:params).and_return({})
     end
     
     it_should_behave_like "A controller with its own resource methods"
@@ -178,7 +178,7 @@ module ResourceMethodsSpec
     before do
       @controller = InhertedMyAbstractControllerWithOwnResourceMethods.new
       @controller.resource_service = User
-      @controller.stub(:params).and_return({})
+      allow(@controller).to receive(:params).and_return({})
     end
     
     it_should_behave_like "A controller with its own resource methods"
@@ -197,7 +197,7 @@ module ResourceMethodsSpec
     before do
       @controller = InhertedMyAbstractControllerWithResourceMethodsOverridden.new
       @controller.resource_service = User
-      @controller.stub(:params).and_return({})
+      allow(@controller).to receive(:params).and_return({})
     end
     
     it_should_behave_like "A controller with its own resource methods"

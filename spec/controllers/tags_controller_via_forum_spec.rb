@@ -4,9 +4,9 @@ module TagsViaForumSpecHelper
   def setup_mocks
     @forum = double('Forum')
     @forum_tags = double('forum_tags assoc')
-    Forum.stub(:find).and_return(@forum)
-    @forum.stub(:tags).and_return(@forum_tags)
-    @forum.stub(:to_param).and_return('1')
+    allow(Forum).to receive(:find).and_return(@forum)
+    allow(@forum).to receive(:tags).and_return(@forum_tags)
+    allow(@forum).to receive(:to_param).and_return('1')
   end
 end
 
@@ -17,38 +17,38 @@ describe TagsController do
     before(:each) do
       setup_mocks
       @tag = double('Tag')
-      @tag.stub(:to_param).and_return('2')
-      @forum_tags.stub(:find).and_return(@tag)
+      allow(@tag).to receive(:to_param).and_return('2')
+      allow(@forum_tags).to receive(:find).and_return(@tag)
     
       get :show, params: { :forum_id => "1", :id => "2" }
     end
   
     it "resources_path to /forums/1/tags" do
-      controller.resources_path.should == '/forums/1/tags'
+      expect(controller.resources_path).to eq('/forums/1/tags')
     end
 
     it "resource_path to /forums/1/tags/2" do
-      controller.resource_path.should == '/forums/1/tags/2'
+      expect(controller.resource_path).to eq('/forums/1/tags/2')
     end
   
     it "resource_path(9) to /forums/1/tags/9" do
-      controller.resource_path(9).should == '/forums/1/tags/9'
+      expect(controller.resource_path(9)).to eq('/forums/1/tags/9')
     end
 
     it "edit_resource_path to /forums/1/tags/2/edit" do
-      controller.edit_resource_path.should == '/forums/1/tags/2/edit'
+      expect(controller.edit_resource_path).to eq('/forums/1/tags/2/edit')
     end
   
     it "edit_resource_path(9) to /forums/1/tags/9/edit" do
-      controller.edit_resource_path(9).should == '/forums/1/tags/9/edit'
+      expect(controller.edit_resource_path(9)).to eq('/forums/1/tags/9/edit')
     end
   
     it "new_resource_path to /forums/1/tags/new" do
-      controller.new_resource_path.should == '/forums/1/tags/new'
+      expect(controller.new_resource_path).to eq('/forums/1/tags/new')
     end
   
     it "enclosing_resource_path to /forums/1" do
-      controller.enclosing_resource_path.should == "/forums/1"
+      expect(controller.enclosing_resource_path).to eq("/forums/1")
     end
   end
 
@@ -66,23 +66,23 @@ describe TagsController do
   
     it "should build new tag with @forum fk and type with new" do
       resource = @resource_service.new
-      resource.should be_kind_of(Tag)
-      resource.taggable_id.should == @forum.id
-      resource.taggable_type.should == 'Forum'
+      expect(resource).to be_kind_of(Tag)
+      expect(resource.taggable_id).to eq(@forum.id)
+      expect(resource.taggable_type).to eq('Forum')
     end
   
     it "should find @tag with find(@tag.id)" do
       resource = @resource_service.find(@tag.id)
-      resource.should == @tag
+      expect(resource).to eq(@tag)
     end
   
     it "should raise RecordNotFound with find(@other_tag.id)" do
-      lambda{ @resource_service.find(@other_tag.id) }.should raise_error(ActiveRecord::RecordNotFound)
+      expect{ @resource_service.find(@other_tag.id) }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "should find only tags belonging to @forum with .all" do
       resources = @resource_service.all
-      resources.should be == Tag.where(taggable_id: @forum.id, taggable_type: 'Forum').all
+      expect(resources).to eq(Tag.where(taggable_id: @forum.id, taggable_type: 'Forum').all)
     end
   end
 
@@ -92,7 +92,7 @@ describe TagsController do
     before(:each) do
       setup_mocks
       @tags = double('Tags')
-      @forum_tags.stub(:all).and_return(@tags)
+      allow(@forum_tags).to receive(:all).and_return(@tags)
     end
   
     def do_get
@@ -100,19 +100,19 @@ describe TagsController do
     end
 
     it "should find the forum" do
-      Forum.should_receive(:find).with('1').and_return(@forum)
+      expect(Forum).to receive(:find).with('1').and_return(@forum)
       do_get
     end
 
     it "should assign the found forum for the view" do
       do_get
-      assigns[:forum].should == @forum
+      expect(assigns[:forum]).to eq(@forum)
     end
 
     it "should assign the forum_tags association as the tags resource_service" do
-      @forum.should_receive(:tags).and_return(@forum_tags)
+      expect(@forum).to receive(:tags).and_return(@forum_tags)
       do_get
-      @controller.resource_service.should == @forum_tags
+      expect(@controller.resource_service).to eq(@forum_tags)
     end 
   end
 
@@ -122,7 +122,7 @@ describe TagsController do
     before(:each) do
       setup_mocks
       @tag = double('Tag')
-      @forum_tags.stub(:build).and_return(@tag)
+      allow(@forum_tags).to receive(:build).and_return(@tag)
     end
   
     def do_get
@@ -130,43 +130,43 @@ describe TagsController do
     end
 
     it "should find the forum" do
-      Forum.should_receive(:find).with('1').and_return(@forum)
+      expect(Forum).to receive(:find).with('1').and_return(@forum)
       do_get
     end
 
     it "should assign the found forum for the view" do
       do_get
-      assigns[:forum].should == @forum
+      expect(assigns[:forum]).to eq(@forum)
     end
 
     it "should assign the forum_tags association as the tags resource_service" do
-      @forum.should_receive(:tags).and_return(@forum_tags)
+      expect(@forum).to receive(:tags).and_return(@forum_tags)
       do_get
-      @controller.resource_service.should == @forum_tags
+      expect(@controller.resource_service).to eq(@forum_tags)
     end
   
     it "should render new template" do
       do_get
-      response.should render_template('new')
+      expect(response).to render_template('new')
     end
   
     it "should build a new tag with params" do
-      @forum_tags.should_receive(:build).with("name" => "hello").and_return(@tag)
+      expect(@forum_tags).to receive(:build).with("name" => "hello").and_return(@tag)
       do_get
     end
   
     it "should not save the new category" do
-      @tag.should_not_receive(:save)
+      expect(@tag).not_to receive(:save)
       do_get
     end
   
     it "should assign the new tag for the view" do
       do_get
-      assigns[:tag].should equal(@tag)
+      expect(assigns[:tag]).to equal(@tag)
     end
   
     it "should send :resource= to controller with @tag" do
-      controller.should_receive(:resource=).with(@tag)
+      expect(controller).to receive(:resource=).with(@tag)
       do_get
     end
   end

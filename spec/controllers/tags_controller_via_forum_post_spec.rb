@@ -3,16 +3,16 @@ require 'spec_helper'
 module TagsViaForumPostSpecHelper
   def setup_mocks
     @forum = double('Forum')
-    Forum.stub(:find).and_return(@forum)
-    @forum.stub(:to_param).and_return('1')
+    allow(Forum).to receive(:find).and_return(@forum)
+    allow(@forum).to receive(:to_param).and_return('1')
     @forum_posts = double('forum_posts assoc')
-    @forum.stub(:posts).and_return(@forum_posts)
+    allow(@forum).to receive(:posts).and_return(@forum_posts)
     
     @post = double('Post')
-    @forum_posts.stub(:find).and_return(@post)
-    @post.stub(:to_param).and_return('2')
+    allow(@forum_posts).to receive(:find).and_return(@post)
+    allow(@post).to receive(:to_param).and_return('2')
     @post_tags = double('post_tags assoc')
-    @post.stub(:tags).and_return(@post_tags)
+    allow(@post).to receive(:tags).and_return(@post_tags)
   end
 end
 
@@ -23,39 +23,39 @@ describe TagsController do
     before(:each) do
       setup_mocks
       @tag = double('Tag')
-      @tag.stub(:to_param).and_return('3')
-      @post_tags.stub(:find).and_return(@tag)
+      allow(@tag).to receive(:to_param).and_return('3')
+      allow(@post_tags).to receive(:find).and_return(@tag)
     
-      @controller.stub(:request_path).and_return('/forums/1/posts/1/tags/3')
+      allow(@controller).to receive(:request_path).and_return('/forums/1/posts/1/tags/3')
       get :show, params: { :forum_id => "1", :post_id => "2", :id => "3" }
     end
   
     it "resources_path to /forums/1/posts/2/tags" do
-      controller.resources_path.should == '/forums/1/posts/2/tags'
+      expect(controller.resources_path).to eq('/forums/1/posts/2/tags')
     end
 
     it "resource_path to /forums/1/posts/2/tags/3" do
-      controller.resource_path.should == '/forums/1/posts/2/tags/3'
+      expect(controller.resource_path).to eq('/forums/1/posts/2/tags/3')
     end
   
     it "resource_path(9) to /forums/1/posts/2/tags/9" do
-      controller.resource_path(9).should == '/forums/1/posts/2/tags/9'
+      expect(controller.resource_path(9)).to eq('/forums/1/posts/2/tags/9')
     end
 
     it "edit_resource_path to /forums/1/posts/2/tags/3/edit" do
-      controller.edit_resource_path.should == '/forums/1/posts/2/tags/3/edit'
+      expect(controller.edit_resource_path).to eq('/forums/1/posts/2/tags/3/edit')
     end
   
     it "edit_resource_path(9) to /forums/1/posts/2/tags/9/edit" do
-      controller.edit_resource_path(9).should == '/forums/1/posts/2/tags/9/edit'
+      expect(controller.edit_resource_path(9)).to eq('/forums/1/posts/2/tags/9/edit')
     end
   
     it "new_resource_path to /forums/1/posts/2/tags/new" do
-      controller.new_resource_path.should == '/forums/1/posts/2/tags/new'
+      expect(controller.new_resource_path).to eq('/forums/1/posts/2/tags/new')
     end
   
     it "enclosing_resource_path to /forums/1/posts/2" do
-      controller.enclosing_resource_path.should == "/forums/1/posts/2"
+      expect(controller.enclosing_resource_path).to eq("/forums/1/posts/2")
     end
   end
 
@@ -68,30 +68,30 @@ describe TagsController do
       @other_post  = Post.create :forum_id => @forum.id
       @other_tag   = Tag.create :taggable_id => @other_post.id, :taggable_type => 'Post'
     
-      @controller.stub(:request_path).and_return("/forums/:id/posts/:id/tags")
+      allow(@controller).to receive(:request_path).and_return("/forums/:id/posts/:id/tags")
       get :index, params: { :forum_id => @forum.id, :post_id => @post.id }
       @resource_service = controller.send :resource_service
     end
   
     it "should build new tag with @post fk and type with new" do
       resource = @resource_service.new
-      resource.should be_kind_of(Tag)
-      resource.taggable_id.should == @post.id
-      resource.taggable_type.should == 'Post'
+      expect(resource).to be_kind_of(Tag)
+      expect(resource.taggable_id).to eq(@post.id)
+      expect(resource.taggable_type).to eq('Post')
     end
   
     it "should find @tag with find(@tag.id)" do
       resource = @resource_service.find(@tag.id)
-      resource.should == @tag
+      expect(resource).to eq(@tag)
     end
   
     it "should raise RecordNotFound with find(@other_tag.id)" do
-      lambda{ @resource_service.find(@other_tag.id) }.should raise_error(ActiveRecord::RecordNotFound)
+      expect{ @resource_service.find(@other_tag.id) }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "should find only tags belonging to @post with .all" do
       resources = @resource_service.all
-      resources.should be == Tag.where(taggable_id: @post.id, taggable_type: 'Post').all
+      expect(resources).to eq(Tag.where(taggable_id: @post.id, taggable_type: 'Post').all)
     end
   end
 
@@ -101,33 +101,33 @@ describe TagsController do
     before(:each) do
       setup_mocks
       @tags = double('Tags')
-      @post_tags.stub(:all).and_return(@tags)
+      allow(@post_tags).to receive(:all).and_return(@tags)
     end
   
     def do_get
-      @controller.stub(:request_path).and_return("/forums/1/posts/2/tags")
+      allow(@controller).to receive(:request_path).and_return("/forums/1/posts/2/tags")
       get :index, params: { :forum_id => '1', :post_id => '2' }
     end
 
     it "should find the forum" do
-      Forum.should_receive(:find).with('1').and_return(@forum)
+      expect(Forum).to receive(:find).with('1').and_return(@forum)
       do_get
     end
   
     it "should find the post" do
-      @forum_posts.should_receive(:find).with('2').and_return(@post)
+      expect(@forum_posts).to receive(:find).with('2').and_return(@post)
       do_get
     end
 
     it "should assign the found post for the view" do
       do_get
-      assigns[:post].should == @post
+      expect(assigns[:post]).to eq(@post)
     end
 
     it "should assign the post_tags association as the tags resource_service" do
-      @post.should_receive(:tags).and_return(@post_tags)
+      expect(@post).to receive(:tags).and_return(@post_tags)
       do_get
-      @controller.resource_service.should == @post_tags
+      expect(@controller.resource_service).to eq(@post_tags)
     end 
   end
 end

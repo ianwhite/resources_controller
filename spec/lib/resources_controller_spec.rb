@@ -8,11 +8,11 @@ describe "ResourcesController (in general)" do
   end
   
   it "nested_in :foo, :polymorphic => true, :class => User should raise argument error (no options or block with polymorphic)" do
-    lambda { @controller.nested_in :foo, :polymorphic => true, :class => User }.should raise_error(ArgumentError)
+    expect { @controller.nested_in :foo, :polymorphic => true, :class => User }.to raise_error(ArgumentError)
   end
   
   it "resources_controller_for :forums, :in => [:user, '*', '*', :comment] should raise argument error (no multiple wildcards in a row)" do
-    lambda { @controller.resources_controller_for :forums, :in => [:user, '*', '*', :comment] }.should raise_error(ArgumentError)
+    expect { @controller.resources_controller_for :forums, :in => [:user, '*', '*', :comment] }.to raise_error(ArgumentError)
   end
 end
 
@@ -20,14 +20,14 @@ describe "ResourcesController#enclosing_resource_name" do
   before do
     @controller = TagsController.new
     info = mock_model(Info, :tags => [])
-    @controller.stub(:current_user).and_return(mock_model(User, :info => info))
-    @controller.stub(:request_path).and_return('/account/info/tags')
-    @controller.stub(:params).and_return({})
+    allow(@controller).to receive(:current_user).and_return(mock_model(User, :info => info))
+    allow(@controller).to receive(:request_path).and_return('/account/info/tags')
+    allow(@controller).to receive(:params).and_return({})
     @controller.send :load_enclosing_resources
   end
 
   it "should be the name of the mapped enclosing_resource" do
-    @controller.enclosing_resource_name.should == 'info'
+    expect(@controller.enclosing_resource_name).to eq('info')
   end
 end
 
@@ -38,7 +38,7 @@ describe "A controller's resource_service" do
     
   it 'may be explicitly set with #resource_service=' do
     @controller.resource_service = 'foo'
-    @controller.resource_service.should == 'foo'
+    expect(@controller.resource_service).to eq('foo')
   end
 end
 
@@ -50,7 +50,7 @@ describe "deprecated methods" do
   
   it "#save_resource should send resource.save" do
     ActiveSupport::Deprecation.silence do
-      @controller.resource.should_receive :save
+      expect(@controller.resource).to receive :save
       @controller.save_resource
     end
   end

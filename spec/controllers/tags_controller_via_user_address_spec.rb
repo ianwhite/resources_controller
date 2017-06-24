@@ -3,16 +3,16 @@ require 'spec_helper'
 module TagsViaUserAddressSpecHelper
   def setup_mocks
     @user = mock_model(User)
-    User.stub(:find_by_login).and_return(@user)
-    @user.stub(:to_param).and_return('dave')
+    allow(User).to receive(:find_by_login).and_return(@user)
+    allow(@user).to receive(:to_param).and_return('dave')
     @user_addresses = double('user_addresses assoc')
-    @user.stub(:addresses).and_return(@user_addresses)
+    allow(@user).to receive(:addresses).and_return(@user_addresses)
     
     @address = mock_model(Address)
-    @user_addresses.stub(:find).and_return(@address)
-    @address.stub(:to_param).and_return('2')
+    allow(@user_addresses).to receive(:find).and_return(@address)
+    allow(@address).to receive(:to_param).and_return('2')
     @address_tags = double('address_tags assoc')
-    @address.stub(:tags).and_return(@address_tags)
+    allow(@address).to receive(:tags).and_return(@address_tags)
   end
 end
 
@@ -23,38 +23,38 @@ describe TagsController do
     before(:each) do
       setup_mocks
       @tag = mock_model(Tag)
-      @tag.stub(:to_param).and_return('3')
-      @address_tags.stub(:find).and_return(@tag)
+      allow(@tag).to receive(:to_param).and_return('3')
+      allow(@address_tags).to receive(:find).and_return(@tag)
     
       get :show, params: { :user_id => "dave", :address_id => "2", :id => "3" }
     end
   
     it "resources_path to /users/dave/addresses/2/tags" do
-      controller.resources_path.should == '/users/dave/addresses/2/tags'
+      expect(controller.resources_path).to eq('/users/dave/addresses/2/tags')
     end
 
     it "resource_path to /users/dave/addresses/2/tags/3" do
-      controller.resource_path.should == '/users/dave/addresses/2/tags/3'
+      expect(controller.resource_path).to eq('/users/dave/addresses/2/tags/3')
     end
   
     it "resource_path(9) to /users/dave/addresses/2/tags/9" do
-      controller.resource_path(9).should == '/users/dave/addresses/2/tags/9'
+      expect(controller.resource_path(9)).to eq('/users/dave/addresses/2/tags/9')
     end
 
     it "edit_resource_path to /users/dave/addresses/2/tags/3/edit" do
-      controller.edit_resource_path.should == '/users/dave/addresses/2/tags/3/edit'
+      expect(controller.edit_resource_path).to eq('/users/dave/addresses/2/tags/3/edit')
     end
   
     it "edit_resource_path(9) to /users/dave/addresses/2/tags/9/edit" do
-      controller.edit_resource_path(9).should == '/users/dave/addresses/2/tags/9/edit'
+      expect(controller.edit_resource_path(9)).to eq('/users/dave/addresses/2/tags/9/edit')
     end
   
     it "new_resource_path to /users/dave/addresses/2/tags/new" do
-      controller.new_resource_path.should == '/users/dave/addresses/2/tags/new'
+      expect(controller.new_resource_path).to eq('/users/dave/addresses/2/tags/new')
     end
   
     it "enclosing_resource_path to /users/dave/addresses/2" do
-      controller.enclosing_resource_path.should == "/users/dave/addresses/2"
+      expect(controller.enclosing_resource_path).to eq("/users/dave/addresses/2")
     end
   end
 
@@ -73,23 +73,23 @@ describe TagsController do
   
     it "should build new tag with @address fk and type with new" do
       resource = @resource_service.new
-      resource.should be_kind_of(Tag)
-      resource.taggable_id.should == @address.id
-      resource.taggable_type.should == 'Address'
+      expect(resource).to be_kind_of(Tag)
+      expect(resource.taggable_id).to eq(@address.id)
+      expect(resource.taggable_type).to eq('Address')
     end
   
     it "should find @tag with find(@tag.id)" do
       resource = @resource_service.find(@tag.id)
-      resource.should == @tag
+      expect(resource).to eq(@tag)
     end
   
     it "should raise RecordNotFound with find(@other_tag.id)" do
-      lambda{ @resource_service.find(@other_tag.id) }.should raise_error(ActiveRecord::RecordNotFound)
+      expect{ @resource_service.find(@other_tag.id) }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "should find only tags belonging to @address with .all" do
       resources = @resource_service.all
-      resources.should be == Tag.where(taggable_id: @address.id, taggable_type: 'Address').all
+      expect(resources).to eq(Tag.where(taggable_id: @address.id, taggable_type: 'Address').all)
     end
   end
 
@@ -99,7 +99,7 @@ describe TagsController do
     before(:each) do
       setup_mocks
       @tags = double('Tags')
-      @address_tags.stub(:all).and_return(@tags)
+      allow(@address_tags).to receive(:all).and_return(@tags)
     end
   
     def do_get
@@ -107,24 +107,24 @@ describe TagsController do
     end
 
     it "should find the user" do
-      User.should_receive(:find_by_login).with('dave').and_return(@user)
+      expect(User).to receive(:find_by_login).with('dave').and_return(@user)
       do_get
     end
   
     it "should find the address" do
-      @user_addresses.should_receive(:find).with('2').and_return(@address)
+      expect(@user_addresses).to receive(:find).with('2').and_return(@address)
       do_get
     end
 
     it "should assign the found address for the view" do
       do_get
-      assigns[:address].should == @address
+      expect(assigns[:address]).to eq(@address)
     end
 
     it "should assign the address_tags association as the tags resource_service" do
-      @address.should_receive(:tags).and_return(@address_tags)
+      expect(@address).to receive(:tags).and_return(@address_tags)
       do_get
-      @controller.resource_service.should == @address_tags
+      expect(@controller.resource_service).to eq(@address_tags)
     end 
   end
 end

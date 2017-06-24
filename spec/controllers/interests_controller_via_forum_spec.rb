@@ -4,9 +4,9 @@ module InterestsViaForumSpecHelper
   def setup_mocks
     @forum = double('Forum')
     @forum_interests = double('forum_interests assoc')
-    Forum.stub(:find).and_return(@forum)
-    @forum.stub(:interests).and_return(@forum_interests)
-    @forum.stub(:to_param).and_return('1')
+    allow(Forum).to receive(:find).and_return(@forum)
+    allow(@forum).to receive(:interests).and_return(@forum_interests)
+    allow(@forum).to receive(:to_param).and_return('1')
   end
 end
 
@@ -17,34 +17,34 @@ describe InterestsController do
     before(:each) do
       setup_mocks
       @interest = double('Interest')
-      @interest.stub(:to_param).and_return('2')
-      @forum_interests.stub(:find).and_return(@interest)
+      allow(@interest).to receive(:to_param).and_return('2')
+      allow(@forum_interests).to receive(:find).and_return(@interest)
     
       get :show, params: { :forum_id => "1", :id => "2" }
     end
   
     it "resources_path to /forums/1/interests" do
-      controller.resources_path.should == '/forums/1/interests'
+      expect(controller.resources_path).to eq('/forums/1/interests')
     end
 
     it "resource_path to /forums/1/interests/2" do
-      controller.resource_path.should == '/forums/1/interests/2'
+      expect(controller.resource_path).to eq('/forums/1/interests/2')
     end
   
     it "resource_path(9) to /forums/1/interests/9" do
-      controller.resource_path(9).should == '/forums/1/interests/9'
+      expect(controller.resource_path(9)).to eq('/forums/1/interests/9')
     end
 
     it "edit_resource_path to /forums/1/interests/2/edit" do
-      controller.edit_resource_path.should == '/forums/1/interests/2/edit'
+      expect(controller.edit_resource_path).to eq('/forums/1/interests/2/edit')
     end
   
     it "edit_resource_path(9) to /forums/1/interests/9/edit" do
-      controller.edit_resource_path(9).should == '/forums/1/interests/9/edit'
+      expect(controller.edit_resource_path(9)).to eq('/forums/1/interests/9/edit')
     end
   
     it "new_resource_path to /forums/1/interests/new" do
-      controller.new_resource_path.should == '/forums/1/interests/new'
+      expect(controller.new_resource_path).to eq('/forums/1/interests/new')
     end
   end
 
@@ -54,7 +54,7 @@ describe InterestsController do
     before(:each) do
       setup_mocks
       @interests = double('Interests')
-      @forum_interests.stub(:all).and_return(@interests)
+      allow(@forum_interests).to receive(:all).and_return(@interests)
     end
   
     def do_get
@@ -62,19 +62,19 @@ describe InterestsController do
     end
 
     it "should find the forum" do
-      Forum.should_receive(:find).with('1').and_return(@forum)
+      expect(Forum).to receive(:find).with('1').and_return(@forum)
       do_get
     end
 
     it "should assign the found forum as :interested_in for the view" do
       do_get
-      assigns[:interested_in].should == @forum
+      expect(assigns[:interested_in]).to eq(@forum)
     end
 
     it "should assign the forum_interests association as the interests resource_service" do
-      @forum.should_receive(:interests).and_return(@forum_interests)
+      expect(@forum).to receive(:interests).and_return(@forum_interests)
       do_get
-      @controller.resource_service.should == @forum_interests
+      expect(@controller.resource_service).to eq(@forum_interests)
     end 
   end
 end

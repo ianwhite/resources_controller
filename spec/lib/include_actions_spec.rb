@@ -21,15 +21,15 @@ module IncludeActionsSpec
 
   describe "Include actions use case" do
     it "ActionController should have actions from actions module" do
-      ActionsController.action_methods.should == ['foo', 'bar', 'faz'].to_set
+      expect(ActionsController.action_methods).to eq(['foo', 'bar', 'faz'].to_set)
     end
     
     it "OnlyFooController should have only :foo from actions module" do
-      OnlyFooController.action_methods.should == ['foo'].to_set
+      expect(OnlyFooController.action_methods).to eq(['foo'].to_set)
     end
     
     it "ExceptFooBarController should not have :foo, :bar from actions module" do
-      ExceptFooBarController.action_methods.should == ['faz'].to_set
+      expect(ExceptFooBarController.action_methods).to eq(['faz'].to_set)
     end
   end
 end
