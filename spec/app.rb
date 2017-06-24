@@ -7,7 +7,7 @@ module ResourcesControllerTest
     config.eager_load = false
     config.action_controller.permit_all_parameters = true
     paths['config/database'] = File.expand_path('../app/database.yml', __FILE__)
-    paths['log'] = File.expand_path('../../../tmp/log', __FILE__)
+    paths['log'] = File.expand_path('../../tmp/log', __FILE__)
   end
 end
 
