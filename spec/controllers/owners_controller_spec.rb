@@ -17,7 +17,7 @@ describe OwnersController do
   
     before(:each) do
       setup_mocks
-      get :show, :forum_id => "2"
+      get :show, params: { :forum_id => "2" }
     end
 
     it "resource_path to /forums/2/owner" do
@@ -58,7 +58,7 @@ describe OwnersController do
   
     before(:each) do
       setup_mocks 
-      get :show, :forum_id => "2"
+      get :show, params: { :forum_id => "2" }
       @resource_service = controller.send :resource_service
     end
   
@@ -81,7 +81,7 @@ describe OwnersController do
     end
   
     def do_get
-      get :show, :forum_id => "2"
+      get :show, params: { :forum_id => "2" }
     end
 
     it "should be successful" do
@@ -124,7 +124,7 @@ describe OwnersController do
     end
   
     def do_get
-      get :new, :forum_id => "2"
+      get :new, params: { :forum_id => "2" }
     end
 
     it "should be successful" do
@@ -151,7 +151,7 @@ describe OwnersController do
     end
   
     def do_get
-      get :edit, :forum_id => "2"
+      get :edit, params: { :forum_id => "2" }
     end
 
     it "should be successful" do
@@ -181,7 +181,7 @@ describe OwnersController do
     end
   
     def do_post
-      post :create, :forum_id => 2, :owner => {:name => 'Fred'}
+      post :create, params: { :forum_id => 2, :owner => {:name => 'Fred'} }
     end
   
     it "should build a new owner" do
@@ -217,7 +217,7 @@ describe OwnersController do
     end
   
     def do_update
-      put :update, :forum_id => "2", :owner => {:name => 'Fred'}
+      put :update, params: { :forum_id => "2", :owner => {:name => 'Fred'} }
     end
   
     it "should find the owner from forum.owner" do
@@ -251,7 +251,7 @@ describe OwnersController do
     end
   
     def do_delete
-      delete :destroy, :forum_id => "2"
+      delete :destroy, params: { :forum_id => "2" }
     end
 
     it "should find the owner from forum.owner" do

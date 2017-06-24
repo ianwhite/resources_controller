@@ -21,7 +21,7 @@ describe ForumPostsController do
       @post.stub(:to_param).and_return('1')
       @forum_posts.stub(:find).and_return(@post)
   
-      get :show, :forum_id => "2", :id => "1"
+      get :show, params: { :forum_id => "2", :id => "1" }
     end
   
     it "resources_path to /forums/2/posts" do
@@ -100,7 +100,7 @@ describe ForumPostsController do
     end
 
     it "should raise ResourceMismatch, when route does not contain the resource segment" do
-      lambda{ get :index, :foo_id => 1}.should raise_error(ResourcesController::ResourceMismatch)
+      lambda{ get :index, params: { :foo_id => 1} }.should raise_error(ResourcesController::ResourceMismatch)
     end
   end
 
@@ -112,7 +112,7 @@ describe ForumPostsController do
       @other_forum  = Forum.create
       @other_post   = Post.create :forum_id => @other_forum.id
     
-      get :index, :forum_id => @forum.id
+      get :index, params: { :forum_id => @forum.id }
       @resource_service = controller.send :resource_service
     end
   
@@ -131,16 +131,16 @@ describe ForumPostsController do
       lambda{ @resource_service.find(@other_post.id) }.should raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it "should find only posts belonging to @forum with find(:all)" do
-      resources = @resource_service.find(:all)
-      resources.should be == Post.find(:all, :conditions => "forum_id = #{@forum.id}")
+    it "should find only posts belonging to @forum with .all" do
+      resources = @resource_service.all
+      resources.should be == Post.where(forum_id: @forum.id).all
     end
   end
 
   describe ForumPostsController, ' order of before_filters' do
     before do
       @forum        = Forum.create
-      get :index, :forum_id => @forum.id
+      get :index, params: { :forum_id => @forum.id }
     end
   
     it { @controller.filter_trace.should == [:abstract, :posts, :load_enclosing, :forum_posts] }
@@ -152,11 +152,11 @@ describe ForumPostsController do
     before(:each) do
       setup_mocks
       @posts = double('Posts')
-      @forum_posts.stub(:find).and_return(@posts)
+      @forum_posts.stub(:order).and_return(@posts)
     end
   
     def do_get
-      get :index, :forum_id => '2'
+      get :index, params: { :forum_id => '2' }
     end
     
     it "should find the forum" do
@@ -187,11 +187,11 @@ describe ForumPostsController do
     before(:each) do
       setup_mocks
       @posts = double('Posts')
-      @forum_posts.stub(:find).and_return(@posts)
+      @forum_posts.stub(:order).and_return(@posts)
     end
   
     def do_get
-      get :index, :forum_id => '2'
+      get :index, params: { :forum_id => '2' }
     end
   
     it "should be successful" do
@@ -205,7 +205,7 @@ describe ForumPostsController do
     end
   
     it "should find all posts, in reverse order (because of AbstractPostsController)" do
-      @forum_posts.should_receive(:find).with(:all, :order => 'id DESC').and_return(@posts)
+      @forum_posts.should_receive(:order).with('id DESC').and_return(@posts)
       do_get
     end
   
@@ -225,7 +225,7 @@ describe ForumPostsController do
     end
   
     def do_get
-      get :show, :id => "1", :forum_id => "2"
+      get :show, params: { :id => "1", :forum_id => "2" }
     end
 
     it "should be successful" do
@@ -259,7 +259,7 @@ describe ForumPostsController do
     end
   
     def do_get
-      get :new, :forum_id => "2"
+      get :new, params: { :forum_id => "2" }
     end
 
     it "should be successful" do
@@ -298,7 +298,7 @@ describe ForumPostsController do
     end
  
     def do_get
-      get :edit, :id => "1", :forum_id => "2"
+      get :edit, params: { :id => "1", :forum_id => "2" }
     end
 
     it "should be successful" do
@@ -334,7 +334,7 @@ describe ForumPostsController do
     end
   
     def do_post
-      post :create, :post => {:name => 'Post'}, :forum_id => "2"
+      post :create, params: { :post => {:name => 'Post'}, :forum_id => "2" }
     end
   
     it "should build a new post" do
@@ -371,7 +371,7 @@ describe ForumPostsController do
     end
   
     def do_update
-      put :update, :id => "1", :forum_id => "2"
+      put :update, params: { :id => "1", :forum_id => "2" }
     end
   
     it "should find the post requested" do
@@ -407,7 +407,7 @@ describe ForumPostsController do
     end
   
     def do_delete
-      delete :destroy, :id => "1", :forum_id => "2"
+      delete :destroy, params: { :id => "1", :forum_id => "2" }
     end
 
     it "should find and destroy the post requested" do

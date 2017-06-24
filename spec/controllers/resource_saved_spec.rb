@@ -22,7 +22,7 @@ describe CommentsController, "#resource_saved" do
   describe "Comment.find(<id>)" do
     before do
       Comment.create! :user => User.create!, :post => Post.create!
-      @controller.resource = Comment.find(:first)
+      @controller.resource = Comment.first
     end
     
     it { @controller.should be_resource_saved }

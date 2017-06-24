@@ -101,7 +101,7 @@ describe UsersController, "handling GET /users/dave" do
   end
   
   def do_get
-    get :show, :id => "dave"
+    get :show, params: { :id => "dave" }
   end
 
   it "should be successful" do
@@ -134,7 +134,7 @@ describe UsersController, "handling GET /users/dave.xml" do
   
   def do_get
     @request.env["HTTP_ACCEPT"] = "application/xml"
-    get :show, :id => "dave"
+    get :show, params: { :id => "dave" }
   end
 
   it "should be successful" do
@@ -168,7 +168,7 @@ describe UsersController, "handling GET /users/dave/edit" do
   end
   
   def do_get
-    get :edit, :id => "dave"
+    get :edit, params: { :id => "dave" }
   end
 
   it "should be successful" do
@@ -207,12 +207,12 @@ describe UsersController, "handling PUT /users/dave" do
   
   def put_with_successful_update
     @user.should_receive(:update_attributes).and_return(true)
-    put :update, :id => "dave"
+    put :update, params: { :id => "dave" }
   end
   
   def put_with_failed_update
     @user.should_receive(:update_attributes).and_return(false)
-    put :update, :id => "dave"
+    put :update, params: { :id => "dave" }
   end
   
   it "should find the user requested" do
@@ -243,6 +243,6 @@ end
 
 describe UsersController, "handling DELETE /users/dave" do
   it "should be unknown action" do
-    lambda{ delete :destroy, :id => "dave" }.should raise_error(::AbstractController::ActionNotFound)
+    lambda{ delete :destroy, params: { :id => "dave" } }.should raise_error(::AbstractController::ActionNotFound)
   end
 end

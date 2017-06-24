@@ -26,7 +26,7 @@ describe CommentsController do
       @comment = double('Comment')
       @comment.stub(:to_param).and_return("1")
       @post_comments.stub(:find).and_return(@comment)
-      get :show, :forum_id => "3", :post_id => "2", :id => "1"
+      get :show, params: { :forum_id => "3", :post_id => "2", :id => "1" }
     end
   
     it "resources_path to /forums/3/posts/2/comments" do
@@ -79,7 +79,7 @@ describe CommentsController do
       @other_post     = Post.create :forum_id => @forum.id
       @other_comment  = Comment.create :post_id => @other_post.id
     
-      get :index, :forum_id => @forum.id, :post_id => @post.id
+      get :index, params: { :forum_id => @forum.id, :post_id => @post.id }
       @resource_service = controller.send :resource_service
     end
   
@@ -98,9 +98,9 @@ describe CommentsController do
       lambda{ @resource_service.find(@other_comment.id) }.should raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it "should find only comments belonging to @post with find(:all)" do
-      resources = @resource_service.find(:all)
-      resources.should be == Comment.find(:all, :conditions => "post_id = #{@post.id}")
+    it "should find only comments belonging to @post with .all" do
+      resources = @resource_service.all
+      resources.should be == Comment.where(post_id: @post.id).all
     end
   end
 
@@ -114,7 +114,7 @@ describe CommentsController do
     end
   
     def do_get
-      get :index, :forum_id => '3', :post_id => '2'
+      get :index, params: { :forum_id => '3', :post_id => '2' }
     end
     
     it "should find the forum" do
@@ -155,7 +155,7 @@ describe CommentsController do
     end
   
     def do_get
-      get :index, :forum_id => '3', :post_id => '2'
+      get :index, params: { :forum_id => '3', :post_id => '2' }
     end
   
     it "should be successful" do
@@ -189,7 +189,7 @@ describe CommentsController do
     end
   
     def do_get
-      get :show, :id => "1", :forum_id => '3', :post_id => '2'
+      get :show, params: { :id => "1", :forum_id => '3', :post_id => '2' }
     end
 
     it "should be successful" do
@@ -223,7 +223,7 @@ describe CommentsController do
     end
   
     def do_get
-      get :new, :forum_id => '3', :post_id => '2'
+      get :new, params: { :forum_id => '3', :post_id => '2' }
     end
 
     it "should be successful" do
@@ -262,7 +262,7 @@ describe CommentsController do
     end
  
     def do_get
-      get :edit, :id => "1", :forum_id => '3', :post_id => '2'
+      get :edit, params: { :id => "1", :forum_id => '3', :post_id => '2' }
     end
 
     it "should be successful" do
@@ -298,7 +298,7 @@ describe CommentsController do
     end
   
     def do_post
-      post :create, :comment => {:name => 'Comment'}, :forum_id => '3', :post_id => '2'
+      post :create, params: { :comment => {:name => 'Comment'}, :forum_id => '3', :post_id => '2' }
     end
   
     it "should build a new comment" do
@@ -324,7 +324,7 @@ describe CommentsController do
     end
   
     def do_update
-      put :update, :id => "1", :forum_id => '3', :post_id => '2'
+      put :update, params: { :id => "1", :forum_id => '3', :post_id => '2' }
     end
   
     it "should find the comment requested" do
@@ -361,7 +361,7 @@ describe CommentsController do
     end
   
     def do_delete
-      delete :destroy, :id => "1", :forum_id => '3', :post_id => '2'
+      delete :destroy, params: { :id => "1", :forum_id => '3', :post_id => '2' }
     end
 
     it "should find and destroy the comment requested" do

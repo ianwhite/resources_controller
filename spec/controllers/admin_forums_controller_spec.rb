@@ -7,7 +7,7 @@ describe Admin::ForumsController do
       @forum = double('Forum')
       @forum.stub(:to_param).and_return('2')
       Forum.stub(:find).and_return(@forum)
-      get :show, :id => "2"
+      get :show, params: { :id => "2" }
     end
   
     it "resources_path to /admin/forums" do
@@ -162,9 +162,9 @@ end_str
       resource.should == @forum
     end
 
-    it "should find all forums with find(:all)" do
-      resources = @resource_service.find(:all)
-      resources.should == Forum.find(:all)
+    it "should find all forums with .all" do
+      resources = @resource_service.all
+      resources.should == Forum.all
     end
   end
 
@@ -239,7 +239,7 @@ end_str
   
     def do_get
       @request.env["HTTP_ACCEPT"] = "text/javascript"
-      xhr :get, :index
+      get :index, xhr: true
     end
   
     it "should be successful" do
@@ -266,7 +266,7 @@ end_str
     end
   
     def do_get
-      get :show, :id => "1"
+      get :show, params: { :id => "1" }
     end
 
     it "should be successful" do
@@ -300,7 +300,7 @@ end_str
   
     def do_get
       @request.env["HTTP_ACCEPT"] = "application/xml"
-      get :show, :id => "1"
+      get :show, params: { :id => "1" }
     end
 
     it "should be successful" do
@@ -328,7 +328,7 @@ end_str
     end
   
     def do_get
-      xhr :get, :show, :id => "1"
+      get :show, params: { :id => "1" }, xhr: true
     end
 
     it "should be successful" do
@@ -397,7 +397,7 @@ end_str
     end
   
     def do_get
-      get :edit, :id => "1"
+      get :edit, params: { :id => "1" }
     end
 
     it "should be successful" do
@@ -431,7 +431,7 @@ end_str
     end
   
     def do_post
-      post :create, :forum => {:name => 'Forum'}
+      post :create, params: { :forum => {:name => 'Forum'} }
     end
   
     it "should create a new forum" do
@@ -461,7 +461,7 @@ end_str
     end
   
     def do_post
-      xhr :post, :create, :forum => {:name => 'Forum'}
+      post :create, params: { :forum => {:name => 'Forum'} }, xhr: true
     end
   
     it "should create a new forum" do
@@ -495,7 +495,7 @@ end_str
     end
   
     def do_update
-      put :update, :id => "1"
+      put :update, params: { :id => "1" }
     end
   
     it "should find the forum requested" do
@@ -535,7 +535,7 @@ end_str
     end
   
     def do_update
-      xhr :put, :update, :id => "1"
+      put :update, params: { :id => "1" }, xhr: true
     end
   
     it "should find the forum requested" do
@@ -579,7 +579,7 @@ end_str
     end
   
     def do_delete
-      delete :destroy, :id => "1"
+      delete :destroy, params: { :id => "1" }
     end
 
     it "should find the forum requested" do
@@ -612,7 +612,7 @@ end_str
     end
   
     def do_delete
-      xhr :delete, :destroy, :id => "1"
+      delete :destroy, params: { :id => "1" }, xhr: true
     end
 
     it "should find the forum requested" do

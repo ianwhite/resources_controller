@@ -31,16 +31,8 @@ module ResourcesController
   # These methods are defined as they are used.  The ActionView Helper module delegates to the current controller to access these
   # methods
   module NamedRouteHelper
-    def self.included(base)
-      base.class_eval do
-        alias_method_chain :method_missing, :named_route_helper
-        alias_method_chain :respond_to?, :named_route_helper
-      end
-      base.hide_action *instance_methods
-      base.hide_action :method_missing_without_named_route_helper, :respond_to_without_named_route_helper?, :respond_to?
-    end
 
-    def method_missing_with_named_route_helper(method, *args, &block)
+    def method_missing(method, *args, &block)
       # TODO: test that methods are only defined once
       if resource_named_route_helper_method?(method, raise_error = true) 
         define_resource_named_route_helper_method(method)
@@ -49,12 +41,12 @@ module ResourcesController
         define_resource_named_route_helper_method_for_name_prefix(method)
         send(method, *args)
       else
-        method_missing_without_named_route_helper(method, *args, &block)
+        super(method, *args, &block)
       end
     end
 
-    def respond_to_with_named_route_helper?(*args)
-      respond_to_without_named_route_helper?(*args) || resource_named_route_helper_method?(args.first)
+    def respond_to?(*args)
+      super(*args) || resource_named_route_helper_method?(args.first)
     end
 
     # return true if the passed method (e.g. 'resources_path') corresponds to a defined
@@ -67,7 +59,7 @@ module ResourcesController
       else
         return false
       end
-      respond_to_without_named_route_helper?(route_method, true) || (raise_error && raise_resource_url_mapping_error(resource_method, route_method))
+      respond_to?(route_method, true) || (raise_error && raise_resource_url_mapping_error(resource_method, route_method))
     end
 
   private

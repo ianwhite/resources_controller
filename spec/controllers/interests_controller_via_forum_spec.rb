@@ -20,7 +20,7 @@ describe InterestsController do
       @interest.stub(:to_param).and_return('2')
       @forum_interests.stub(:find).and_return(@interest)
     
-      get :show, :forum_id => "1", :id => "2"
+      get :show, params: { :forum_id => "1", :id => "2" }
     end
   
     it "resources_path to /forums/1/interests" do
@@ -58,7 +58,7 @@ describe InterestsController do
     end
   
     def do_get
-      get :index, :forum_id => '1'
+      get :index, params: { :forum_id => '1' }
     end
 
     it "should find the forum" do

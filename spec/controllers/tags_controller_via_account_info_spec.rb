@@ -25,7 +25,7 @@ describe TagsController do
       @info_tags.stub(:find).and_return(@tag)
     
       @controller.stub(:request_path).and_return('/account/info/tags/2')
-      get :show, :id => 2
+      get :show, params: {  :id => 2 }
     end
   
     it "resources_path to /account/info/tags" do
@@ -88,9 +88,9 @@ describe TagsController do
       lambda{ @resource_service.find(@other_tag.id) }.should raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it "should find only tags belonging to @info with find(:all)" do
-      resources = @resource_service.find(:all)
-      resources.should be == Tag.find(:all, :conditions => "taggable_id = #{@info.id} AND taggable_type = 'Info'")
+    it "should find only tags belonging to @info with .all" do
+      resources = @resource_service.all
+      resources.should be == Tag.where(taggable_id: @info.id, taggable_type: 'Info').all
     end
   end
 

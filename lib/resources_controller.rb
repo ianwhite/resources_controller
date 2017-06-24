@@ -424,21 +424,21 @@ module ResourcesController
   # customising the default behaviour.
   #
   # === load_enclosing_resources
-  # By default, a before_filter is added by resources_controller called :load_enclosing_resources - which
+  # By default, a before_action is added by resources_controller called :load_enclosing_resources - which
   # does all the work of loading the enclosing resources.  You can use ActionControllers standard filter
   # mechanisms to control when this filter is invoked.  For example - you can choose not to load resources
   # on an action
   #
   #   resources_controller_for :foos
-  #   skip_before_filter :load_enclosing_resources, :only => :static_page
+  #   skip_before_action :load_enclosing_resources, :only => :static_page
   #
   # Or, you can change the order of when the filter is invoked by adding the filter call yourself (rc will
   # only add the filter if it doesn't exist)
   #
-  #   before_filter :do_something
-  #   prepend_before_filter :load_enclosing_resources
+  #   before_action :do_something
+  #   prepend_before_action :load_enclosing_resources
   #   resources_controller_for :foos
-  #   before_filter :do_something_else     # chain => [:load_enclosing_resources, :do_something, :do_something_else]
+  #   before_action :do_something_else     # chain => [:load_enclosing_resources, :do_something, :do_something_else]
   #
   # === Default actions module
   # If you have your own actions module you prefer to use other than the standard resources_controller ones
@@ -456,14 +456,13 @@ module ResourcesController
 
     unless included_modules.include? ResourcesController::InstanceMethods
       class_attribute :specifications, :route_name
-      hide_action :specifications, :route_name
       extend  ResourcesController::ClassMethods
       helper  ResourcesController::Helper
       include ResourcesController::InstanceMethods, ResourcesController::NamedRouteHelper
       include ResourcesController::ResourceMethods unless options.delete(:resource_methods) == false || included_modules.include?(ResourcesController::ResourceMethods)
     end
 
-    before_filter(:load_enclosing_resources, when_options.dup) unless load_enclosing_resources_filter_exists?
+    before_action(:load_enclosing_resources, when_options.dup) unless load_enclosing_resources_filter_exists?
 
     self.specifications = []
     specifications << '*' unless options.delete(:load_enclosing) == false
@@ -556,9 +555,6 @@ private
   end
 
   module InstanceMethods
-    def self.included(controller)
-      controller.send :hide_action, *instance_methods
-    end
 
     def resource_service=(service)
       @resource_service = service
@@ -662,7 +658,7 @@ private
     end
 
   private
-    # this is the before_filter that loads all specified and wildcard resources
+    # this is the before_action that loads all specified and wildcard resources
     def load_enclosing_resources
       namespace_segments.each {|segment| update_name_prefix("#{segment}_") }
       specifications.each_with_index do |spec, idx|

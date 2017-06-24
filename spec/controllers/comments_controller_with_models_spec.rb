@@ -10,7 +10,7 @@ describe CommentsController, "without stubs" do
   
   describe "responding to GET index" do
     def do_get
-      get :index, :forum_id => @forum.id, :post_id => @post.id
+      get :index, params: { :forum_id => @forum.id, :post_id => @post.id }
     end
     
     it "should expose all comments as @comments" do
@@ -29,7 +29,7 @@ describe CommentsController, "without stubs" do
 
   describe "responding to GET show" do
     def do_get
-      get :show, :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id
+      get :show, params: { :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id }
     end
     
     it "should expose the requested comment as @comment" do
@@ -48,7 +48,7 @@ describe CommentsController, "without stubs" do
 
   describe "responding to GET new" do
     def do_get
-      get :new, :forum_id => @forum.id, :post_id => @post.id
+      get :new, params: { :forum_id => @forum.id, :post_id => @post.id }
     end
   
     it "should expose a new comment as @comment" do
@@ -60,7 +60,7 @@ describe CommentsController, "without stubs" do
 
   describe "responding to GET edit" do
     def do_get
-      get :edit, :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id
+      get :edit, params: { :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id }
     end
     
     it "should expose the requested comment as @comment" do
@@ -72,7 +72,7 @@ describe CommentsController, "without stubs" do
   describe "responding to POST create" do
     describe "with valid params" do
       def do_post
-        post :create, :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => @user.id}
+        post :create, params: { :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => @user.id} }
       end
       
       it "should create a comment" do
@@ -81,7 +81,7 @@ describe CommentsController, "without stubs" do
       
       it "should expose the newly created comment as @comment" do
         do_post
-        assigns(:comment).should == Comment.find(:first, :order => 'id DESC')
+        assigns(:comment).should == Comment.last
       end
 
       it "should be resource_saved?" do
@@ -91,13 +91,13 @@ describe CommentsController, "without stubs" do
       
       it "should redirect to the created comment" do
         do_post
-        response.should redirect_to(forum_post_comment_url(@forum, @post, Comment.find(:first, :order => 'id DESC')))
+        response.should redirect_to(forum_post_comment_url(@forum, @post, Comment.last))
       end
     end
     
     describe "with invalid params" do
       def do_post
-        post :create, :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => ''}
+        post :create, params: { :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => ''} }
       end
 
       it "should not create a comment" do
@@ -129,7 +129,7 @@ describe CommentsController, "without stubs" do
       end
       
       def do_put
-        put :update, :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => @new_user.id}
+        put :update, params: { :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => @new_user.id} }
       end
 
       it "should update the requested comment" do
@@ -160,7 +160,7 @@ describe CommentsController, "without stubs" do
     
     describe "with invalid params" do
       def do_put
-        put :update, :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => ''}
+        put :update, params: { :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => ''} }
       end
 
       it "should fail to update the requested comment" do
@@ -187,7 +187,7 @@ describe CommentsController, "without stubs" do
 
   describe "responding to DELETE destroy" do
     def do_delete
-      delete :destroy, :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id
+      delete :destroy, params: { :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id }
     end
     
     it "should delete the requested comment" do

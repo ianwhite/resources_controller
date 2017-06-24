@@ -13,7 +13,11 @@ describe "ActionView with resources_controller Helper" do
   
   def self.it_should_forward_to_controller(msg, *args)
     it "should forward ##{msg}#{args.size > 0 ? "(#{args.join(',')})" : ""} to controller" do
-      @controller.should_receive(msg).with(*args)
+      if args.empty?
+        @controller.should_receive(msg).with(no_args)
+      else
+        @controller.should_receive(msg).with(*args)
+      end
       @view.send(msg, *args)
     end
   end
@@ -31,11 +35,12 @@ describe "ActionView with resources_controller Helper" do
     lambda { @view.send(:resource_foo_path) }.should raise_error(NoMethodError)
   end
   
-  it "#error_messages_for_resource should call error_messages_for with resource_name" do
-    @controller.should_receive(:resource_name).and_return('name')
-    @view.should_receive(:error_messages_for).with('name')
-    @view.error_messages_for_resource
-  end
+  #pending "errors_messages_for no longer exists in rails 5"
+  #pending "#error_messages_for_resource should call error_messages_for with resource_name" do
+  #  @controller.should_receive(:resource_name).and_return('name')
+  #  @view.should_receive(:error_messages_for).with('name')
+  #  @view.error_messages_for_resource
+  #end
 end
 
 describe "Helper#form_for_resource (when resource is new record)" do
@@ -67,7 +72,7 @@ describe "Helper#form_for_resource (when resource is new record)" do
   end
 
   it 'when not passed :url_options, they should not be passed to the path generation' do
-    @view.should_receive(:resources_path).with().and_return('/forums')
+    @view.should_receive(:resources_path).with(no_args).and_return('/forums')
     @view.should_receive(:form_for).with(@resource, {:as => 'forum', :html => {:method => :post}, :url => '/forums'})
     @view.form_for_resource{}
   end

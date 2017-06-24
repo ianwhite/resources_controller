@@ -20,7 +20,7 @@ describe InterestsController do
       @interest.stub(:to_param).and_return('2')
       @user_interests.stub(:find).and_return(@interest)
     
-      get :show, :user_id => "dave", :id => "2"
+      get :show, params: { :user_id => "dave", :id => "2" }
     end
   
     it "resources_path to /users/dave/interests" do
@@ -48,7 +48,7 @@ describe InterestsController do
     end
   end
 
-  describe "resource_service in InterestsController via Forum" do
+  describe "resource_service in InterestsController via User" do
   
     before(:each) do
       @user           = User.create :login => 'dave'
@@ -56,7 +56,7 @@ describe InterestsController do
       @other_user     = User.create
       @other_interest = Interest.create :interested_in_id => @other_user.id, :interested_in_type => 'User'
     
-      get :index, :user_id => @user.login
+      get :index, params: { :user_id => @user.login }
       @resource_service = controller.send :resource_service
     end
   
@@ -76,9 +76,9 @@ describe InterestsController do
       lambda{ @resource_service.find(@other_interest.id) }.should raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it "should find only interests belonging to @user with find(:all)" do
-      resources = @resource_service.find(:all)
-      resources.should be == Interest.find(:all, :conditions => "interested_in_id = #{@user.id} AND interested_in_type = 'User'")
+    it "should find only interests belonging to @user with .all" do
+      resources = @resource_service.all
+      resources.should be == Interest.where(interested_in_id: @user.id, interested_in_type: 'User').all
     end
   end
 
@@ -92,7 +92,7 @@ describe InterestsController do
     end
   
     def do_get
-      get :index, :user_id => "dave"
+      get :index, params: { :user_id => "dave" }
     end
 
     it "should find the user" do

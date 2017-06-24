@@ -27,7 +27,7 @@ describe TagsController do
       @post_tags.stub(:find).and_return(@tag)
     
       @controller.stub(:request_path).and_return('/forums/1/posts/1/tags/3')
-      get :show, :forum_id => "1", :post_id => "2", :id => "3"
+      get :show, params: { :forum_id => "1", :post_id => "2", :id => "3" }
     end
   
     it "resources_path to /forums/1/posts/2/tags" do
@@ -69,7 +69,7 @@ describe TagsController do
       @other_tag   = Tag.create :taggable_id => @other_post.id, :taggable_type => 'Post'
     
       @controller.stub(:request_path).and_return("/forums/:id/posts/:id/tags")
-      get :index, :forum_id => @forum.id, :post_id => @post.id
+      get :index, params: { :forum_id => @forum.id, :post_id => @post.id }
       @resource_service = controller.send :resource_service
     end
   
@@ -89,9 +89,9 @@ describe TagsController do
       lambda{ @resource_service.find(@other_tag.id) }.should raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it "should find only tags belonging to @post with find(:all)" do
-      resources = @resource_service.find(:all)
-      resources.should be == Tag.find(:all, :conditions => "taggable_id = #{@post.id} AND taggable_type = 'Post'")
+    it "should find only tags belonging to @post with .all" do
+      resources = @resource_service.all
+      resources.should be == Tag.where(taggable_id: @post.id, taggable_type: 'Post').all
     end
   end
 
@@ -106,7 +106,7 @@ describe TagsController do
   
     def do_get
       @controller.stub(:request_path).and_return("/forums/1/posts/2/tags")
-      get :index, :forum_id => '1', :post_id => '2'
+      get :index, params: { :forum_id => '1', :post_id => '2' }
     end
 
     it "should find the forum" do

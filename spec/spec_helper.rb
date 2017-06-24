@@ -12,6 +12,15 @@ ActionController::Base.view_paths = [File.join(File.dirname(__FILE__), "app/view
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
+  config.infer_spec_type_from_file_location!
+  config.expect_with(:rspec) { |c| c.syntax = [ :should, :expect ] }
 end
+
+require 'rails-controller-testing'
+Rails::Controller::Testing.install
+require 'rspec/active_model/mocks'
+require 'active_model/serializers'
+
+
 
 require File.dirname(__FILE__) + '/app'

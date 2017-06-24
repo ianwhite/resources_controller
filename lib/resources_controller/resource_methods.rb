@@ -9,14 +9,14 @@ module ResourcesController
 
     # finds the resource, using the passed id, defaults to the current params[:id]
     def find_resource(id = nil)
-      id ||= respond_to?(:params) && params.is_a?(Hash) && params[:id]
+      id ||= respond_to?(:params) && params.is_a?(ActionController::Parameters) && params[:id]
       resource_service.find id
     end
 
     # makes a new resource, if attributes are not supplied, determine them from the
     # params hash and the current resource_class, or resource_name (the latter left in for BC)
     def new_resource(attributes = nil, &block)
-      if attributes.blank? && respond_to?(:params) && params.is_a?(Hash)
+      if attributes.blank? && respond_to?(:params) && params.is_a?(ActionController::Parameters)
         resource_form_name = ActiveModel::Naming.singular(resource_class)
         attributes = params[resource_form_name] || params[resource_name] || {}
       end
@@ -25,7 +25,7 @@ module ResourcesController
     
     # destroys and returns the resource, using the passed id, defaults to the current params[:id]
     def destroy_resource(id = nil)
-      id ||= respond_to?(:params) && params.is_a?(Hash) && params[:id]
+      id ||= respond_to?(:params) && params.is_a?(ActionController::Parameters) && params[:id]
       resource_service.destroy id
     end
   end

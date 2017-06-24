@@ -41,8 +41,6 @@ module ResourcesController
   module Helper
     def self.included(base)
       base.class_eval do
-        alias_method_chain :method_missing, :named_route_helper
-        alias_method_chain :respond_to?, :named_route_helper
         delegate :resource_name, :resources_name, :resource, :resources, :enclosing_resource, :enclosing_resource_name, :to => :controller
       end
     end
@@ -85,18 +83,18 @@ module ResourcesController
     
     # Delegate named_route helper method to the controller.  Create the delegation
     # to short circuit the method_missing call for future invocations.
-    def method_missing_with_named_route_helper(method, *args, &block)
+    def method_missing(method, *args, &block)
       if controller.resource_named_route_helper_method?(method)
         self.class.send(:delegate, method, :to => :controller)
         controller.send(method, *args)
       else
-        method_missing_without_named_route_helper(method, *args, &block)
+        super(method, *args, &block)
       end
     end
 
     # delegate url help method creation to the controller
-    def respond_to_with_named_route_helper?(*args)
-      respond_to_without_named_route_helper?(*args) || controller.resource_named_route_helper_method?(args.first)
+    def respond_to?(*args)
+      super(*args) || controller.resource_named_route_helper_method?(args.first)
     end
   
   private

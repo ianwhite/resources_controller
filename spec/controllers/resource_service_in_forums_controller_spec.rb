@@ -20,9 +20,9 @@ describe ForumsController do
       resource.should == @forum
     end
 
-    it "should find all forums with find(:all)" do
-      resources = @resource_service.find(:all)
-      resources.should == Forum.find(:all)
+    it "should find all forums with .all" do
+      resources = @resource_service.all
+      resources.should == Forum.all
     end
   
     it "should destroy the forum with destroy(@forum.id)" do

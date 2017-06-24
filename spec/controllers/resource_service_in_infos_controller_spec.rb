@@ -9,7 +9,7 @@ describe InfosController do
     
       @controller.stub(:current_user).and_return(@account)
     
-      get :show, :resource_path => '/account/info'
+      get :show, params: { :resource_path => '/account/info' }
       @resource_service = controller.send :resource_service
     end
   

@@ -26,7 +26,7 @@ describe TagsController do
       @tag.stub(:to_param).and_return('3')
       @address_tags.stub(:find).and_return(@tag)
     
-      get :show, :user_id => "dave", :address_id => "2", :id => "3"
+      get :show, params: { :user_id => "dave", :address_id => "2", :id => "3" }
     end
   
     it "resources_path to /users/dave/addresses/2/tags" do
@@ -67,7 +67,7 @@ describe TagsController do
       @other_address  = Address.create :user_id => @user.id
       @other_tag   = Tag.create :taggable_id => @other_address.id, :taggable_type => 'Address'
     
-      get :index, :user_id => @user.id, :address_id => @address.id
+      get :index, params: { :user_id => @user.id, :address_id => @address.id }
       @resource_service = controller.send :resource_service
     end
   
@@ -87,9 +87,9 @@ describe TagsController do
       lambda{ @resource_service.find(@other_tag.id) }.should raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it "should find only tags belonging to @address with find(:all)" do
-      resources = @resource_service.find(:all)
-      resources.should be == Tag.find(:all, :conditions => "taggable_id = #{@address.id} AND taggable_type = 'Address'")
+    it "should find only tags belonging to @address with .all" do
+      resources = @resource_service.all
+      resources.should be == Tag.where(taggable_id: @address.id, taggable_type: 'Address').all
     end
   end
 
@@ -103,7 +103,7 @@ describe TagsController do
     end
   
     def do_get
-      get :index, :user_id => "dave", :address_id => '2'
+      get :index, params: { :user_id => "dave", :address_id => '2' }
     end
 
     it "should find the user" do

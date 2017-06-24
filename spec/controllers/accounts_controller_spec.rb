@@ -29,7 +29,7 @@ describe AccountsController do
 
   describe AccountsController, " requesting garbage url" do
     it "should raise ResourcesController::Specification::NoClassFoundError" do
-      lambda { get :show, :resource_path => "/crayzeee" }.should raise_error(ResourcesController::Specification::NoClassFoundError)
+      lambda { get :show, params: { :resource_path => "/crayzeee" }}.should raise_error(ResourcesController::Specification::NoClassFoundError)
     end
   end
   
@@ -71,7 +71,7 @@ describe AccountsController do
   
     it ".respond_to?(:foo) should call respond_to?(:foo) on User" do
       User.stub(:foo)
-      @resource_service.respond_to?(:foo).should be_true
+      @resource_service.respond_to?(:foo).should be true
     end
   end
 end

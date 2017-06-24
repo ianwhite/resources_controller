@@ -5,10 +5,9 @@ module Bug0001Spec
   end
   
   class MyController < ActionController::Base
-    def respond_to_with_cruft?(method)
-      respond_to_without_cruft?(method)
+    def respond_to?(method)
+      super(method)
     end
-    alias_method_chain :respond_to?, :cruft
     
     resources_controller_for :things, :class => Thing
   end

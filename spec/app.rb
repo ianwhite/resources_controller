@@ -161,6 +161,7 @@ class Address < ActiveRecord::Base
 end
 
 class Forum < ActiveRecord::Base
+  include ActiveModel::Serializers::Xml
   has_many :posts
   has_many :tags, :as => :taggable
   has_many :interests, :as => :interested_in
@@ -256,32 +257,32 @@ class PostsAbstractController < ApplicationController
   attr_accessor :filter_trace
 
   # for testing filter load order
-  before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :abstract}
+  before_action {|controller| controller.filter_trace ||= []; controller.filter_trace << :abstract}
 
 protected
   # redefine find_resources
   def find_resources
-    resource_service.find :all, :order => 'id DESC'
+    resource_service.order('id DESC')
   end
 end
 
 class PostsController < PostsAbstractController
   # for testing filter load order
-  before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :posts}
+  before_action {|controller| controller.filter_trace ||= []; controller.filter_trace << :posts}
 
   # example of providing options to resources_controller_for
   resources_controller_for :posts, :class => Post, :route => 'posts'
 
-  def load_enclosing_resources_with_trace(*args)
+  # with trace
+  def load_enclosing_resources(*args)
     self.filter_trace ||= []; self.filter_trace << :load_enclosing
-    load_enclosing_resources_without_trace(*args)
+    super(*args)
   end
-  alias_method_chain :load_enclosing_resources, :trace
 end
 
 class UserPostsController < PostsController
   # for testing filter load order
-  before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :user_posts}
+  before_action {|controller| controller.filter_trace ||= []; controller.filter_trace << :user_posts}
 
   # example of providing options to nested in
   nested_in :user, :class => User, :key => 'user_id', :name_prefix => 'user_'
@@ -293,7 +294,7 @@ end
 
 class ForumPostsController < PostsController
   # for testing filter load order
-  before_filter {|controller| controller.filter_trace ||= []; controller.filter_trace << :forum_posts}
+  before_action {|controller| controller.filter_trace ||= []; controller.filter_trace << :forum_posts}
 
   # test override resources_controller_for use
   resources_controller_for :posts

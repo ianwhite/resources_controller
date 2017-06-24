@@ -21,7 +21,7 @@ describe AddressesController do
       @address.stub(:to_param).and_return('1')
       @user_addresses.stub(:find).and_return(@address)
   
-      get :show, :user_id => "dave", :id => "1"
+      get :show, params: { :user_id => "dave", :id => "1" }
     end
   
     it "resources_path to /users/dave/addresses" do
@@ -57,7 +57,7 @@ describe AddressesController do
       @other_user    = User.create
       @other_address = Address.create :user_id => @other_user.id
     
-      get :index, :user_id => 'dave'
+      get :index, params: { :user_id => 'dave' }
       @resource_service = controller.send :resource_service
     end
   
@@ -77,8 +77,8 @@ describe AddressesController do
     end
 
     it "should find only addresses belonging to @user with find(:all)" do
-      resources = @resource_service.find(:all)
-      resources.should be == Address.find(:all, :conditions => "user_id = #{@user.id}")
+      resources = @resource_service.all
+      resources.should be == Address.where(user_id: @user.id).all
     end
   end
 
@@ -92,7 +92,7 @@ describe AddressesController do
     end
   
     def do_get
-      get :index, :user_id => 'dave'
+      get :index, params: { :user_id => 'dave' }
     end
     
     it "should find the user" do
@@ -122,7 +122,7 @@ describe AddressesController do
     end
   
     def do_get
-      get :index, :user_id => '2'
+      get :index, params: { :user_id => '2' }
     end
   
     it "should be successful" do
@@ -156,7 +156,7 @@ describe AddressesController do
     end
   
     def do_get
-      get :show, :id => "1", :user_id => "dave"
+      get :show, params: { :id => "1", :user_id => "dave" }
     end
 
     it "should be successful" do
@@ -190,7 +190,7 @@ describe AddressesController do
     end
   
     def do_get
-      get :new, :user_id => "dave"
+      get :new, params: { :user_id => "dave" }
     end
 
     it "should be successful" do
@@ -229,7 +229,7 @@ describe AddressesController do
     end
  
     def do_get
-      get :edit, :id => "1", :user_id => "dave"
+      get :edit, params: { :id => "1", :user_id => "dave" }
     end
 
     it "should be successful" do
@@ -265,7 +265,7 @@ describe AddressesController do
     end
   
     def do_post
-      post :create, :address => {:name => 'Address'}, :user_id => "dave"
+      post :create, params: { :address => {:name => 'Address'}, :user_id => "dave" }
     end
   
     it "should create a new address" do
@@ -291,7 +291,7 @@ describe AddressesController do
     end
   
     def do_update
-      put :update, :id => "1", :user_id => "dave"
+      put :update, params: { :id => "1", :user_id => "dave" }
     end
   
     it "should find the address requested" do
@@ -327,7 +327,7 @@ describe AddressesController do
     end
   
     def do_delete
-      delete :destroy, :id => "1", :user_id => "dave"
+      delete :destroy, params: { :id => "1", :user_id => "dave" }
     end
 
     it "should find and destroy the address requested" do

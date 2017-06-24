@@ -32,7 +32,7 @@ describe TagsController do
       @tag.stub(:to_param).and_return('4')
       @comment_tags.stub(:find).and_return(@tag)
     
-      get :show, :forum_id => "1", :post_id => "2", :comment_id => '3', :id => "4"
+      get :show, params: { :forum_id => "1", :post_id => "2", :comment_id => '3', :id => "4" }
     end
   
     it "resources_path to /forums/1/posts/2/comments/3/tags" do
@@ -74,7 +74,7 @@ describe TagsController do
       @other_comment = Comment.create :post_id => @forum.id
       @other_tag     = Tag.create :taggable_id => @other_comment.id, :taggable_type => 'Comment'
     
-      get :index, :forum_id => @forum.id, :post_id => @post.id, :comment_id => @comment.id
+      get :index, params: { :forum_id => @forum.id, :post_id => @post.id, :comment_id => @comment.id }
       @resource_service = controller.send :resource_service
     end
   
@@ -94,9 +94,9 @@ describe TagsController do
       lambda{ @resource_service.find(@other_tag.id) }.should raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it "should find only tags belonging to @post with find(:all)" do
-      resources = @resource_service.find(:all)
-      resources.should be == Tag.find(:all, :conditions => "taggable_id = #{@comment.id} AND taggable_type = 'Comment'")
+    it "should find only tags belonging to @post with .all" do
+      resources = @resource_service.all
+      resources.should be == Tag.where(taggable_id: @comment.id, taggable_type: 'Comment').all
     end
   end
 
@@ -110,7 +110,7 @@ describe TagsController do
     end
   
     def do_get
-      get :index, :forum_id => '1', :post_id => '2', :comment_id => '3'
+      get :index, params: { :forum_id => '1', :post_id => '2', :comment_id => '3' }
     end
 
     it "should find the forum" do

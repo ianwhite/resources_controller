@@ -9,7 +9,7 @@ describe TagsController do
       Tag.stub(:find).and_return(@tag)
     
       @controller.stub(:request_path).and_return('/tags/2')
-      get :show, :id => "2"
+      get :show, params: { :id => "2" }
     end
   
     it "resources_path to /tags" do
@@ -37,7 +37,7 @@ describe TagsController do
     end
   
     it "enclosing_resource_path should raise error" do
-      lambda{ controller.enclosing_resource_path }.should raise_error
+      lambda{ controller.enclosing_resource_path }.should raise_error(NoMethodError)
     end
   end
 
