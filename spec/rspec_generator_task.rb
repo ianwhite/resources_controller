@@ -29,7 +29,7 @@ namespace :spec do
     puts "Generating test app"
     mkdir_p "tmp"
     cd 'tmp' do
-      system "rails new test_app --skip-gemfile --skip-bundle --skip-git --skip-test-unit"
+      system "rails new test_app --skip-listen --skip-turbolinks --skip-gemfile --skip-bundle --skip-git --skip-test-unit"
       
       cd 'test_app' do
         File.open('Gemfile', 'w+') do |file|
