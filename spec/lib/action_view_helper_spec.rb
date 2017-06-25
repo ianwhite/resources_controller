@@ -34,13 +34,6 @@ describe "ActionView with resources_controller Helper" do
     expect(@controller).not_to receive(:resource_foo_path)
     expect { @view.send(:resource_foo_path) }.to raise_error(NoMethodError)
   end
-  
-  #pending "errors_messages_for no longer exists in rails 5"
-  #pending "#error_messages_for_resource should call error_messages_for with resource_name" do
-  #  @controller.should_receive(:resource_name).and_return('name')
-  #  @view.should_receive(:error_messages_for).with('name')
-  #  @view.error_messages_for_resource
-  #end
 end
 
 describe "Helper#form_for_resource (when resource is new record)" do

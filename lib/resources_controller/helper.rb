@@ -76,11 +76,6 @@ module ResourcesController
       form_for(resource, form_for_resource_options(resource, resource_name, options), &block)
     end
 
-    # print the error messages for the current resource
-    def error_messages_for_resource
-      error_messages_for resource_name
-    end
-    
     # Delegate named_route helper method to the controller.  Create the delegation
     # to short circuit the method_missing call for future invocations.
     def method_missing(method, *args, &block)
