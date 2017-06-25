@@ -31,16 +31,8 @@ module ResourcesController
   # These methods are defined as they are used.  The ActionView Helper module delegates to the current controller to access these
   # methods
   module NamedRouteHelper
-    def self.included(base)
-      base.class_eval do
-        alias_method_chain :method_missing, :named_route_helper
-        alias_method_chain :respond_to?, :named_route_helper
-      end
-      base.hide_action *instance_methods
-      base.hide_action :method_missing_without_named_route_helper, :respond_to_without_named_route_helper?, :respond_to?
-    end
 
-    def method_missing_with_named_route_helper(method, *args, &block)
+    def method_missing(method, *args, &block)
       # TODO: test that methods are only defined once
       if resource_named_route_helper_method?(method, raise_error = true) 
         define_resource_named_route_helper_method(method)
@@ -49,12 +41,12 @@ module ResourcesController
         define_resource_named_route_helper_method_for_name_prefix(method)
         send(method, *args)
       else
-        method_missing_without_named_route_helper(method, *args, &block)
+        super(method, *args, &block)
       end
     end
 
-    def respond_to_with_named_route_helper?(*args)
-      respond_to_without_named_route_helper?(*args) || resource_named_route_helper_method?(args.first)
+    def respond_to?(*args)
+      super(*args) || resource_named_route_helper_method?(args.first)
     end
 
     # return true if the passed method (e.g. 'resources_path') corresponds to a defined
@@ -67,7 +59,7 @@ module ResourcesController
       else
         return false
       end
-      respond_to_without_named_route_helper?(route_method) || (raise_error && raise_resource_url_mapping_error(resource_method, route_method))
+      respond_to?(route_method, true) || (raise_error && raise_resource_url_mapping_error(resource_method, route_method))
     end
 
   private
@@ -123,24 +115,26 @@ generated name_prefix is '#{name_prefix}'
       name_prefix = method.to_s.sub(/^.*_for_/,'')
       if resource_method =~ /enclosing_resource/
         route, route_method = *route_and_method_from_enclosing_resource_method_and_name_prefix(resource_method, name_prefix)
-        required_args = (route.segment_keys - [:format]).size
-      
+        required_args = (route.segment_keys - [:format, :locale]).size
+
         self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
           def #{method}(*args)
             options = args.extract_options!
+            options.merge!(default_url_options)
             args = args.size < #{required_args} ? enclosing_collection_resources + args : enclosing_collection_resources - [enclosing_resource] + args
             args = args + [options] if options.size > 0
             send :#{route_method}, *args
           end
         end_eval
-                
+
       else
         route, route_method = *route_and_method_from_resource_method_and_name_prefix(resource_method, name_prefix)
-        required_args = (route.segment_keys - [:format]).size
+        required_args = (route.segment_keys - [:format, :locale]).size
 
         self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
           def #{method}(*args)
             options = args.extract_options!
+            options.merge!(default_url_options)
             #{"args = [resource] + args if enclosing_collection_resources.size + args.size < #{required_args}" if required_args > 0}
             args = args + [options] if options.size > 0
             send :#{route_method}, *(enclosing_collection_resources + args)

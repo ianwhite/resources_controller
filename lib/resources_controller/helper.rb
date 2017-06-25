@@ -41,8 +41,6 @@ module ResourcesController
   module Helper
     def self.included(base)
       base.class_eval do
-        alias_method_chain :method_missing, :named_route_helper
-        alias_method_chain :respond_to?, :named_route_helper
         delegate :resource_name, :resources_name, :resource, :resources, :enclosing_resource, :enclosing_resource_name, :to => :controller
       end
     end
@@ -75,42 +73,31 @@ module ResourcesController
     def form_for_resource(*args, &block)
       options = args.extract_options!
       resource = args[0] || self.resource
-      form_for(resource_name, resource, form_for_resource_options(resource, options), &block)
+      form_for(resource, form_for_resource_options(resource, resource_name, options), &block)
     end
 
-    # same API as form_for_resource
-    def remote_form_for_resource(*args, &block)
-      options = args.extract_options!
-      resource = args[0] || self.resource
-      remote_form_for(resource_name, resource, form_for_resource_options(resource, options), &block)
-    end
-  
-    # print the error messages for the current resource
-    def error_messages_for_resource
-      error_messages_for resource_name
-    end
-    
     # Delegate named_route helper method to the controller.  Create the delegation
     # to short circuit the method_missing call for future invocations.
-    def method_missing_with_named_route_helper(method, *args, &block)
+    def method_missing(method, *args, &block)
       if controller.resource_named_route_helper_method?(method)
         self.class.send(:delegate, method, :to => :controller)
         controller.send(method, *args)
       else
-        method_missing_without_named_route_helper(method, *args, &block)
+        super(method, *args, &block)
       end
     end
 
     # delegate url help method creation to the controller
-    def respond_to_with_named_route_helper?(*args)
-      respond_to_without_named_route_helper?(*args) || controller.resource_named_route_helper_method?(args.first)
+    def respond_to?(*args)
+      super(*args) || controller.resource_named_route_helper_method?(args.first)
     end
   
   private
-    def form_for_resource_options(resource, options)
+    def form_for_resource_options(resource, resource_name, options)
       options.dup.tap do |options|
         options[:html] ||= {}
         options[:html][:method] ||= resource.new_record? ? :post : :put
+        options[:as] = resource_name
         args = options[:url_options] ? [options.delete(:url_options)] : []
         options[:url] ||= if resource.new_record?
           controller.resource_specification.singleton? ? resource_path(*args) : resources_path(*args)

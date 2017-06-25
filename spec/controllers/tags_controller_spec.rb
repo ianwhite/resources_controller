@@ -4,40 +4,40 @@ describe TagsController do
   describe "Routing shortcuts for Tags should map" do
   
     before(:each) do
-      @tag = mock('Tag')
-      @tag.stub!(:to_param).and_return('2')
-      Tag.stub!(:find).and_return(@tag)
+      @tag = double('Tag')
+      allow(@tag).to receive(:to_param).and_return('2')
+      allow(Tag).to receive(:find).and_return(@tag)
     
-      @controller.stub!(:request_path).and_return('/tags/2')
-      get :show, :id => "2"
+      allow(@controller).to receive(:request_path).and_return('/tags/2')
+      get :show, params: { :id => "2" }
     end
   
     it "resources_path to /tags" do
-      controller.resources_path.should == '/tags'
+      expect(controller.resources_path).to eq('/tags')
     end
 
     it "resource_path to /tags/2" do
-      controller.resource_path.should == '/tags/2'
+      expect(controller.resource_path).to eq('/tags/2')
     end
   
     it "resource_path(9) to /tags/9" do
-      controller.resource_path(9).should == '/tags/9'
+      expect(controller.resource_path(9)).to eq('/tags/9')
     end
 
     it "edit_resource_path to /tags/2/edit" do
-      controller.edit_resource_path.should == '/tags/2/edit'
+      expect(controller.edit_resource_path).to eq('/tags/2/edit')
     end
   
     it "edit_resource_path(9) to /tags/9/edit" do
-      controller.edit_resource_path(9).should == '/tags/9/edit'
+      expect(controller.edit_resource_path(9)).to eq('/tags/9/edit')
     end
   
     it "new_resource_path to /forums/1/tags/new" do
-      controller.new_resource_path.should == '/tags/new'
+      expect(controller.new_resource_path).to eq('/tags/new')
     end
   
     it "enclosing_resource_path should raise error" do
-      lambda{ controller.enclosing_resource_path }.should raise_error
+      expect{ controller.enclosing_resource_path }.to raise_error(NoMethodError)
     end
   end
 
@@ -48,12 +48,12 @@ describe TagsController do
     end
   
     it ".new should call new on Tag" do
-      Tag.should_receive(:new).with(:args => "args")
+      expect(Tag).to receive(:new).with(:args => "args")
       resource = @resource_service.new(:args => "args")
     end
   
     it ".find should call find on Tag" do
-      Tag.should_receive(:find).with(:id)
+      expect(Tag).to receive(:find).with(:id)
       resource = @resource_service.find(:id)
     end
   end
@@ -61,23 +61,23 @@ describe TagsController do
   describe "Requesting /tags/index" do
 
     before(:each) do
-      @tags = mock('Tags')
-      Tag.stub!(:all).and_return(@tags)
+      @tags = double('Tags')
+      allow(Tag).to receive(:all).and_return(@tags)
     end
   
     def do_get
-      @controller.stub!(:request_path).and_return('/tags/index')
+      allow(@controller).to receive(:request_path).and_return('/tags/index')
       get :index
     end
 
     it "should find the tags" do
-      Tag.should_receive(:all).and_return(@tags)
+      expect(Tag).to receive(:all).and_return(@tags)
       do_get
     end
 
     it "should assign the tags for the view" do
       do_get
-      assigns[:tags].should == @tags
+      expect(assigns[:tags]).to eq(@tags)
     end
   end
 end

@@ -2,18 +2,18 @@ require 'spec_helper'
 
 module CommentsSpecHelper
   def setup_mocks
-    @forum = mock('Forum')
-    @forum_posts = mock('Assoc: forum_posts')
-    @forum.stub!(:posts).and_return(@forum_posts)
-    @forum.stub!(:to_param).and_return("3")
+    @forum = double('Forum')
+    @forum_posts = double('Assoc: forum_posts')
+    allow(@forum).to receive(:posts).and_return(@forum_posts)
+    allow(@forum).to receive(:to_param).and_return("3")
     
-    @post = mock('Post')
-    @post_comments = mock('Assoc: post_comments')
-    @post.stub!(:comments).and_return(@post_comments)
-    @post.stub!(:to_param).and_return("2")
+    @post = double('Post')
+    @post_comments = double('Assoc: post_comments')
+    allow(@post).to receive(:comments).and_return(@post_comments)
+    allow(@post).to receive(:to_param).and_return("2")
         
-    Forum.stub!(:find).and_return(@forum)
-    @forum_posts.stub!(:find).and_return(@post)
+    allow(Forum).to receive(:find).and_return(@forum)
+    allow(@forum_posts).to receive(:find).and_return(@post)
   end
 end
 
@@ -23,50 +23,50 @@ describe CommentsController do
   
     before(:each) do
       setup_mocks
-      @comment = mock('Comment')
-      @comment.stub!(:to_param).and_return("1")
-      @post_comments.stub!(:find).and_return(@comment)
-      get :show, :forum_id => "3", :post_id => "2", :id => "1"
+      @comment = double('Comment')
+      allow(@comment).to receive(:to_param).and_return("1")
+      allow(@post_comments).to receive(:find).and_return(@comment)
+      get :show, params: { :forum_id => "3", :post_id => "2", :id => "1" }
     end
   
     it "resources_path to /forums/3/posts/2/comments" do
-      controller.resources_path.should == '/forums/3/posts/2/comments'
+      expect(controller.resources_path).to eq('/forums/3/posts/2/comments')
     end
 
     it "resource_path to /forums/3/posts/2/comments/1" do
-      controller.resource_path.should == '/forums/3/posts/2/comments/1'
+      expect(controller.resource_path).to eq('/forums/3/posts/2/comments/1')
     end
   
     it "resource_path(9) to /forums/3/posts/2/comments/9" do
-      controller.resource_path(9).should == '/forums/3/posts/2/comments/9'
+      expect(controller.resource_path(9)).to eq('/forums/3/posts/2/comments/9')
     end
 
     it "edit_resource_path to /forums/3/posts/2/comments/1/edit" do
-      controller.edit_resource_path.should == '/forums/3/posts/2/comments/1/edit'
+      expect(controller.edit_resource_path).to eq('/forums/3/posts/2/comments/1/edit')
     end
   
     it "edit_resource_path(9) to /forums/3/posts/2/comments/9/edit" do
-      controller.edit_resource_path(9).should == '/forums/3/posts/2/comments/9/edit'
+      expect(controller.edit_resource_path(9)).to eq('/forums/3/posts/2/comments/9/edit')
     end
   
     it "new_resource_path to /forums/3/posts/2/comments/new" do
-      controller.new_resource_path.should == '/forums/3/posts/2/comments/new'
+      expect(controller.new_resource_path).to eq('/forums/3/posts/2/comments/new')
     end
   
     it "resource_tags_path to /forums/3/posts/2/comments/1/tags" do
-      controller.resource_tags_path.should == "/forums/3/posts/2/comments/1/tags"
+      expect(controller.resource_tags_path).to eq("/forums/3/posts/2/comments/1/tags")
     end
 
     it "resource_tags_path(9) to /forums/3/posts/2/comments/9/tags" do
-      controller.resource_tags_path(9).should == "/forums/3/posts/2/comments/9/tags" 
+      expect(controller.resource_tags_path(9)).to eq("/forums/3/posts/2/comments/9/tags") 
     end
   
     it "resource_tag_path(5) to /forums/3/posts/2/comments/1/tags/5" do
-      controller.resource_tag_path(5).should == "/forums/3/posts/2/comments/1/tags/5"
+      expect(controller.resource_tag_path(5)).to eq("/forums/3/posts/2/comments/1/tags/5")
     end
   
     it "resource_tag_path(9,5) to /forums/3/posts/2/comments/9/tags/5" do
-      controller.resource_tag_path(9,5).should == "/forums/3/posts/2/comments/9/tags/5"
+      expect(controller.resource_tag_path(9,5)).to eq("/forums/3/posts/2/comments/9/tags/5")
     end
   end
 
@@ -79,28 +79,28 @@ describe CommentsController do
       @other_post     = Post.create :forum_id => @forum.id
       @other_comment  = Comment.create :post_id => @other_post.id
     
-      get :index, :forum_id => @forum.id, :post_id => @post.id
+      get :index, params: { :forum_id => @forum.id, :post_id => @post.id }
       @resource_service = controller.send :resource_service
     end
   
     it "should build new comment with @post foreign key with new" do
       resource = @resource_service.new
-      resource.should be_kind_of(Comment)
-      resource.post_id.should == @post.id
+      expect(resource).to be_kind_of(Comment)
+      expect(resource.post_id).to eq(@post.id)
     end
   
     it "should find @comment with find(@comment.id)" do
       resource = @resource_service.find(@comment.id)
-      resource.should == @comment
+      expect(resource).to eq(@comment)
     end
   
     it "should raise RecordNotFound with find(@other_post.id)" do
-      lambda{ @resource_service.find(@other_comment.id) }.should raise_error(ActiveRecord::RecordNotFound)
+      expect{ @resource_service.find(@other_comment.id) }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it "should find only comments belonging to @post with find(:all)" do
-      resources = @resource_service.find(:all)
-      resources.should be == Comment.find(:all, :conditions => "post_id = #{@post.id}")
+    it "should find only comments belonging to @post with .all" do
+      resources = @resource_service.all
+      expect(resources).to eq(Comment.where(post_id: @post.id).all)
     end
   end
 
@@ -109,39 +109,39 @@ describe CommentsController do
   
     before(:each) do
       setup_mocks
-      @comments = mock('Comments')
-      @post_comments.stub!(:all).and_return(@comments)
+      @comments = double('Comments')
+      allow(@post_comments).to receive(:all).and_return(@comments)
     end
   
     def do_get
-      get :index, :forum_id => '3', :post_id => '2'
+      get :index, params: { :forum_id => '3', :post_id => '2' }
     end
     
     it "should find the forum" do
-      Forum.should_receive(:find).with('3').and_return(@forum)
+      expect(Forum).to receive(:find).with('3').and_return(@forum)
       do_get
     end
   
     it "should assign the found forum for the view" do
       do_get
-      assigns[:forum].should == @forum
+      expect(assigns[:forum]).to eq(@forum)
     end
   
     it "should find the post" do
-      @forum.should_receive(:posts).and_return(@forum_posts)
-      @forum_posts.should_receive(:find).with('2').and_return(@post)
+      expect(@forum).to receive(:posts).and_return(@forum_posts)
+      expect(@forum_posts).to receive(:find).with('2').and_return(@post)
       do_get
     end
   
     it "should assign the found post for the view" do
       do_get
-      assigns[:post].should == @post
+      expect(assigns[:post]).to eq(@post)
     end
   
     it "should assign the post_comments association as the comments resource_service" do
-      @post.should_receive(:comments).and_return(@post_comments)
+      expect(@post).to receive(:comments).and_return(@post_comments)
       do_get
-      @controller.resource_service.should == @post_comments
+      expect(@controller.resource_service).to eq(@post_comments)
     end
   end
 
@@ -150,32 +150,32 @@ describe CommentsController do
 
     before(:each) do
       setup_mocks
-      @comments = mock('Comments')
-      @post_comments.stub!(:all).and_return(@comments)
+      @comments = double('Comments')
+      allow(@post_comments).to receive(:all).and_return(@comments)
     end
   
     def do_get
-      get :index, :forum_id => '3', :post_id => '2'
+      get :index, params: { :forum_id => '3', :post_id => '2' }
     end
   
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should render index.rhtml" do
       do_get
-      response.should render_template(:index)
+      expect(response).to render_template(:index)
     end
   
     it "should find comments in post" do
-      @post_comments.should_receive(:all).and_return(@comments)
+      expect(@post_comments).to receive(:all).and_return(@comments)
       do_get
     end
   
     it "should assign the found comments for the view" do
       do_get
-      assigns[:comments].should == @comments
+      expect(assigns[:comments]).to eq(@comments)
     end
   end
 
@@ -184,32 +184,32 @@ describe CommentsController do
 
     before(:each) do
       setup_mocks
-      @comment = mock('a post')
-      @post_comments.stub!(:find).and_return(@comment)
+      @comment = double('a post')
+      allow(@post_comments).to receive(:find).and_return(@comment)
     end
   
     def do_get
-      get :show, :id => "1", :forum_id => '3', :post_id => '2'
+      get :show, params: { :id => "1", :forum_id => '3', :post_id => '2' }
     end
 
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
   
     it "should render show.rhtml" do
       do_get
-      response.should render_template(:show)
+      expect(response).to render_template(:show)
     end
   
     it "should find the comment requested" do
-      @post_comments.should_receive(:find).with("1").and_return(@comment)
+      expect(@post_comments).to receive(:find).with("1").and_return(@comment)
       do_get
     end
   
     it "should assign the found comment for the view" do
       do_get
-      assigns[:comment].should == @comment
+      expect(assigns[:comment]).to eq(@comment)
     end
   end
 
@@ -218,37 +218,37 @@ describe CommentsController do
 
     before(:each) do
       setup_mocks
-      @comment = mock('new Comment')
-      @post_comments.stub!(:build).and_return(@comment)
+      @comment = double('new Comment')
+      allow(@post_comments).to receive(:build).and_return(@comment)
     end
   
     def do_get
-      get :new, :forum_id => '3', :post_id => '2'
+      get :new, params: { :forum_id => '3', :post_id => '2' }
     end
 
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
   
     it "should render new.rhtml" do
       do_get
-      response.should render_template(:new)
+      expect(response).to render_template(:new)
     end
   
     it "should build a new comment" do
-      @post_comments.should_receive(:build).and_return(@comment)
+      expect(@post_comments).to receive(:build).and_return(@comment)
       do_get
     end
   
     it "should not save the new comment" do
-      @comment.should_not_receive(:save)
+      expect(@comment).not_to receive(:save)
       do_get
     end
   
     it "should assign the new comment for the view" do
       do_get
-      assigns[:post].should == @post
+      expect(assigns[:post]).to eq(@post)
     end
   end
 
@@ -257,32 +257,32 @@ describe CommentsController do
 
     before(:each) do
       setup_mocks
-      @comment = mock('Comment')
-      @post_comments.stub!(:find).and_return(@comment)
+      @comment = double('Comment')
+      allow(@post_comments).to receive(:find).and_return(@comment)
     end
  
     def do_get
-      get :edit, :id => "1", :forum_id => '3', :post_id => '2'
+      get :edit, params: { :id => "1", :forum_id => '3', :post_id => '2' }
     end
 
     it "should be successful" do
       do_get
-      response.should be_success
+      expect(response).to be_success
     end
   
     it "should render edit.rhtml" do
       do_get
-      response.should render_template(:edit)
+      expect(response).to render_template(:edit)
     end
   
     it "should find the comment requested" do
-      @post_comments.should_receive(:find).with("1").and_return(@comment)
+      expect(@post_comments).to receive(:find).with("1").and_return(@comment)
       do_get
     end
   
     it "should assign the found comment for the view" do
       do_get
-      assigns(:comment).should == @comment
+      expect(assigns(:comment)).to eq(@comment)
     end
   end
 
@@ -291,25 +291,25 @@ describe CommentsController do
 
     before(:each) do
       setup_mocks
-      @comment = mock('Comment')
-      @comment.stub!(:save).and_return(true)
-      @comment.stub!(:to_param).and_return("1")
-      @post_comments.stub!(:build).and_return(@comment)
+      @comment = double('Comment')
+      allow(@comment).to receive(:save).and_return(true)
+      allow(@comment).to receive(:to_param).and_return("1")
+      allow(@post_comments).to receive(:build).and_return(@comment)
     end
   
     def do_post
-      post :create, :comment => {:name => 'Comment'}, :forum_id => '3', :post_id => '2'
+      post :create, params: { :comment => {:name => 'Comment'}, :forum_id => '3', :post_id => '2' }
     end
   
     it "should build a new comment" do
-      @post_comments.should_receive(:build).with({'name' => 'Comment'}).and_return(@comment)
+      expect(@post_comments).to receive(:build).with({'name' => 'Comment'}).and_return(@comment)
       do_post
     end
 
     it "should redirect to the new comment" do
       do_post
-      response.should be_redirect
-      response.redirect_url.should == "http://test.host/forums/3/posts/2/comments/1"
+      expect(response).to be_redirect
+      expect(response.redirect_url).to eq("http://test.host/forums/3/posts/2/comments/1")
     end
   end
 
@@ -318,34 +318,34 @@ describe CommentsController do
 
     before(:each) do
       setup_mocks
-      @comment = mock('Comment').as_null_object
-      @comment.stub!(:to_param).and_return("1")
-      @post_comments.stub!(:find).and_return(@comment)
+      @comment = double('Comment').as_null_object
+      allow(@comment).to receive(:to_param).and_return("1")
+      allow(@post_comments).to receive(:find).and_return(@comment)
     end
   
     def do_update
-      put :update, :id => "1", :forum_id => '3', :post_id => '2'
+      put :update, params: { :id => "1", :forum_id => '3', :post_id => '2' }
     end
   
     it "should find the comment requested" do
-      @post_comments.should_receive(:find).with("1").and_return(@comment)
+      expect(@post_comments).to receive(:find).with("1").and_return(@comment)
       do_update
     end
 
     it "should update the found comment" do
-      @comment.should_receive(:update_attributes).and_return(true)
+      expect(@comment).to receive(:update).and_return(true)
       do_update
     end
 
     it "should assign the found comment for the view" do
       do_update
-      assigns(:comment).should == @comment
+      expect(assigns(:comment)).to eq(@comment)
     end
 
     it "should redirect to the comment" do
       do_update
-      response.should be_redirect
-      response.redirect_url.should == "http://test.host/forums/3/posts/2/comments/1"
+      expect(response).to be_redirect
+      expect(response.redirect_url).to eq("http://test.host/forums/3/posts/2/comments/1")
     end
   end
 
@@ -355,26 +355,26 @@ describe CommentsController do
 
     before(:each) do
       setup_mocks
-      @comment = mock('Comment', :id => '1').as_null_object
-      @post_comments.stub!(:find).and_return(@comment)
-      @post_comments.stub!(:destroy)
+      @comment = double('Comment', :id => '1').as_null_object
+      allow(@post_comments).to receive(:find).and_return(@comment)
+      allow(@post_comments).to receive(:destroy)
     end
   
     def do_delete
-      delete :destroy, :id => "1", :forum_id => '3', :post_id => '2'
+      delete :destroy, params: { :id => "1", :forum_id => '3', :post_id => '2' }
     end
 
     it "should find and destroy the comment requested" do
-      @post_comments.should_receive(:find).with("1").and_return(@comment)
-      @post_comments.should_receive(:destroy).with("1")
+      expect(@post_comments).to receive(:find).with("1").and_return(@comment)
+      expect(@post_comments).to receive(:destroy).with("1")
       do_delete
-      assigns['comment'].should == @comment
+      expect(assigns['comment']).to eq(@comment)
     end
   
     it "should redirect to the comments list" do
       do_delete
-      response.should be_redirect
-      response.redirect_url.should == "http://test.host/forums/3/posts/2/comments"
+      expect(response).to be_redirect
+      expect(response.redirect_url).to eq("http://test.host/forums/3/posts/2/comments")
     end
   end
 end

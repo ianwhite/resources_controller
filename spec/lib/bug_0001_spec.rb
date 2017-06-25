@@ -5,10 +5,9 @@ module Bug0001Spec
   end
   
   class MyController < ActionController::Base
-    def respond_to_with_cruft?(method)
-      respond_to_without_cruft?(method)
+    def respond_to?(method)
+      super(method)
     end
-    alias_method_chain :respond_to?, :cruft
     
     resources_controller_for :things, :class => Thing
   end
@@ -16,7 +15,7 @@ module Bug0001Spec
   describe "Calling respond_to? when it has an old signature buried in there [#1]" do
     it "should work just fine" do
       c = MyController.new
-      c.respond_to?(:foo).should == false
+      expect(c.respond_to?(:foo)).to eq(false)
     end
   end
 end

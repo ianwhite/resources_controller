@@ -1,6 +1,9 @@
 require 'spec_helper'
 
 describe CommentsController, "without stubs" do
+
+  render_views
+
   before do
     @user = User.create!
     @forum = Forum.create!
@@ -10,114 +13,114 @@ describe CommentsController, "without stubs" do
   
   describe "responding to GET index" do
     def do_get
-      get :index, :forum_id => @forum.id, :post_id => @post.id
+      get :index, params: { :forum_id => @forum.id, :post_id => @post.id }
     end
     
     it "should expose all comments as @comments" do
       do_get
-      assigns[:comments].should == [@comment]
+      expect(assigns[:comments]).to eq([@comment])
     end
 
-    describe "with mime type of xml" do
-      it "should render all comments as xml" do
-        request.env["HTTP_ACCEPT"] = "application/xml"
+    describe "with mime type of json" do
+      it "should render all comments as json" do
+        request.env["HTTP_ACCEPT"] = "application/json"
         do_get
-        response.body.should == [@comment].to_xml
+        expect(response.body).to eq([@comment].to_json)
       end
     end
   end
 
   describe "responding to GET show" do
     def do_get
-      get :show, :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id
+      get :show, params: { :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id }
     end
     
     it "should expose the requested comment as @comment" do
       do_get
-      assigns[:comment].should == @comment
+      expect(assigns[:comment]).to eq(@comment)
     end
     
-    describe "with mime type of xml" do
-      it "should render the requested comment as xml" do
-        request.env["HTTP_ACCEPT"] = "application/xml"
+    describe "with mime type of json" do
+      it "should render the requested comment as json" do
+        request.env["HTTP_ACCEPT"] = "application/json"
         do_get
-        response.body.should == @comment.to_xml
+        expect(response.body).to eq(@comment.to_json)
       end
     end
   end
 
   describe "responding to GET new" do
     def do_get
-      get :new, :forum_id => @forum.id, :post_id => @post.id
+      get :new, params: { :forum_id => @forum.id, :post_id => @post.id }
     end
   
     it "should expose a new comment as @comment" do
       do_get
-      assigns[:comment].should be_new_record
-      assigns[:comment].post.should == @post
+      expect(assigns[:comment]).to be_new_record
+      expect(assigns[:comment].post).to eq(@post)
     end
   end
 
   describe "responding to GET edit" do
     def do_get
-      get :edit, :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id
+      get :edit, params: { :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id }
     end
     
     it "should expose the requested comment as @comment" do
       do_get
-      assigns[:comment].should == @comment
+      expect(assigns[:comment]).to eq(@comment)
     end
   end
 
   describe "responding to POST create" do
     describe "with valid params" do
       def do_post
-        post :create, :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => @user.id}
+        post :create, params: { :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => @user.id} }
       end
       
       it "should create a comment" do
-        lambda { do_post }.should change(Comment, :count).by(1)
+        expect { do_post }.to change(Comment, :count).by(1)
       end
       
       it "should expose the newly created comment as @comment" do
         do_post
-        assigns(:comment).should == Comment.find(:first, :order => 'id DESC')
+        expect(assigns(:comment)).to eq(Comment.last)
       end
 
       it "should be resource_saved?" do
         do_post
-        @controller.should be_resource_saved
+        expect(@controller).to be_resource_saved
       end
       
       it "should redirect to the created comment" do
         do_post
-        response.should redirect_to(forum_post_comment_url(@forum, @post, Comment.find(:first, :order => 'id DESC')))
+        expect(response).to redirect_to(forum_post_comment_url(@forum, @post, Comment.last))
       end
     end
     
     describe "with invalid params" do
       def do_post
-        post :create, :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => ''}
+        post :create, params: { :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => ''} }
       end
 
       it "should not create a comment" do
-        lambda { do_post }.should_not change(Comment, :count)
+        expect { do_post }.not_to change(Comment, :count)
       end
  
       it "should expose a newly created but unsaved comment as @comment" do
         do_post
-        assigns(:comment).should be_new_record
-        assigns(:comment).post.should == @post
+        expect(assigns(:comment)).to be_new_record
+        expect(assigns(:comment).post).to eq(@post)
       end
 
       it "should not be resource_saved?" do
         do_post
-        @controller.should_not be_resource_saved
+        expect(@controller).not_to be_resource_saved
       end
 
       it "should re-render the 'new' template" do
         do_post
-        response.should render_template('new')
+        expect(response).to render_template('new')
       end
     end
   end
@@ -129,74 +132,74 @@ describe CommentsController, "without stubs" do
       end
       
       def do_put
-        put :update, :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => @new_user.id}
+        put :update, params: { :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => @new_user.id} }
       end
 
       it "should update the requested comment" do
         do_put
-        Comment.find(@comment.id).user_id.should == @new_user.id
+        expect(Comment.find(@comment.id).user_id).to eq(@new_user.id)
       end
 
       it "should not contain errors on comment" do
         do_put
-        @comment.errors.should be_empty
+        expect(@comment.errors).to be_empty
       end
       
       it "should be resource_saved?" do
         do_put
-        @controller.should be_resource_saved
+        expect(@controller).to be_resource_saved
       end
       
       it "should expose the requested comment as @comment" do
         do_put
-        assigns[:comment].should == @comment
+        expect(assigns[:comment]).to eq(@comment)
       end
 
       it "should redirect to the comment" do
         do_put
-        response.should redirect_to(forum_post_comment_url(@forum, @post, @comment))
+        expect(response).to redirect_to(forum_post_comment_url(@forum, @post, @comment))
       end
     end
     
     describe "with invalid params" do
       def do_put
-        put :update, :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => ''}
+        put :update, params: { :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id, :comment => {:user_id => ''} }
       end
 
       it "should fail to update the requested comment" do
         do_put
-        Comment.find(@comment.id).user_id.should == @user.id 
+        expect(Comment.find(@comment.id).user_id).to eq(@user.id) 
       end
 
       it "should not be resource_saved?" do
         do_put
-        @controller.should_not be_resource_saved
+        expect(@controller).not_to be_resource_saved
       end
       
       it "should expose the requested comment as @comment" do
         do_put
-        assigns[:comment].should == @comment
+        expect(assigns[:comment]).to eq(@comment)
       end
 
       it "should re-render the 'edit' template" do
         do_put
-        response.should render_template('edit')
+        expect(response).to render_template('edit')
       end
     end
   end
 
   describe "responding to DELETE destroy" do
     def do_delete
-      delete :destroy, :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id
+      delete :destroy, params: { :id => @comment.id, :forum_id => @forum.id, :post_id => @post.id }
     end
     
     it "should delete the requested comment" do
-      lambda { do_delete }.should change(Comment, :count).by(-1)
+      expect { do_delete }.to change(Comment, :count).by(-1)
     end
 
     it "should redirect to the comments list" do
       do_delete
-      response.should redirect_to(forum_post_comments_url(@forum, @post))
+      expect(response).to redirect_to(forum_post_comments_url(@forum, @post))
     end
   end
 end

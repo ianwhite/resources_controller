@@ -9,68 +9,68 @@ module RequestPathIntrospectionSpec
     before do
       @klass = Class.new(ActionController::Base)
       @controller = @klass.new
-      @controller.stub!(:controller_name).and_return('forums')
-      @controller.stub!(:controller_path).and_return('forums')
-      @controller.stub!(:params).and_return({})
-      @controller.stub!(:request).and_return(mock('request', :path => '/forums'))
+      allow(@controller).to receive(:controller_name).and_return('forums')
+      allow(@controller).to receive(:controller_path).and_return('forums')
+      allow(@controller).to receive(:params).and_return({})
+      allow(@controller).to receive(:request).and_return(double('request', :path => '/forums'))
     end
     
     describe "#request_path" do
       it "should default to request.path" do
-        @controller.send(:request_path).should == '/forums'
+        expect(@controller.send(:request_path)).to eq('/forums')
       end
       
       it " should be params[:resource_path], when set" do
         @controller.params[:resource_path] = '/foo'
-        @controller.send(:request_path).should == '/foo'
+        expect(@controller.send(:request_path)).to eq('/foo')
       end
     end
     
     describe "#nesting_request_path" do
       it "should remove the controller_name segment" do
-        @controller.stub!(:request_path).and_return('/users/1/forums/2')
-        @controller.send(:nesting_request_path).should == '/users/1'
+        allow(@controller).to receive(:request_path).and_return('/users/1/forums/2')
+        expect(@controller.send(:nesting_request_path)).to eq('/users/1')
       end
       
       it "when resource_specification present, whould remove taht segment" do
-        @controller.stub!(:resource_specification).and_return(ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :segment => 'foromas'))
-        @controller.stub!(:request_path).and_return('/users/1/foromas/2')
-        @controller.send(:nesting_request_path).should == '/users/1'
+        allow(@controller).to receive(:resource_specification).and_return(ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :segment => 'foromas'))
+        allow(@controller).to receive(:request_path).and_return('/users/1/foromas/2')
+        expect(@controller.send(:nesting_request_path)).to eq('/users/1')
       end
       
       it "should remove only the controller_name segment, when nesting is same name" do
-        @controller.stub!(:request_path).and_return('/forums/1/forums/2')
-        @controller.send(:nesting_request_path).should == '/forums/1'
+        allow(@controller).to receive(:request_path).and_return('/forums/1/forums/2')
+        expect(@controller.send(:nesting_request_path)).to eq('/forums/1')
       end
 
       it "should remove the controller_name segment, even when id matches controller name" do
-        @controller.stub!(:request_path).and_return('/forums/1/forums/forums.atom')
-        @controller.send(:nesting_request_path).should == '/forums/1'
+        allow(@controller).to receive(:request_path).and_return('/forums/1/forums/forums.atom')
+        expect(@controller.send(:nesting_request_path)).to eq('/forums/1')
       end
 
       it "should remove only the controller_name segment even when nesting is same name" do
-        @controller.stub!(:resource_specification).and_return(ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :singleton => true))
-        @controller.stub!(:request_path).and_return('/users/1/forum/forum.atom')
-        @controller.send(:nesting_request_path).should == '/users/1/forum'
+        allow(@controller).to receive(:resource_specification).and_return(ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :singleton => true))
+        allow(@controller).to receive(:request_path).and_return('/users/1/forum/forum.atom')
+        expect(@controller.send(:nesting_request_path)).to eq('/users/1/forum')
       end
       
       it "should remove any controller namespace" do
-        @controller.stub!(:controller_path).and_return('some/name/space/forums')
-        @controller.stub!(:request_path).and_return('/some/name/space/users/1/secret/forums')
-        @controller.send(:nesting_request_path).should == '/users/1/secret'
+        allow(@controller).to receive(:controller_path).and_return('some/name/space/forums')
+        allow(@controller).to receive(:request_path).and_return('/some/name/space/users/1/secret/forums')
+        expect(@controller.send(:nesting_request_path)).to eq('/users/1/secret')
       end
     end
     
     it "#namespace_segments should return [] segments if NOT present in request_path" do
-      @controller.stub!(:controller_path).and_return('some/name/space/forums')
-      @controller.stub!(:request_path).and_return('/SAM/name/space/users/1/secret/forums')
-      @controller.send(:namespace_segments).should == []
+      allow(@controller).to receive(:controller_path).and_return('some/name/space/forums')
+      allow(@controller).to receive(:request_path).and_return('/SAM/name/space/users/1/secret/forums')
+      expect(@controller.send(:namespace_segments)).to eq([])
     end
     
     it "#namespace_segments should return namespace segments if present in request_path" do
-      @controller.stub!(:controller_path).and_return('some/name/space/forums')
-      @controller.stub!(:request_path).and_return('/some/name/space/users/1/secret/forums')
-      @controller.send(:namespace_segments).should == ['some', 'name', 'space']
+      allow(@controller).to receive(:controller_path).and_return('some/name/space/forums')
+      allow(@controller).to receive(:request_path).and_return('/some/name/space/users/1/secret/forums')
+      expect(@controller.send(:namespace_segments)).to eq(['some', 'name', 'space'])
     end
     
     describe "#nesting_segments" do
@@ -80,13 +80,13 @@ module RequestPathIntrospectionSpec
         end
         
         it "and request path is '/users/1/forums', should return [{:segment => 'users', :singleton => false}]" do
-          @controller.request.stub!(:path).and_return('/users/1/forums')
-          @controller.send(:nesting_segments).should == [{:segment => 'users', :singleton => false}]
+          allow(@controller.request).to receive(:path).and_return('/users/1/forums')
+          expect(@controller.send(:nesting_segments)).to eq([{:segment => 'users', :singleton => false}])
         end
         
         it "and request path is '/account/users/1/forums', should return [{:segment => 'account', :singleton => true}, {:segment => 'users', :singleton => false}]" do
-          @controller.request.stub!(:path).and_return('/account/users/1/forums')
-          @controller.send(:nesting_segments).should == [{:segment => 'account', :singleton => true}, {:segment => 'users', :singleton => false}]
+          allow(@controller.request).to receive(:path).and_return('/account/users/1/forums')
+          expect(@controller.send(:nesting_segments)).to eq([{:segment => 'account', :singleton => true}, {:segment => 'users', :singleton => false}])
         end
         
         describe "when controller has nesting for :user => 'muchachos'" do
@@ -96,8 +96,8 @@ module RequestPathIntrospectionSpec
           end
           
           it "and request path is '/muchachos/1/forums', should return [{:segment => 'muchachos', :singleton => false}]" do
-            @controller.request.stub!(:path).and_return('/muchachos/1/forums')
-            @controller.send(:nesting_segments).should == [{:segment => 'muchachos', :singleton => false}]
+            allow(@controller.request).to receive(:path).and_return('/muchachos/1/forums')
+            expect(@controller.send(:nesting_segments)).to eq([{:segment => 'muchachos', :singleton => false}])
           end
         end
         
@@ -107,8 +107,8 @@ module RequestPathIntrospectionSpec
           end
           
           it "and request path is '/muchachos/1/forums', should return [{:segment => 'muchachos', :singleton => false}]" do
-            @controller.request.stub!(:path).and_return('/muchachos/1/forums')
-            @controller.send(:nesting_segments).should == [{:segment => 'muchachos', :singleton => false}]
+            allow(@controller.request).to receive(:path).and_return('/muchachos/1/forums')
+            expect(@controller.send(:nesting_segments)).to eq([{:segment => 'muchachos', :singleton => false}])
           end
         end
       end
@@ -122,7 +122,7 @@ module RequestPathIntrospectionSpec
         end
         
         it "('user_id') should return 'users'" do
-          @controller.send(:segment_for_key, 'user_id').should == 'users'
+          expect(@controller.send(:segment_for_key, 'user_id')).to eq('users')
         end
       end
     end

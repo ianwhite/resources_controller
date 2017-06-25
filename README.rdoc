@@ -7,17 +7,20 @@ you override the default RESTful funtionality in a clean and simple manner.
 
 The gem name is *rc_rails*
 
-== Rails 3 version
-
 Add this to your Gemfile
 
   gem 'rc_rails'
   
+
+== Rails 5 version
+
+Version 3.x of this gem is compatible with Rails 5.x
+
 == Resources
 
-<b>Github</b> for code: http://github.com/ianwhite/resources_controller
+<b>Documentation and How-to</b>: http://www.rubydoc.info/github/ianwhite/resources_controller/master/ResourcesController
 
-<b>Rdoc.info</b> docs: http://rdoc.info/github/ianwhite/resources_controller/master/frames
+<b>Github</b> for code: http://github.com/ianwhite/resources_controller
 
 <b>Google group</b> for questions: http://groups.google.com/group/resources_controller
 

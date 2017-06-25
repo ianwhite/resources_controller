@@ -1,5 +1,5 @@
 module ResourcesController
-  # standard CRUD actions, with html, js and xml responses, re-written to mnake best use of resources_cotroller.
+  # standard CRUD actions, with html and json responses, re-written to mnake best use of resources_cotroller.
   # This helps if you're writing controllers that you want to share via mixin or inheritance.
   #
   # This module is used as the actions for the controller by default, but you can change this behaviour:
@@ -17,7 +17,7 @@ module ResourcesController
   # Instead of this:
   #   @post = Post.find(params[:id])
   #   @post = Post.new
-  #   @posts = Post.find(:all)
+  #   @posts = Post.all
   #
   # do this:
   #   self.resource = find_resource
@@ -26,12 +26,12 @@ module ResourcesController
   #
   # === referring to resources
   # Instead of this:
-  #   format.xml { render :xml => @post }
-  #   format.xml { render :xml => @posts }
+  #   format.json { render :json => @post }
+  #   format.json { render :json => @posts }
   #   
   # do this:
-  #   format.xml { render :xml => resource }
-  #   format.xml { render :xml => resources }
+  #   format.json { render :json => resource }
+  #   format.json { render :json => resources }
   #
   # === urls 
   # Instead of this:
@@ -42,106 +42,93 @@ module ResourcesController
   #   redirect_to resources_url
   #   redirect_to new_resource_url
   #
+  # == strong paramaters
+  #
+  # Never trust parameters from the scary internet. Create your own white list method called 
+  #   resource_params
+  # or, even better, a method named after your resource name, e.g. 
+  #   event_params
+  #
   module Actions
+
     # GET /events
-    # GET /events.xml
+    # GET /events.json
     def index
       self.resources = find_resources
-
-      respond_to do |format|
-        format.html # index.rhtml
-        format.js
-        format.xml  { render :xml => resources }
-      end
     end
 
     # GET /events/1
-    # GET /events/1.xml
+    # GET /events/1.json
     def show
       self.resource = find_resource
-
-      respond_to do |format|
-        format.html # show.erb.html
-        format.js
-        format.xml  { render :xml => resource }
-      end
     end
 
     # GET /events/new
     def new
       self.resource = new_resource
-
-      respond_to do |format|
-        format.html # new.html.erb
-        format.js
-        format.xml  { render :xml => resource }
-      end
     end
 
     # GET /events/1/edit
     def edit
       self.resource = find_resource
-      respond_to do |format|
-        format.html # edit.html.erb
-        format.js
-        format.xml  { render :xml => resource }
-      end
     end
 
     # POST /events
-    # POST /events.xml
+    # POST /events.json
     def create
-      self.resource = new_resource
+      self.resource = new_resource( resource_params )
       
       respond_to do |format|
         if resource.save
-          format.html do
-            flash[:notice] = "#{resource_name.humanize} was successfully created."
-            redirect_to resource_url
-          end
+          format.html { redirect_to resource_url, notice: "#{resource_name.humanize} was successfully created." }
           format.js
-          format.xml  { render :xml => resource, :status => :created, :location => resource_url }
+          format.json { render :show, status: :create, location: resource_url }
         else
-          format.html { render :action => "new" }
-          format.js   { render :action => "new" }
-          format.xml  { render :xml => resource.errors, :status => :unprocessable_entity }
+          format.html { render :new }
+          format.js   { render :new }
+          format.json { render json: resource.errors, status: :unprocessable_entity }
         end
       end
     end
 
-    # PUT /events/1
-    # PUT /events/1.xml
+    # PATCH/PUT /events/1
+    # PATCH/PUT /events/1.json
     def update
       self.resource = find_resource
       
       respond_to do |format|
-        if resource.update_attributes(params[resource_name])
-          format.html do
-            flash[:notice] = "#{resource_name.humanize} was successfully updated."
-            redirect_to resource_url
-          end
+        if resource.update( resource_params )
+          format.html { redirect_to resource_url, notice: "#{resource_name.humanize} was successfully updated." }
           format.js
-          format.xml  { head :ok }
+          format.json { render :show, status: :ok, location: resource_url }
         else
-          format.html { render :action => "edit" }
-          format.js   { render :action => "edit" }
-          format.xml  { render :xml => resource.errors, :status => :unprocessable_entity }
+          format.html { render :edit }
+          format.js   { render :edit }
+          format.json { render json: resource.errors, status: :unprocessable_entity }
         end
       end
     end
 
     # DELETE /events/1
-    # DELETE /events/1.xml
+    # DELETE /events/1.json
     def destroy
       self.resource = destroy_resource
       respond_to do |format|
-        format.html do
-          flash[:notice] = "#{resource_name.humanize} was successfully destroyed."
-          redirect_to resources_url
-        end
+        format.html { redirect_to resources_url, notice: "#{resource_name.humanize} was successfully destroyed." }
         format.js
-        format.xml  { head :ok }
+        format.json { head :no_content }
       end
     end
   end
+
+
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def resource_params
+    if self.respond_to?("#{resource_name}_params", true)
+      return self.send("#{resource_name}_params")
+    else
+      return params.require(resource_name).permit( *(resource_service.content_columns.map(&:name) - [ 'updated_at', 'created_at' ]) )
+    end
+  end
+  
 end

@@ -4,20 +4,20 @@ describe "(re: saved?) Comment" do
   describe ".new(<invalid attrs>)" do
     before { @comment = Comment.new }
     
-    it { @comment.should_not be_validation_attempted }
-    it { @comment.should_not be_saved }
+    it { expect(@comment).not_to be_validation_attempted }
+    it { expect(@comment).not_to be_saved }
 
     describe ".save" do
       before { @comment.save }
 
-      it { @comment.should be_validation_attempted }
-      it { @comment.should_not be_saved }
+      it { expect(@comment).to be_validation_attempted }
+      it { expect(@comment).not_to be_saved }
 
       describe "then update_attributes(<valid attrs>)" do
         before { @comment.update_attributes :user => User.create!, :post => Post.create! }
         
-        it { @comment.should be_validation_attempted }
-        it { @comment.should be_saved }
+        it { expect(@comment).to be_validation_attempted }
+        it { expect(@comment).to be_saved }
       end
     end
   end

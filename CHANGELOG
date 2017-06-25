@@ -1,3 +1,10 @@
+= 3.0.0
+
+  * upgraded to Rails 5 and RSpec 3 [Jason Lee]
+  * added resource_params method which will try to call a
+    "#{resource_name}_params" method (similar to standard rails scaffold convention)
+  * removed error_messages_for_resource helper
+
 = 2.1.1
 
   * Stop modifying resource_specification_map in place [Joel Chippendale]
