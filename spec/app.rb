@@ -1,3 +1,4 @@
+# coding: utf-8
 # Testing app setup
 
 module ResourcesControllerTest
@@ -199,10 +200,6 @@ class ApplicationController < ActionController::Base
 protected
   def current_user
     @current_user
-  end
-
-  def resource_params
-    params
   end
 end
 
