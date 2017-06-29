@@ -129,7 +129,7 @@ module ResourcesController
     elsif self.respond_to?("#{resource_name}_params", true)
       return self.send("#{resource_name}_params")
     else
-      return params.require(resource_name).permit( *(resource_service.content_columns.map(&:name) - [ 'updated_at', 'created_at' ]) )
+      raise RuntimeError, "resource_params and #{resource_name}_params both unimplemented"
     end
   end
   

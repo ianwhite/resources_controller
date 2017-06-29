@@ -9,11 +9,18 @@ require File.expand_path('../../lib/resources_controller', __FILE__)
 # just about every test fail.
 ActionController::Base.view_paths = [File.join(File.dirname(__FILE__), "app/views")]
 
+module SpecConveniences
+  def ac_permitted(hsh)
+    ActionController::Parameters.new(hsh).permit!
+  end
+end
+
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
   config.infer_spec_type_from_file_location!
   config.expect_with(:rspec) { |c| c.syntax = [ :should, :expect ] }
+  config.include SpecConveniences # defined above
 end
 
 require 'rails-controller-testing'

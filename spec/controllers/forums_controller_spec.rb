@@ -204,12 +204,12 @@ end_str
     end
   
     def do_post
-      post :create, params: { :forum => {:name => 'Forum'}, :resource_path => '/forums', :resource_method => :post }
+      post :create, params: { :forum => {:title => 'Forum'}, :resource_path => '/forums', :resource_method => :post }
     
     end
   
     it "should create a new forum" do
-      expect(Forum).to receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
+      expect(Forum).to receive(:new).with(ac_permitted('title' => 'Forum')).and_return(@mock_forum)
       do_post
     end
 
@@ -490,11 +490,11 @@ end_str
     end
   
     def do_post
-      post :create, params: { :forum => {:name => 'Forum'} }
+      post :create, params: { :forum => {:title => 'Forum'} }
     end
   
     it "should create a new forum" do
-      expect(Forum).to receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
+      expect(Forum).to receive(:new).with(ac_permitted('title' => 'Forum')).and_return(@mock_forum)
       do_post
     end
 
@@ -520,11 +520,11 @@ end_str
     end
   
     def do_post
-      post :create, params: { :forum => {:name => 'Forum'} }, xhr: true
+      post :create, params: { :forum => {:title => 'Forum'} }, xhr: true
     end
   
     it "should create a new forum" do
-      expect(Forum).to receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
+      expect(Forum).to receive(:new).with(ac_permitted('title' => 'Forum')).and_return(@mock_forum)
       do_post
     end
 

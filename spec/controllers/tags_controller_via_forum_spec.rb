@@ -151,7 +151,7 @@ describe TagsController do
     end
   
     it "should build a new tag with params" do
-      expect(@forum_tags).to receive(:build).with("name" => "hello").and_return(@tag)
+      expect(@forum_tags).to receive(:build).with(ac_permitted("name" => "hello")).and_return(@tag)
       do_get
     end
   
