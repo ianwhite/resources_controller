@@ -1,3 +1,6 @@
+= 3.0.1
+  * remove duplicate method definition of resource_params (reported by Robert Thau)
+
 = 3.0.0
 
   * upgraded to Rails 5 and RSpec 3 [Jason Lee]

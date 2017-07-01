@@ -121,14 +121,4 @@ module ResourcesController
     end
   end
 
-
-  # Never trust parameters from the scary internet, only allow the white list through.
-  def resource_params
-    if self.respond_to?("#{resource_name}_params", true)
-      return self.send("#{resource_name}_params")
-    else
-      return params.require(resource_name).permit( *(resource_service.content_columns.map(&:name) - [ 'updated_at', 'created_at' ]) )
-    end
-  end
-  
 end
