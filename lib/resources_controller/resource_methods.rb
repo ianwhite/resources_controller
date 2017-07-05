@@ -36,7 +36,7 @@ module ResourcesController
       elsif self.respond_to?("#{resource_name}_params", true)
         return self.send("#{resource_name}_params")
       else
-        raise RuntimeError, "resource_params and #{resource_name}_params both unimplemented"
+        raise NoMethodError, "resource_params and #{resource_name}_params both unimplemented"
       end
     end
   
