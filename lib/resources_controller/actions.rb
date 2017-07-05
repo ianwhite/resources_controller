@@ -121,16 +121,4 @@ module ResourcesController
     end
   end
 
-
-  # Never trust parameters from the scary internet, only allow the white list through.
-  def resource_params
-    if defined?(super)
-      return super
-    elsif self.respond_to?("#{resource_name}_params", true)
-      return self.send("#{resource_name}_params")
-    else
-      raise RuntimeError, "resource_params and #{resource_name}_params both unimplemented"
-    end
-  end
-  
 end
