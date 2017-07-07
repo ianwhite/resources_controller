@@ -22,6 +22,9 @@ require 'resources_controller/specification'
 #
 #   class ForumsController < ApplicationController
 #     resources_controller_for :forums
+#     def forum_params
+#       params.fetch('forum',{}).permit(%i(name description ...))
+#     end
 #   end
 #
 # Your controller will get the standard CRUD actions, @forum will be set in member actions, @forums in
@@ -30,9 +33,15 @@ require 'resources_controller/specification'
 # ==== Example 2: Specifying enclosing resources
 #   class PostsController < ApplicationController
 #     resources_controller_for :posts, :in => :forum
+#     def resource_params
+#       params.fetch('post',{}).permit(%i(title body ...))
+#     end
 #   end
 #
-# As above, but the controller will load @forum on every action, and use @forum to find and create @posts
+# As above, but the controller will load @forum on every action, and use @forum to find and create @posts.
+# Note also the use of resource_params instead of post_params (named by the resource
+# name); either version works, but one must be defined.  See the discussion of
+# strong parameters below.
 #
 # ==== Wildcard enclosing resources
 # All of the above examples will work for any routes that match what it specified
@@ -76,6 +85,7 @@ require 'resources_controller/specification'
 #     resources_controller_for :account, :class => User, :singleton => true do
 #       @current_user
 #     end
+#     def account_params; ...; end
 #   end
 #
 # Your controller will use the block to find the resource.  The @account will be assigned to @current_user
@@ -85,6 +95,7 @@ require 'resources_controller/specification'
 #
 #   class PostsController < ApplicationController
 #     resources_controller_for :posts
+#     def post_params; ...; end
 #   end
 #
 # This will now work for /users/2/posts.
@@ -112,6 +123,7 @@ require 'resources_controller/specification'
 #
 #   class ImageController < ApplicationController
 #     resources_controller_for :image, :singleton => true
+#     def image_params; ...; end
 #   end
 #
 # When invoked with /users/3/image RC will find @user, and use @user.image to find the resource, and
@@ -159,26 +171,32 @@ require 'resources_controller/specification'
 #    map_enclosing_resource :account, :singleton => true, :find => :current_user
 #
 #    def current_user # get it from session or whatnot
+#    end
 #  end
 #
 #  class ForumsController < AplicationController
 #    resources_controller_for :forums
+#    def forum_params; ...; end
 #  end
 #
 #  class PostsController < AplicationController
 #    resources_controller_for :posts
+#    def post_params; ...; end
 #  end
 #
 #  class UsersController < AplicationController
 #    resources_controller_for :users
+#    def user_params; ...; end
 #  end
 #
 #  class ImageController < AplicationController
 #    resources_controller_for :image, :singleton => true
+#    def image_params; ...; end
 #  end
 #
 #  class AccountController < ApplicationController
 #    resources_controller_for :account, :singleton => true, :find => :current_user
+#    def account_params; ...; end
 #  end
 #
 # This is how the app will handle the following routes:
@@ -211,6 +229,42 @@ require 'resources_controller/specification'
 #  /account/posts/3 PUT   posts         @account = self.current_user
 #                                       @post = @account.posts.find(3)
 #                                       @post.update_attributes(params[:post])
+#
+# === Strong parameters
+#
+# Note that in all the examples above, the controller must define a method
+# resource_params, or #{resource_name}_params, which will be used to select
+# parameters out of the params fed into the controller by the standard
+# create and update actions.  (This is invoked by a parent resource_params
+# method in lib/resource_controller/resource_methods.rb, which dispatches
+# to whichever available, with #{resource_name}_params preferred if they
+# both are.)
+#
+# The method can be inherited from a base class, not defined by a controller
+# itself.  Thus, if you have several controllers that take a common set of
+# attributes, you can define resource_params in a controller base class and not
+# bother with a bunch of identical resource_params definitions in the
+# definitions of the individual controllers.
+#
+# (It also means that if, for some reason, you want to avoid defining any
+# such methods at all, you can put
+#
+#    def resource_params
+#      params.fetch(resource_name, {}).permit!
+#    end
+#
+# in ApplicationController.  However, this is not recommended for the same
+# reasons permit! (which permits whatever the client supplied) is not
+# recommended -- a hostile user can use browser dev tools to add extra
+# inputs to your forms, and set whatever attributes they like, whether you
+# expected them to or not.  Easy exploits for this are setting 'is_admin' on a
+# User object, or altering the blog_id on a Post to put it on a blog where the
+# user doesn't have publication rights.  And that's just within the context
+# of the sample app above.  A reasonable rule of thumb might be to not give
+# any user access to a controller with permit! unless the same user has
+# access to the production database SQL prompt.  And then remember that a
+# web client with access to your trusted user's credentials might not be
+# your trusted user!)
 #
 # === Views
 #
