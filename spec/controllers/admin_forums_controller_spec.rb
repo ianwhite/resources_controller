@@ -433,11 +433,11 @@ end_str
     end
   
     def do_post
-      post :create, params: { :forum => {:name => 'Forum'} }
+      post :create, params: { :forum => {:owner_id => '1'} }
     end
   
     it "should create a new forum" do
-      expect(Forum).to receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
+      expect(Forum).to receive(:new).with(ac_permitted(:owner_id => '1')).and_return(@mock_forum)
       do_post
     end
 
@@ -463,11 +463,11 @@ end_str
     end
   
     def do_post
-      post :create, params: { :forum => {:name => 'Forum'} }, xhr: true
+      post :create, params: { :forum => {:owner_id => '1'} }, xhr: true
     end
   
     it "should create a new forum" do
-      expect(Forum).to receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
+      expect(Forum).to receive(:new).with(ac_permitted(:owner_id => '1')).and_return(@mock_forum)
       do_post
     end
 
@@ -492,12 +492,13 @@ end_str
 
     before(:each) do
       @mock_forum = double('Forum').as_null_object
+      @update_params = { :owner_id => "1" }
       allow(@mock_forum).to receive(:to_param).and_return("1")
       allow(Forum).to receive(:find).and_return(@mock_forum)
     end
   
     def do_update
-      put :update, params: { :id => "1" }
+      put :update, params: { :id => "1", :forum => @update_params }
     end
   
     it "should find the forum requested" do
@@ -511,7 +512,9 @@ end_str
     end
 
     it "should update the found forum" do
-      expect(@mock_forum).to receive(:update).and_return(true)
+      expected_params = ActionController::Parameters.new(@update_params)
+      expected_params.permit(:owner_id)
+      expect(@mock_forum).to receive(:update).with(expected_params).and_return(true)
       do_update
       expect(assigns(:forum)).to eq(@mock_forum)
     end

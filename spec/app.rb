@@ -1,3 +1,4 @@
+# coding: utf-8
 # Testing app setup
 
 module ResourcesControllerTest
@@ -95,6 +96,7 @@ ActiveRecord::Migration.suppress_messages do
 
     create_table :infos, :force => true do |t|
       t.column "user_id", :integer
+      t.column "info", :string
     end
 
     create_table :addresses, :force => true do |t|
@@ -200,16 +202,14 @@ protected
   def current_user
     @current_user
   end
-
-  def resource_params
-    params
-  end
 end
 
 module Admin
   class ForumsController < ApplicationController
     resources_controller_for :forums
-
+    def resource_params
+      params['forum'].try(:permit, %i(owner_id))
+    end
   end
 
   class InterestsController < ApplicationController
@@ -238,10 +238,16 @@ end
 
 class InfosController < ApplicationController
   resources_controller_for :info, :singleton => true, :only => [:show, :edit, :update]
+  def resource_params
+    params['info'].try(:permit, %i(attr other_attr)) # no real attrs!
+  end
 end
 
 class TagsController < ApplicationController
   resources_controller_for :tags
+  def resource_params
+    params['tag'].try(:permit, :name)
+  end
 end
 
 class UsersController < ApplicationController

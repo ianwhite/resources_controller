@@ -298,11 +298,11 @@ describe CommentsController do
     end
   
     def do_post
-      post :create, params: { :comment => {:name => 'Comment'}, :forum_id => '3', :post_id => '2' }
+      post :create, params: { :comment => {:user_id => '3'}, :forum_id => '3', :post_id => '2' }
     end
   
     it "should build a new comment" do
-      expect(@post_comments).to receive(:build).with({'name' => 'Comment'}).and_return(@comment)
+      expect(@post_comments).to receive(:build).with(ac_permitted('user_id' => '3')).and_return(@comment)
       do_post
     end
 

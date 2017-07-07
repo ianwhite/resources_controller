@@ -13,12 +13,11 @@ module ResourcesController
       resource_service.find id
     end
 
-    # makes a new resource, if attributes are not supplied, determine them from the
-    # params hash and the current resource_class, or resource_name (the latter left in for BC)
+    # makes a new resource.  If attributes are not supplied, we try to get them
+    # from 'resource_params', if available.
     def new_resource(attributes = nil, &block)
-      if attributes.blank? && respond_to?(:params) && params.is_a?(ActionController::Parameters)
-        resource_form_name = ActiveModel::Naming.singular(resource_class)
-        attributes = params[resource_form_name] || params[resource_name] || {}
+      if attributes.blank? && respond_to?(:resource_params)
+        attributes = resource_params
       end
       resource_service.new attributes, &block
     end
@@ -34,8 +33,10 @@ module ResourcesController
     def resource_params
       if self.respond_to?("#{resource_name}_params", true)
         return self.send("#{resource_name}_params")
+      elsif defined?(super)
+        return super
       else
-        return params.fetch(resource_name, {}).permit( *(resource_service.content_columns.map(&:name) - [ 'updated_at', 'created_at' ]) )
+        raise NoMethodError, "resource_params and #{resource_name}_params both unimplemented"
       end
     end
   
