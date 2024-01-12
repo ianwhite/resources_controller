@@ -535,7 +535,7 @@ private
 
       names.each do |name|
         ensure_sane_wildcard if name == '*'
-        specifications << (name.to_s =~ /^(\*|\?(.*))$/ ? name.to_s : Specification.new(name, options, &block))
+        specifications << (name.to_s.match?(/\A(\*|\?(.*))\z/) ? name.to_s : Specification.new(name, options, &block))
       end
     end
 
@@ -664,7 +664,7 @@ private
       specifications.each_with_index do |spec, idx|
         case spec
           when '*' then load_wildcards_from(idx)
-          when /^\?(.*)/ then load_wildcard($1)
+          when /\A\?(.*)/ then load_wildcard($1)
           else load_enclosing_resource_from_specification(spec)
         end
       end

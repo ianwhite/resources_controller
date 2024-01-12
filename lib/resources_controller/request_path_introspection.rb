@@ -23,14 +23,14 @@ module ResourcesController
     # to help resources_controller do the right thing
     def namespace_segments
       unless @namespace_segments
-        namespace = controller_path.sub(%r(#{controller_name}$), '')
-        @namespace_segments = (request_path =~ %r(^/#{namespace}) ? namespace.split('/') : [])
+        namespace = controller_path.delete_suffix(controller_name)
+        @namespace_segments = (request_path.match?( %r(\A/#{namespace}) ) ? namespace.split('/') : [])
       end
       @namespace_segments
     end
     
     def param_keys
-      params.keys.map(&:to_s).select{|k| k[-3..-1] == '_id'}
+      params.keys.map(&:to_s).select{|k| k.end_with?('_id')}
     end
     
   private
@@ -48,7 +48,7 @@ module ResourcesController
       
     def remove_namespace(path)
       if namespace_segments.any?
-        path.sub(%r(^/#{namespace_segments.join('/')}), '')
+        path.delete_prefix("/#{namespace_segments.join('/')}")
       else
         path
       end
