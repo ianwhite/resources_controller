@@ -1,3 +1,6 @@
+= 4.0.0
+  * replace remaining regex-based routing checks with string helpers for better performance
+
 = 3.0.1
   * remove duplicate method definition of resource_params (reported by Robert Thau)
 
