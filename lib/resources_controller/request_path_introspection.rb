@@ -23,8 +23,12 @@ module ResourcesController
     # to help resources_controller do the right thing
     def namespace_segments
       unless @namespace_segments
-        namespace = controller_path.delete_suffix(controller_name)
-        @namespace_segments = (request_path.match?( %r(\A/#{namespace}) ) ? namespace.split('/') : [])
+        namespace = controller_path.delete_suffix(controller_name).delete_suffix('/')
+        @namespace_segments = if namespace.empty?
+          []
+        else
+          request_path.start_with?("/#{namespace}") ? namespace.split('/') : []
+        end
       end
       @namespace_segments
     end
