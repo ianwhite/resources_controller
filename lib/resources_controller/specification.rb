@@ -27,7 +27,7 @@ module ResourcesController
     
     # Example Usage
     #
-    #  Specifcation.new <name>, <options hash>, <&block>
+    #  Specification.new <name>, <options hash>, <&block>
     #
     # _name_ should always be singular.
     #
@@ -37,7 +37,7 @@ module ResourcesController
     # * <tt>:find:</tt> (default null) set this to a symbol or Proc to specify how to find the resource.
     #   Use this if the resource is found in an unconventional way
     #
-    # Options for unconvential use (otherwise these are all inferred from the _name_)
+    # Options for unconventional use (otherwise these are all inferred from the _name_)
     # * <tt>:source:</tt> a plural string or symbol (e.g. :users).  This is used to find the class or association name
     # * <tt>:class:</tt> a Class.  This is the class of the resource (if it can't be inferred from _name_ or :source)
     # * <tt>:key:</tt> (e.g. :user_id) used to find the resource id in params
@@ -90,7 +90,7 @@ module ResourcesController
   class SingletonSpecification < Specification
     # Same as Specification except: 
     #
-    # Options for unconvential use (otherwise these are all inferred from the _name_) 
+    # Options for unconventional use (otherwise these are all inferred from the _name_) 
     # * <tt>:source:</tt> a singular string or symbol (e.g. :blog).  This is used to find the class or association name
     # * <tt>:segment:</tt> (e.g. 'blog') the segment name in the route that is matched
     def initialize(spec_name, options = {}, &block)

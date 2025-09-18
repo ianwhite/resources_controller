@@ -80,7 +80,7 @@
   rspec's generated controller specs (try rake spec:generate).
   
   To do that I need the default update action to use :update. This meant that the old strategy
-  of keeping track of saves by using save_resource wont work.  Instead, we keep track by looking at the
+  of keeping track of saves by using save_resource won't work.  Instead, we keep track by looking at the
   AR's state (see lib/ardes/active_record/saved.rb) which is a far better solution anyway.
 
 * API change: save_resource deprecated
@@ -216,7 +216,7 @@
   access to enclosing resources)
 
 * resources_controller_for can now be specified more than once in a controller 
-  heirachy.  The latter definition will overwrite the previous one, and will 
+  hierarchy.  The latter definition will overwrite the previous one, and will 
   also 'reset' the nestings.
 
 * First stab at namespace support:

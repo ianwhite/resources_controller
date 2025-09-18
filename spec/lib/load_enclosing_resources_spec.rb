@@ -211,7 +211,7 @@ describe "#load_enclosing_resources for resources_controller_for :tags, :in => [
 end
 
 # specing some branching BC code
-# find_filter dissapeared from edge, but we want to support it for 2.0-stable
+# find_filter disappeared from edge, but we want to support it for 2.0-stable
 describe "ResourcesController.load_enclosing_resources_filter_exists?" do
   before do
     @klass = Class.new(ActionController::Base)

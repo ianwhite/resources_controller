@@ -232,7 +232,7 @@ end
 class AccountsController < ApplicationController
   resources_controller_for :account, :singleton => true, :source => :user, :find => :current_user
   def account_params
-    params.fetch(:acount).permit()
+    params.fetch(:account).permit()
   end
 end
 

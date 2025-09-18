@@ -3,7 +3,7 @@
 {<img src="https://secure.travis-ci.org/ianwhite/resources_controller.png?branch=master" alt="Build Status" />}[http://travis-ci.org/ianwhite/resources_controller]
 
 is a plugin to facilitate inheritance and DRYness in your resources controllers.  It introduces some abstraction to help
-you override the default RESTful funtionality in a clean and simple manner.
+you override the default RESTful functionality in a clean and simple manner.
 
 The gem name is *rc_rails*
 

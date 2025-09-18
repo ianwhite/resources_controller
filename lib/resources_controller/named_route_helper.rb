@@ -10,7 +10,7 @@ module ResourcesController
   #
   # If the route specified requires a member argument and you don't provide it, the current resource is used.
   #
-  # In general you may subsitute 'resource' for the current (maybe polymorphic) resource. e.g.
+  # In general you may substitute 'resource' for the current (maybe polymorphic) resource. e.g.
   #
   # You may also substitute 'enclosing_resource' to get urls for the enclosing resource
   #
@@ -107,7 +107,7 @@ generated name_prefix is '#{name_prefix}'
       [Rails.application.routes.named_routes.get(route_key.to_sym), route_method]
     end
     
-    # defines a method that calls the appropriate named route method, with appropraite args.
+    # defines a method that calls the appropriate named route method, with appropriate args.
     def define_resource_named_route_helper_method(method)
       self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
         def #{method}(*args)

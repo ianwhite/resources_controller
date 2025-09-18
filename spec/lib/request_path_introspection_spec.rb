@@ -32,7 +32,7 @@ module RequestPathIntrospectionSpec
         expect(@controller.send(:nesting_request_path)).to eq('/users/1')
       end
       
-      it "when resource_specification present, whould remove taht segment" do
+      it "when resource_specification present, would remove that segment" do
         allow(@controller).to receive(:resource_specification).and_return(ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :segment => 'foromas'))
         allow(@controller).to receive(:request_path).and_return('/users/1/foromas/2')
         expect(@controller.send(:nesting_request_path)).to eq('/users/1')
@@ -115,7 +115,7 @@ module RequestPathIntrospectionSpec
     end
   
     describe "#segment_for_key" do
-      describe "when controller has map {:user, :singelton => true}" do
+      describe "when controller has map {:user, :singleton => true}" do
         before do
           @klass.resources_controller_for :forums, :class => RequestPathIntrospectionSpec::Forum
           @klass.map_enclosing_resource :user, :singleton => true, :class => RequestPathIntrospectionSpec::User

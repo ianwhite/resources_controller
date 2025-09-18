@@ -39,7 +39,7 @@ describe InterestsController do
       expect { Interest.find(@interest.id) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   
-    it "should NOT destory the other interest with destroy(@other_interest.id)" do
+    it "should NOT destroy the other interest with destroy(@other_interest.id)" do
       expect { @resource_service.destroy(@other_interest.id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect(Interest.find(@other_interest.id)).to eq(@other_interest)
     end

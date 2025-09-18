@@ -205,7 +205,7 @@ describe OwnersController do
       expect(response.redirect_url).to eq("http://test.host/forums/2/owner")
     end
   
-    it "should render new when post unsuccesful" do
+    it "should render new when post unsuccessful" do
       allow(@owner).to receive(:save).and_return(false)
       do_post
       expect(response).to render_template('new')

@@ -487,7 +487,7 @@ end_str
       expect(response).to render_template('create')
     end
   
-    it "should render new.rjs if unsuccesful" do
+    it "should render new.rjs if unsuccessful" do
       allow(@mock_forum).to receive(:save).and_return(false)
       do_post
       expect(response).to render_template('new')
