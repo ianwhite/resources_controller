@@ -124,7 +124,7 @@ describe TagsController do
     it "should assign the address_tags association as the tags resource_service" do
       expect(@address).to receive(:tags).and_return(@address_tags)
       do_get
-      expect(@controller.resource_service).to eq(@address_tags)
+      expect(@controller.resource_service.service).to be(@address_tags)
     end 
   end
 end

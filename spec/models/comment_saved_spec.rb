@@ -13,8 +13,8 @@ describe "(re: saved?) Comment" do
       it { expect(@comment).to be_validation_attempted }
       it { expect(@comment).not_to be_saved }
 
-      describe "then update_attributes(<valid attrs>)" do
-        before { @comment.update_attributes :user => User.create!, :post => Post.create! }
+      describe "then update(<valid attrs>)" do
+        before { @comment.update :user => User.create!, :post => Post.create! }
         
         it { expect(@comment).to be_validation_attempted }
         it { expect(@comment).to be_saved }

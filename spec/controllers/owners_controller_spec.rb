@@ -86,7 +86,7 @@ describe OwnersController do
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render show.rhtml" do
@@ -129,7 +129,7 @@ describe OwnersController do
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render new.rhtml" do
@@ -156,7 +156,7 @@ describe OwnersController do
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render edit.rhtml" do
@@ -185,7 +185,12 @@ describe OwnersController do
     end
   
     it "should build a new owner" do
-      expect(@forum).to receive(:build_owner).with({'name' => 'Fred'}).and_return(@owner)
+      expect(@forum).to receive(:build_owner) do |params|
+        expect(params).to be_a(ActionController::Parameters)
+        expect(params.permitted?).to be true
+        expect(params.to_h).to eq('name' => 'Fred')
+        @owner
+      end
       do_post
     end
 
@@ -231,7 +236,11 @@ describe OwnersController do
     end
 
     it "should update the owner" do
-      expect(@owner).to receive(:update).with('name' => 'Fred')
+      expect(@owner).to receive(:update) do |params|
+        expect(params).to be_a(ActionController::Parameters)
+        expect(params.permitted?).to be true
+        expect(params.to_h).to eq('name' => 'Fred')
+      end
       do_update
     end
 

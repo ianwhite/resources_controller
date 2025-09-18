@@ -108,7 +108,7 @@ describe AddressesController do
     it "should assign the user_addresses association as the addresses resource_service" do
       expect(@user).to receive(:addresses).and_return(@user_addresses)
       do_get
-      expect(@controller.resource_service).to eq(@user_addresses)
+      expect(@controller.resource_service.service).to be(@user_addresses)
     end 
   end
 
@@ -127,7 +127,7 @@ describe AddressesController do
   
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
 
     it "should render index.rhtml" do
@@ -161,7 +161,7 @@ describe AddressesController do
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render show.rhtml" do
@@ -195,7 +195,7 @@ describe AddressesController do
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render new.rhtml" do
@@ -234,7 +234,7 @@ describe AddressesController do
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render edit.rhtml" do
@@ -269,7 +269,12 @@ describe AddressesController do
     end
   
     it "should create a new address" do
-      expect(@user_addresses).to receive(:build).with({'name' => 'Address'}).and_return(@address)
+      expect(@user_addresses).to receive(:build) do |params|
+        expect(params).to be_a(ActionController::Parameters)
+        expect(params.permitted?).to be true
+        expect(params.to_h).to eq('name' => 'Address')
+        @address
+      end
       do_post
     end
 

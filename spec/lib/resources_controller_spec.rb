@@ -49,9 +49,10 @@ describe "deprecated methods" do
   end
   
   it "#save_resource should send resource.save" do
-    ActiveSupport::Deprecation.silence do
-      expect(@controller.resource).to receive :save
-      @controller.save_resource
-    end
+    stub_const('ActiveSupport::Deprecation', Class.new do
+      def self.warn(*args); end
+    end)
+    expect(@controller.resource).to receive :save
+    @controller.save_resource
   end
 end

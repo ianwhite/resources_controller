@@ -112,7 +112,7 @@ describe TagsController do
     it "should assign the forum_tags association as the tags resource_service" do
       expect(@forum).to receive(:tags).and_return(@forum_tags)
       do_get
-      expect(@controller.resource_service).to eq(@forum_tags)
+      expect(@controller.resource_service.service).to be(@forum_tags)
     end 
   end
 
@@ -142,7 +142,7 @@ describe TagsController do
     it "should assign the forum_tags association as the tags resource_service" do
       expect(@forum).to receive(:tags).and_return(@forum_tags)
       do_get
-      expect(@controller.resource_service).to eq(@forum_tags)
+      expect(@controller.resource_service.service).to be(@forum_tags)
     end
   
     it "should render new template" do
@@ -151,7 +151,12 @@ describe TagsController do
     end
   
     it "should build a new tag with params" do
-      expect(@forum_tags).to receive(:build).with("name" => "hello").and_return(@tag)
+      expect(@forum_tags).to receive(:build) do |params|
+        expect(params).to be_a(ActionController::Parameters)
+        expect(params.permitted?).to be true
+        expect(params.to_h).to eq('name' => 'hello')
+        @tag
+      end
       do_get
     end
   

@@ -79,7 +79,7 @@
   BTW.  All of these changes to resource_saved? behaviour is aimed at making RC drop in compatible with
   rspec's generated controller specs (try rake spec:generate).
   
-  To do that I need the default update action to use :update_attributes. This meant that the old strategy
+  To do that I need the default update action to use :update. This meant that the old strategy
   of keeping track of saves by using save_resource wont work.  Instead, we keep track by looking at the
   AR's state (see lib/ardes/active_record/saved.rb) which is a far better solution anyway.
 

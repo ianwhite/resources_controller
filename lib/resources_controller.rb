@@ -210,7 +210,7 @@ require 'resources_controller/specification'
 #
 #  /account/posts/3 PUT   posts         @account = self.current_user
 #                                       @post = @account.posts.find(3)
-#                                       @post.update_attributes(params[:post])
+#                                       @post.update(params[:post])
 #
 # === Views
 #
@@ -639,7 +639,7 @@ private
     # record and return the result
     #
     # This method uses the @resource_saved tracking var, or the model's state itself if
-    # that is not available (which means if you do resource.update_attributes, then this
+    # that is not available (which means if you do resource.update, then this
     # method will return the correct result)
     def resource_saved?
       save_resource if @resource_saved.nil? && !resource.validation_attempted?
@@ -650,7 +650,7 @@ private
     # NOTE: it's clearer to just keep track of record saves yourself, this is here for BC
     # See the comment on #resource_saved?
     #
-    # @resource_saved = resource.update_attributes(params[resource_name])
+    # @resource_saved = resource.update(params[resource_name])
     #
     # Save the resource, and keep track of the result
     def save_resource
@@ -743,26 +743,30 @@ private
       @controller = controller
     end
 
-    def method_missing(*args, &block)
-      service.send(*args, &block)
+    def method_missing(method, *args, **kwargs, &block)
+      service.__send__(method, *args, **kwargs, &block)
     end
 
-    def find(*args, &block)
+    def find(*args, **kwargs, &block)
       resource_specification.find ? resource_specification.find_custom(controller) : super
     end
 
     # build association on the enclosing resource if there is one, otherwise call new
-    def new(*args, &block)
-      enclosing_resource ? service.build(*args, &block) : service.new(*args, &block)
+    def new(*args, **kwargs, &block)
+      if enclosing_resource
+        service.build(*args, **kwargs, &block)
+      else
+        service.new(*args, **kwargs, &block)
+      end
     end
 
     # find the resource
     # If we have a resource service, we call destroy on it with the reosurce id, so that any callbacks can be triggered
     # Otherwise, just call destroy on the resource
-    def destroy(*args)
-      resource = find(*args)
+    def destroy(*args, **kwargs)
+      resource = find(*args, **kwargs)
       if enclosing_resource
-        service.destroy(*args)
+        service.destroy(*args, **kwargs)
         resource
       else
         resource.destroy
@@ -779,7 +783,7 @@ private
   end
 
   class SingletonResourceService < ResourceService
-    def find(*args)
+    def find(*args, **kwargs)
       if resource_specification.find
         resource_specification.find_custom(controller)
       elsif controller.enclosing_resources.size > 0
@@ -790,11 +794,15 @@ private
     end
 
     # build association on the enclosing resource if there is one, otherwise call new
-    def new(*args, &block)
-      enclosing_resource ? enclosing_resource.send("build_#{resource_specification.source}", *args, &block) : service.new(*args, &block)
+    def new(*args, **kwargs, &block)
+      if enclosing_resource
+        enclosing_resource.send("build_#{resource_specification.source}", *args, **kwargs, &block)
+      else
+        service.new(*args, **kwargs, &block)
+      end
     end
 
-    def destroy(*args)
+    def destroy(*args, **kwargs)
       find.destroy
     end
 
