@@ -536,7 +536,7 @@ private
       names.each do |name|
         ensure_sane_wildcard if name == '*'
         name_str = name.to_s
-        specifications << (name_str.match?(/\A(\*|\?(.*))\z/) ? name_str : Specification.new(name, options, &block))
+        specifications << (name_str == '*' || name_str.start_with?('?') ? name_str : Specification.new(name, options, &block))
       end
     end
 
