@@ -87,7 +87,7 @@ generated name_prefix is '#{name_prefix}'
     def route_and_method_from_enclosing_resource_method_and_name_prefix(method, name_prefix)
       if enclosing_resource
         enclosing_route = name_prefix.delete_suffix('_')
-        method_str = method.is_a?(String) ? method : method.to_s
+        method_str = method.to_s
         substitution = method_str.include?('enclosing_resources') ? enclosing_route.pluralize : enclosing_route
         route_method = method_str.sub(method_str.include?('enclosing_resources') ? 'enclosing_resources' : 'enclosing_resource', substitution)
         route_key = route_method.delete_suffix('_path').delete_suffix('_url')
@@ -100,7 +100,7 @@ generated name_prefix is '#{name_prefix}'
     # passed something like (^|.*_)resource(s)_.*(url|path)\z, will 
     # return the [route, route_method]  for the expanded resource
     def route_and_method_from_resource_method_and_name_prefix(method, name_prefix)
-      method_str = method.is_a?(String) ? method : method.to_s
+      method_str = method.to_s
       replacement = method_str.include?('resources_') ? "#{name_prefix}#{route_name.pluralize}" : "#{name_prefix}#{route_name}"
       route_method = method_str.sub(method_str.include?('resources_') ? 'resources' : 'resource', replacement)
       route_key = route_method.delete_suffix('_path').delete_suffix('_url')
