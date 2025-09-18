@@ -3,7 +3,7 @@ module ResourcesController
   class CantMapRoute < ArgumentError #:nodoc:
   end
   
-  # This module provides methods are provided to aid in writing inheritable controllers.
+  # This module provides methods to aid in writing inheritable controllers.
   #
   # When writing an action that redirects to the list of resources, you may use *resources_url* and the controller
   # will call the url_writer method appropriate to what the controller is a resources controller for.
@@ -72,8 +72,8 @@ module ResourcesController
 Tried to map :#{resource_method} to :#{route_method},
 which doesn't exist. You may not have defined the route in config/routes.rb.
 
-Or, if you have unconventianal route names or name prefixes, you may need
-to explicictly set the :route option in resources_controller_for, and set
+Or, if you have unconventional route names or name prefixes, you may need
+to explicitly set the :route option in resources_controller_for, and set
 the :name_prefix option on your enclosing resources.
 
 Currently:
