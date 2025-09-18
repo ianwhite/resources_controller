@@ -52,18 +52,18 @@ module ResourcesController
     # return true if the passed method (e.g. 'resources_path') corresponds to a defined
     # named route helper method
     def resource_named_route_helper_method?(resource_method, raise_error = false)
-      if resource_method.to_s.match?(/_(path|url)\z/) 
-        if resource_method.to_s.match?(/\A(.*_)?enclosing_resource(s)?_/)
-          _, route_method = *route_and_method_from_enclosing_resource_method_and_name_prefix(resource_method, name_prefix)
-        elsif resource_method.to_s.match?(/\A(.*_)?resource(s)?_/)
-          _, route_method = *route_and_method_from_resource_method_and_name_prefix(resource_method, name_prefix)
-        else
-          return false
-        end
-        return respond_to?(route_method, true) || (raise_error && raise_resource_url_mapping_error(resource_method, route_method))
+      method_str = resource_method.to_s
+      return false unless method_str.match?(/_(path|url)\z/)
+
+      if method_str.match?(/\A(.*_)?enclosing_resource(s)?_/)
+        _, route_method = *route_and_method_from_enclosing_resource_method_and_name_prefix(method_str, name_prefix)
+      elsif method_str.match?(/\A(.*_)?resource(s)?_/)
+        _, route_method = *route_and_method_from_resource_method_and_name_prefix(method_str, name_prefix)
       else
         return false
       end
+
+      respond_to?(route_method, true) || (raise_error && raise_resource_url_mapping_error(resource_method, route_method))
     end
 
   private
@@ -87,7 +87,8 @@ generated name_prefix is '#{name_prefix}'
     def route_and_method_from_enclosing_resource_method_and_name_prefix(method, name_prefix)
       if enclosing_resource
         enclosing_route = name_prefix.delete_suffix('_')
-        route_method = method.to_s.sub(/enclosing_resource(s)?/) { $1 ? enclosing_route.pluralize : enclosing_route }
+        method_str = method.is_a?(String) ? method : method.to_s
+        route_method = method_str.sub(/enclosing_resource(s)?/) { $1 ? enclosing_route.pluralize : enclosing_route }
         return [Rails.application.routes.named_routes.get(route_method.sub(/_(path|url)\z/,'').to_sym), route_method]
       else
         raise NoMethodError, "Tried to map :#{method} but there is no enclosing_resource for this controller"
@@ -97,7 +98,8 @@ generated name_prefix is '#{name_prefix}'
     # passed something like (^|.*_)resource(s)_.*(url|path)\z, will 
     # return the [route, route_method]  for the expanded resource
     def route_and_method_from_resource_method_and_name_prefix(method, name_prefix)
-      route_method = method.to_s.sub(/resource(s)?/) { $1 ? "#{name_prefix}#{route_name.pluralize}" : "#{name_prefix}#{route_name}" }
+      method_str = method.is_a?(String) ? method : method.to_s
+      route_method = method_str.sub(/resource(s)?/) { $1 ? "#{name_prefix}#{route_name.pluralize}" : "#{name_prefix}#{route_name}" }
       return [Rails.application.routes.named_routes.get(route_method.sub(/_(path|url)\z/,'').to_sym), route_method]
     end
     
@@ -111,12 +113,14 @@ generated name_prefix is '#{name_prefix}'
     end
 
     def resource_named_route_helper_method_for_name_prefix?(method)
-      method.to_s.match?(/_for_.*\z/) && resource_named_route_helper_method?(method.to_s.sub(/_for_.*\z/,''))
+      method_str = method.to_s
+      method_str.match?(/_for_.*\z/) && resource_named_route_helper_method?(method_str.sub(/_for_.*\z/,''))
     end
 
     def define_resource_named_route_helper_method_for_name_prefix(method)
-      resource_method = method.to_s.sub(/_for_.*\z/,'')
-      name_prefix = method.to_s.sub(/\A.*_for_/,'')
+      method_str = method.to_s
+      resource_method = method_str.sub(/_for_.*\z/,'')
+      name_prefix = method_str.sub(/\A.*_for_/,'')
       if resource_method.match?(/enclosing_resource/)
         route, route_method = *route_and_method_from_enclosing_resource_method_and_name_prefix(resource_method, name_prefix)
         required_args = (route.segment_keys - [:format, :locale]).size
