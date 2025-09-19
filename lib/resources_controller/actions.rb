@@ -42,7 +42,7 @@ module ResourcesController
   #   redirect_to resources_url
   #   redirect_to new_resource_url
   #
-  # == strong paramaters
+  # == strong parameters
   #
   # Never trust parameters from the scary internet. Create your own white list method called 
   #   resource_params

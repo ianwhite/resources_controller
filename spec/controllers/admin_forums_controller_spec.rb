@@ -181,7 +181,7 @@ end_str
   
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
 
     it "should render index.rhtml" do
@@ -216,7 +216,7 @@ end_str
   
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
 
     it "should find all forums" do
@@ -245,7 +245,7 @@ end_str
   
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
 
     it "should find all forums" do
@@ -272,7 +272,7 @@ end_str
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render show.rhtml" do
@@ -307,7 +307,7 @@ end_str
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should find the forum requested" do
@@ -335,7 +335,7 @@ end_str
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render show.rjs" do
@@ -367,7 +367,7 @@ end_str
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render new.rhtml" do
@@ -404,7 +404,7 @@ end_str
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render edit.rhtml" do
@@ -437,7 +437,10 @@ end_str
     end
   
     it "should create a new forum" do
-      expect(Forum).to receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
+      expect(Forum).to receive(:new) do |params|
+        expect(params).to eq(ActionController::Parameters.new('name' => 'Forum').permit!)
+        @mock_forum
+      end
       do_post
     end
 
@@ -467,7 +470,10 @@ end_str
     end
   
     it "should create a new forum" do
-      expect(Forum).to receive(:new).with({'name' => 'Forum'}).and_return(@mock_forum)
+      expect(Forum).to receive(:new) do |params|
+        expect(params).to eq(ActionController::Parameters.new('name' => 'Forum').permit!)
+        @mock_forum
+      end
       do_post
     end
 
@@ -481,7 +487,7 @@ end_str
       expect(response).to render_template('create')
     end
   
-    it "should render new.rjs if unsuccesful" do
+    it "should render new.rjs if unsuccessful" do
       allow(@mock_forum).to receive(:save).and_return(false)
       do_post
       expect(response).to render_template('new')

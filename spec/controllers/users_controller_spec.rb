@@ -46,7 +46,7 @@ describe UsersController, "handling GET /users" do
   
   it "should be successful" do
     do_get
-    expect(response).to be_success
+    expect(response).to have_http_status(:ok)
   end
 
   it "should render index template" do
@@ -80,7 +80,7 @@ describe UsersController, "handling GET /users.json" do
   
   it "should be successful" do
     do_get
-    expect(response).to be_success
+    expect(response).to have_http_status(:ok)
   end
 
   it "should find all users" do
@@ -108,7 +108,7 @@ describe UsersController, "handling GET /users/dave" do
 
   it "should be successful" do
     do_get
-    expect(response).to be_success
+    expect(response).to have_http_status(:ok)
   end
   
   it "should render show template" do
@@ -142,7 +142,7 @@ describe UsersController, "handling GET /users/dave.json" do
 
   it "should be successful" do
     do_get
-    expect(response).to be_success
+    expect(response).to have_http_status(:ok)
   end
   
   it "should find the user requested" do
@@ -176,7 +176,7 @@ describe UsersController, "handling GET /users/dave/edit" do
 
   it "should be successful" do
     do_get
-    expect(response).to be_success
+    expect(response).to have_http_status(:ok)
   end
   
   it "should render edit template" do

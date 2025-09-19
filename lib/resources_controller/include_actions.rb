@@ -8,7 +8,7 @@ module ResourcesController
   #
   # RC extends any actions module with this automatically, so you don't need to know about it.
   #
-  # However, if you ahve any special behaviour in your actions module that is sensitive to
+  # However, if you have any special behaviour in your actions module that is sensitive to
   # :only and :except, you can define your own include_actions method on that module
   # to effect this special behaviour.
   module IncludeActions

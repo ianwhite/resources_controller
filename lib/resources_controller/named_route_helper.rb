@@ -3,14 +3,14 @@ module ResourcesController
   class CantMapRoute < ArgumentError #:nodoc:
   end
   
-  # This module provides methods are provided to aid in writing inheritable controllers.
+  # This module provides methods to aid in writing inheritable controllers.
   #
   # When writing an action that redirects to the list of resources, you may use *resources_url* and the controller
   # will call the url_writer method appropriate to what the controller is a resources controller for.
   #
   # If the route specified requires a member argument and you don't provide it, the current resource is used.
   #
-  # In general you may subsitute 'resource' for the current (maybe polymorphic) resource. e.g.
+  # In general you may substitute 'resource' for the current (maybe polymorphic) resource. e.g.
   #
   # You may also substitute 'enclosing_resource' to get urls for the enclosing resource
   #
@@ -52,13 +52,17 @@ module ResourcesController
     # return true if the passed method (e.g. 'resources_path') corresponds to a defined
     # named route helper method
     def resource_named_route_helper_method?(resource_method, raise_error = false)
-      if resource_method.to_s =~ /_(path|url)$/ && resource_method.to_s =~ /(^|^.*_)enclosing_resource(s)?_/
-        _, route_method = *route_and_method_from_enclosing_resource_method_and_name_prefix(resource_method, name_prefix)
-      elsif resource_method.to_s =~ /_(path|url)$/ && resource_method.to_s =~ /(^|^.*_)resource(s)?_/
-        _, route_method = *route_and_method_from_resource_method_and_name_prefix(resource_method, name_prefix)
+      method_str = resource_method.to_s
+      return false unless method_str.end_with?('_path', '_url')
+
+      if method_str.include?('enclosing_resource')
+        _, route_method = *route_and_method_from_enclosing_resource_method_and_name_prefix(method_str, name_prefix)
+      elsif method_str.include?('resource')
+        _, route_method = *route_and_method_from_resource_method_and_name_prefix(method_str, name_prefix)
       else
         return false
       end
+
       respond_to?(route_method, true) || (raise_error && raise_resource_url_mapping_error(resource_method, route_method))
     end
 
@@ -68,8 +72,8 @@ module ResourcesController
 Tried to map :#{resource_method} to :#{route_method},
 which doesn't exist. You may not have defined the route in config/routes.rb.
 
-Or, if you have unconventianal route names or name prefixes, you may need
-to explicictly set the :route option in resources_controller_for, and set
+Or, if you have unconventional route names or name prefixes, you may need
+to explicitly set the :route option in resources_controller_for, and set
 the :name_prefix option on your enclosing resources.
 
 Currently:
@@ -78,26 +82,32 @@ generated name_prefix is '#{name_prefix}'
       end_str
     end
     
-    # passed something like (^|.*_)enclosing_resource(s)_.*(url|path)$, will 
+    # passed something like (^|.*_)enclosing_resource(s)_.*(url|path)\z, will 
     # return the [route, route_method]  for the expanded resource
     def route_and_method_from_enclosing_resource_method_and_name_prefix(method, name_prefix)
       if enclosing_resource
-        enclosing_route = name_prefix.sub(/_$/,'')
-        route_method = method.to_s.sub(/enclosing_resource(s)?/) { $1 ? enclosing_route.pluralize : enclosing_route }
-        return [Rails.application.routes.named_routes.get(route_method.sub(/_(path|url)$/,'').to_sym), route_method]
+        enclosing_route = name_prefix.delete_suffix('_')
+        method_str = method.to_s
+        substitution = method_str.include?('enclosing_resources') ? enclosing_route.pluralize : enclosing_route
+        route_method = method_str.sub(method_str.include?('enclosing_resources') ? 'enclosing_resources' : 'enclosing_resource', substitution)
+        route_key = route_method.delete_suffix('_path').delete_suffix('_url')
+        return [Rails.application.routes.named_routes.get(route_key.to_sym), route_method]
       else
         raise NoMethodError, "Tried to map :#{method} but there is no enclosing_resource for this controller"
       end
     end
     
-    # passed something like (^|.*_)resource(s)_.*(url|path)$, will 
+    # passed something like (^|.*_)resource(s)_.*(url|path)\z, will 
     # return the [route, route_method]  for the expanded resource
     def route_and_method_from_resource_method_and_name_prefix(method, name_prefix)
-      route_method = method.to_s.sub(/resource(s)?/) { $1 ? "#{name_prefix}#{route_name.pluralize}" : "#{name_prefix}#{route_name}" }
-      return [Rails.application.routes.named_routes.get(route_method.sub(/_(path|url)$/,'').to_sym), route_method]
+      method_str = method.to_s
+      replacement = method_str.include?('resources_') ? "#{name_prefix}#{route_name.pluralize}" : "#{name_prefix}#{route_name}"
+      route_method = method_str.sub(method_str.include?('resources_') ? 'resources' : 'resource', replacement)
+      route_key = route_method.delete_suffix('_path').delete_suffix('_url')
+      [Rails.application.routes.named_routes.get(route_key.to_sym), route_method]
     end
     
-    # defines a method that calls the appropriate named route method, with appropraite args.
+    # defines a method that calls the appropriate named route method, with appropriate args.
     def define_resource_named_route_helper_method(method)
       self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
         def #{method}(*args)
@@ -107,13 +117,16 @@ generated name_prefix is '#{name_prefix}'
     end
 
     def resource_named_route_helper_method_for_name_prefix?(method)
-      method.to_s =~ /_for_.*$/ && resource_named_route_helper_method?(method.to_s.sub(/_for_.*$/,''))
+      method_str = method.to_s
+      return false unless method_str.include?('_for_')
+
+      resource_named_route_helper_method?(method_str.split('_for_', 2).first)
     end
 
     def define_resource_named_route_helper_method_for_name_prefix(method)
-      resource_method = method.to_s.sub(/_for_.*$/,'')
-      name_prefix = method.to_s.sub(/^.*_for_/,'')
-      if resource_method =~ /enclosing_resource/
+      method_str = method.to_s
+      resource_method, name_prefix = method_str.split('_for_', 2)
+      if resource_method.match?(/enclosing_resource/)
         route, route_method = *route_and_method_from_enclosing_resource_method_and_name_prefix(resource_method, name_prefix)
         required_args = (route.segment_keys - [:format, :locale]).size
 

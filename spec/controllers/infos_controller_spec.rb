@@ -42,12 +42,12 @@ describe InfosController do
   
     it "GET /account/info should be successful" do
       get :show
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
 
     it "GET /account/info/edit should be successful" do
       get :edit
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "PUT /account/info should be successful" do

@@ -138,7 +138,7 @@ describe TagsController do
     it "should assign the comment_tags association as the tags resource_service" do
       expect(@comment).to receive(:tags).and_return(@comment_tags)
       do_get
-      expect(@controller.resource_service).to eq(@comment_tags)
+      expect(@controller.resource_service.service).to be(@comment_tags)
     end 
   end
 end

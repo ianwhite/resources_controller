@@ -141,7 +141,7 @@ describe CommentsController do
     it "should assign the post_comments association as the comments resource_service" do
       expect(@post).to receive(:comments).and_return(@post_comments)
       do_get
-      expect(@controller.resource_service).to eq(@post_comments)
+      expect(@controller.resource_service.service).to be(@post_comments)
     end
   end
 
@@ -160,7 +160,7 @@ describe CommentsController do
   
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
 
     it "should render index.rhtml" do
@@ -194,7 +194,7 @@ describe CommentsController do
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render show.rhtml" do
@@ -228,7 +228,7 @@ describe CommentsController do
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render new.rhtml" do
@@ -267,7 +267,7 @@ describe CommentsController do
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render edit.rhtml" do
@@ -302,7 +302,12 @@ describe CommentsController do
     end
   
     it "should build a new comment" do
-      expect(@post_comments).to receive(:build).with({'name' => 'Comment'}).and_return(@comment)
+      expect(@post_comments).to receive(:build) do |params|
+        expect(params).to be_a(ActionController::Parameters)
+        expect(params.permitted?).to be true
+        expect(params.to_h).to eq('name' => 'Comment')
+        @comment
+      end
       do_post
     end
 

@@ -97,8 +97,8 @@ require 'resources_controller/specification'
 #
 #   map_enclosing_resource :account, :singleton => true, :class => User, :find => :current_user
 #
-# Now, if :account apears in any part of a route (for PostsController) it will be mapped to
-# (in this case) the current_user method of teh PostsController.
+# Now, if :account appears in any part of a route (for PostsController) it will be mapped to
+# (in this case) the current_user method of the PostsController.
 #
 # To make the :account mapping available to all, just chuck it in ApplicationController
 #
@@ -132,7 +132,7 @@ require 'resources_controller/specification'
 #
 # ==== Putting it all together
 #
-# An exmaple app
+# An example app
 #
 # config/routes.rb:
 #
@@ -210,7 +210,7 @@ require 'resources_controller/specification'
 #
 #  /account/posts/3 PUT   posts         @account = self.current_user
 #                                       @post = @account.posts.find(3)
-#                                       @post.update_attributes(params[:post])
+#                                       @post.update(params[:post])
 #
 # === Views
 #
@@ -314,7 +314,7 @@ require 'resources_controller/specification'
 #
 #   map.resources :things, :collection => {:order => :put}
 #
-# and the view can conatin a scriptaculous drag and drop with param name 'things_order'
+# and the view can contain a scriptaculous drag and drop with param name 'things_order'
 #
 # When this controller is invoked of /things the :order_by_ids message will be sent to the Thing class,
 # when it's invoked by /foos/1/things, then :order_by_ids message will be send to Foo.find(1).things association
@@ -324,11 +324,11 @@ require 'resources_controller/specification'
 # Lets say you want to set to_param to login, and use find_by_login
 # for your users in your URLs, with routes as follows:
 #
-#   map.reosurces :users do |user|
+#   map.resources :users do |user|
 #     user.resources :addresses
 #   end
 #
-# First, the users controller needs to find reosurces using find_by_login
+# First, the users controller needs to find resources using find_by_login
 #
 #   class UsersController < ApplicationController
 #     resources_controller_for :users
@@ -410,7 +410,7 @@ module ResourcesController
   # * <tt>:only:</tt> only include the specified actions.
   # * <tt>:except:</tt> include all actions except the specified actions.
   #
-  # ===== Options for unconvential use
+  # ===== Options for unconventional use
   # (otherwise these are all inferred from the _name_)
   # * <tt>:route:</tt> the route name (without name_prefix) if it can't be inferred from _name_.
   #   For a collection resource this should be plural, for a singleton it should be singular.
@@ -535,7 +535,8 @@ private
 
       names.each do |name|
         ensure_sane_wildcard if name == '*'
-        specifications << (name.to_s =~ /^(\*|\?(.*))$/ ? name.to_s : Specification.new(name, options, &block))
+        name_str = name.to_s
+        specifications << (name_str == '*' || name_str.start_with?('?') ? name_str : Specification.new(name, options, &block))
       end
     end
 
@@ -631,7 +632,7 @@ private
       @enclosing_collection_resources ||= []
     end
 
-    # NOTE: This method is overly complicated and unecessary.  It's much clearer just to keep
+    # NOTE: This method is overly complicated and unnecessary.  It's much clearer just to keep
     # track of record saves yourself, this is here for BC.  For an example of how it should be
     # done look at the actions module in http://github.com/ianwhite/response_for_rc
     #
@@ -639,7 +640,7 @@ private
     # record and return the result
     #
     # This method uses the @resource_saved tracking var, or the model's state itself if
-    # that is not available (which means if you do resource.update_attributes, then this
+    # that is not available (which means if you do resource.update, then this
     # method will return the correct result)
     def resource_saved?
       save_resource if @resource_saved.nil? && !resource.validation_attempted?
@@ -650,7 +651,7 @@ private
     # NOTE: it's clearer to just keep track of record saves yourself, this is here for BC
     # See the comment on #resource_saved?
     #
-    # @resource_saved = resource.update_attributes(params[resource_name])
+    # @resource_saved = resource.update(params[resource_name])
     #
     # Save the resource, and keep track of the result
     def save_resource
@@ -664,7 +665,7 @@ private
       specifications.each_with_index do |spec, idx|
         case spec
           when '*' then load_wildcards_from(idx)
-          when /^\?(.*)/ then load_wildcard($1)
+          when /\A\?(.*)/ then load_wildcard($1)
           else load_enclosing_resource_from_specification(spec)
         end
       end
@@ -735,7 +736,7 @@ private
 
   # Proxy class to provide a consistent API for resource_service.  This is mostly
   # required for Singleton resources. Also allows decoration of the resource service with custom finders
-  class ResourceService < ActiveSupport::ProxyObject
+  class ResourceService < BasicObject
     attr_reader :controller
     delegate :resource_specification, :resource_class, :enclosing_resource, :to => :controller
 
@@ -743,26 +744,30 @@ private
       @controller = controller
     end
 
-    def method_missing(*args, &block)
-      service.send(*args, &block)
+    def method_missing(method, *args, **kwargs, &block)
+      service.__send__(method, *args, **kwargs, &block)
     end
 
-    def find(*args, &block)
+    def find(*args, **kwargs, &block)
       resource_specification.find ? resource_specification.find_custom(controller) : super
     end
 
     # build association on the enclosing resource if there is one, otherwise call new
-    def new(*args, &block)
-      enclosing_resource ? service.build(*args, &block) : service.new(*args, &block)
+    def new(*args, **kwargs, &block)
+      if enclosing_resource
+        service.build(*args, **kwargs, &block)
+      else
+        service.new(*args, **kwargs, &block)
+      end
     end
 
     # find the resource
-    # If we have a resource service, we call destroy on it with the reosurce id, so that any callbacks can be triggered
+    # If we have a resource service, we call destroy on it with the resource id, so that any callbacks can be triggered
     # Otherwise, just call destroy on the resource
-    def destroy(*args)
-      resource = find(*args)
+    def destroy(*args, **kwargs)
+      resource = find(*args, **kwargs)
       if enclosing_resource
-        service.destroy(*args)
+        service.destroy(*args, **kwargs)
         resource
       else
         resource.destroy
@@ -779,7 +784,7 @@ private
   end
 
   class SingletonResourceService < ResourceService
-    def find(*args)
+    def find(*args, **kwargs)
       if resource_specification.find
         resource_specification.find_custom(controller)
       elsif controller.enclosing_resources.size > 0
@@ -790,11 +795,15 @@ private
     end
 
     # build association on the enclosing resource if there is one, otherwise call new
-    def new(*args, &block)
-      enclosing_resource ? enclosing_resource.send("build_#{resource_specification.source}", *args, &block) : service.new(*args, &block)
+    def new(*args, **kwargs, &block)
+      if enclosing_resource
+        enclosing_resource.send("build_#{resource_specification.source}", *args, **kwargs, &block)
+      else
+        service.new(*args, **kwargs, &block)
+      end
     end
 
-    def destroy(*args)
+    def destroy(*args, **kwargs)
       find.destroy
     end
 

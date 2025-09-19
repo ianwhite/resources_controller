@@ -74,7 +74,7 @@ describe InterestsController do
     it "should assign the forum_interests association as the interests resource_service" do
       expect(@forum).to receive(:interests).and_return(@forum_interests)
       do_get
-      expect(@controller.resource_service).to eq(@forum_interests)
+      expect(@controller.resource_service.service).to be(@forum_interests)
     end 
   end
 end

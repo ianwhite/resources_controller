@@ -6,7 +6,7 @@ end
 
 describe "ActionView with resources_controller Helper" do
   before do
-    @view = ViewWithResourcesControllerHelper.new
+    @view = ViewWithResourcesControllerHelper.new(ActionView::LookupContext.new([]), {}, nil)
     @controller = double('Controller')
     @view.controller = @controller
   end
@@ -38,7 +38,7 @@ end
 
 describe "Helper#form_for_resource (when resource is new record)" do
   before do
-    @view = ViewWithResourcesControllerHelper.new
+    @view = ViewWithResourcesControllerHelper.new(ActionView::LookupContext.new([]), {}, nil)
     @controller = double('Controller')
     @specification = double('Specification')
     allow(@specification).to receive(:singleton?).and_return(false)
@@ -73,7 +73,7 @@ end
 
 describe "Helper#form_for_resource (when resource is new record) and resource is singleton" do
   before do
-    @view = ViewWithResourcesControllerHelper.new
+    @view = ViewWithResourcesControllerHelper.new(ActionView::LookupContext.new([]), {}, nil)
     @controller = double('Controller')
     @specification = double('Specification')
     allow(@specification).to receive(:singleton?).and_return(true)
@@ -96,7 +96,7 @@ end
 
 describe "Helper#form_for_resource (when resource is existing record)" do
   before do
-    @view = ViewWithResourcesControllerHelper.new
+    @view = ViewWithResourcesControllerHelper.new(ActionView::LookupContext.new([]), {}, nil)
     @controller = double('Controller')
     @specification = double('Specification')
     allow(@specification).to receive(:singleton?).and_return(false)
@@ -116,4 +116,3 @@ describe "Helper#form_for_resource (when resource is existing record)" do
     @view.form_for_resource{}
   end
 end
-

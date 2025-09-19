@@ -127,7 +127,7 @@ describe TagsController do
     it "should assign the post_tags association as the tags resource_service" do
       expect(@post).to receive(:tags).and_return(@post_tags)
       do_get
-      expect(@controller.resource_service).to eq(@post_tags)
+      expect(@controller.resource_service.service).to be(@post_tags)
     end 
   end
 end

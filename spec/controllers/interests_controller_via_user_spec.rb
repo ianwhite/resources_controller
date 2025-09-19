@@ -108,7 +108,7 @@ describe InterestsController do
     it "should assign the user_interests association as the interests resource_service" do
       expect(@user).to receive(:interests).and_return(@user_interests)
       do_get
-      expect(@controller.resource_service).to eq(@user_interests)
+      expect(@controller.resource_service.service).to be(@user_interests)
     end
   end
 end

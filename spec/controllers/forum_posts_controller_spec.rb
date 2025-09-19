@@ -177,7 +177,7 @@ describe ForumPostsController do
     it "should assign the forum_posts association as the posts resource_service" do
       expect(@forum).to receive(:posts).and_return(@forum_posts)
       do_get
-      expect(@controller.resource_service).to eq(@forum_posts)
+      expect(@controller.resource_service.service).to be(@forum_posts)
     end 
   end
 
@@ -196,7 +196,7 @@ describe ForumPostsController do
   
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
 
     it "should render index.rhtml" do
@@ -230,7 +230,7 @@ describe ForumPostsController do
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render show.rhtml" do
@@ -264,7 +264,7 @@ describe ForumPostsController do
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render new.rhtml" do
@@ -303,7 +303,7 @@ describe ForumPostsController do
 
     it "should be successful" do
       do_get
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
   
     it "should render edit.rhtml" do
@@ -338,7 +338,12 @@ describe ForumPostsController do
     end
   
     it "should build a new post" do
-      expect(@forum_posts).to receive(:build).with({'name' => 'Post'}).and_return(@post)
+      expect(@forum_posts).to receive(:build) do |params|
+        expect(params).to be_a(ActionController::Parameters)
+        expect(params.permitted?).to be true
+        expect(params.to_h).to eq('name' => 'Post')
+        @post
+      end
       do_post
     end
 
