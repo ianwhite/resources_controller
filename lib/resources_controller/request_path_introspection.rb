@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ResourcesController
   # included into ActionController::Base
   #
@@ -34,16 +36,27 @@ module ResourcesController
     end
     
     def param_keys
-      params.keys.map(&:to_s).select{|k| k.end_with?('_id')}
+      params.each_key.filter_map do |k|
+        k_str = k.to_s
+        k_str if k_str.end_with?('_id')
+      end
     end
     
   private
+    # Removes the current resource segment, and everything after it, from the path,
+    # e.g. '/users/1/forums/2' => '/users/1'.
+    #
+    # This is only called from #nesting_request_path, which is memoised per request,
+    # so the pattern is built at most once per request - there is no need to cache it.
+    # The segment is escaped so that it is matched literally, as in #remove_namespace.
     def remove_current_segment(path)
-      if respond_to?(:resource_specification) && resource_specification.singleton?
-        path.sub(%r(/#{current_segment}(?!.*/#{current_segment}).*$), '')
+      segment = Regexp.escape(current_segment.to_s)
+      pattern = if respond_to?(:resource_specification) && resource_specification.singleton?
+        %r(/#{segment}(?!.*/#{segment}).*$)
       else
-        path.sub(%r(/#{current_segment}(?!.+/#{current_segment}).*$), '')
+        %r(/#{segment}(?!.+/#{segment}).*$)
       end
+      path.sub(pattern, '')
     end
     
     def current_segment
@@ -60,7 +73,7 @@ module ResourcesController
     
     def segments_for_path_and_keys(path, keys)
       key_segments = keys.map{|k| segment_for_key(k)}
-      path_segments = path[1..-1].to_s.split('/')
+      path_segments = path.delete_prefix('/').split('/')
       segments = []
       while path_segments.any? do
         segment = path_segments.shift
@@ -75,12 +88,13 @@ module ResourcesController
     end
     
     def segment_for_key(key)
-      if respond_to?(:specifications) && spec = specifications.find{|s| s.respond_to?(:key) && s.key == key.to_s}
+      key_str = key.to_s
+      if respond_to?(:specifications) && spec = specifications.find{|s| s.respond_to?(:key) && s.key == key_str}
         spec.segment
-      elsif spec = resource_specification_map.values.find{|s| s.key == key.to_s}
+      elsif spec = resource_specification_map.values.find{|s| s.key == key_str}
         spec.segment
       else
-        key.to_s[0..-4].pluralize
+        key_str.delete_suffix('_id').pluralize
       end
     end
   end

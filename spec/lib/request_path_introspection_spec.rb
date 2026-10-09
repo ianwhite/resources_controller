@@ -53,6 +53,12 @@ module RequestPathIntrospectionSpec
         allow(@controller).to receive(:request_path).and_return('/users/1/forum/forum.atom')
         expect(@controller.send(:nesting_request_path)).to eq('/users/1/forum')
       end
+
+      it "should match the current segment literally, when it contains regexp characters" do
+        allow(@controller).to receive(:resource_specification).and_return(ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :segment => 'v1.0'))
+        allow(@controller).to receive(:request_path).and_return('/v1X0/2')
+        expect(@controller.send(:nesting_request_path)).to eq('/v1X0/2')
+      end
       
       it "should remove any controller namespace" do
         allow(@controller).to receive(:controller_path).and_return('some/name/space/forums')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ResourcesController
   # extension for any module that is used as an Actions module.
   #

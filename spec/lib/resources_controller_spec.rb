@@ -34,11 +34,53 @@ end
 describe "A controller's resource_service" do
   before do
     @controller = ForumsController.new
+    @resource_service = @controller.resource_service
   end
     
   it 'may be explicitly set with #resource_service=' do
     @controller.resource_service = 'foo'
     expect(@controller.resource_service).to eq('foo')
+  end
+
+  # ResourceService is a BasicObject, so it has no #respond_to? to fall back on for
+  # its own methods (see ResourceService::PROXY_METHODS)
+  it 'should respond to its own methods' do
+    expect(@resource_service.respond_to?(:controller)).to eq(true)
+    expect(@resource_service.respond_to?(:service)).to eq(true)
+    expect(@resource_service.respond_to?(:find)).to eq(true)
+    expect(@resource_service.respond_to?(:new)).to eq(true)
+    expect(@resource_service.respond_to?(:destroy)).to eq(true)
+  end
+
+  it 'should respond to the methods it delegates to the controller' do
+    expect(@resource_service.respond_to?(:resource_specification)).to eq(true)
+    expect(@resource_service.respond_to?(:resource_class)).to eq(true)
+    expect(@resource_service.respond_to?(:enclosing_resource)).to eq(true)
+  end
+
+  it 'should respond to the methods of the service it proxies' do
+    expect(Forum.respond_to?(:count)).to eq(true)
+    expect(@resource_service.respond_to?(:count)).to eq(true)
+    expect(@resource_service.respond_to?(:no_such_method_at_all)).to eq(false)
+  end
+end
+
+describe "ResourcesController#update_name_prefix" do
+  before do
+    @controller = ForumsController.new
+  end
+
+  it "should accumulate the prefixes of the enclosing resources" do
+    @controller.send :update_name_prefix, 'forum_'
+    @controller.send :update_name_prefix, 'user_'
+    expect(@controller.name_prefix).to eq('forum_user_')
+  end
+
+  it "should leave name_prefix as an empty String when the given prefix is empty or nil" do
+    @controller.send :update_name_prefix, nil
+    @controller.send :update_name_prefix, ''
+    expect(@controller.instance_variable_get(:@name_prefix)).to eq('')
+    expect(@controller.name_prefix).to eq('')
   end
 end
 

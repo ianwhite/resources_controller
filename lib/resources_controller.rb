@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'resources_controller/active_record/saved'
 require 'resources_controller/railtie' if defined?(Rails)
 
@@ -506,11 +508,7 @@ module ResourcesController
 
 private
   def load_enclosing_resources_filter_exists?
-    if respond_to?(:find_filter) # BC 2.0-stable branch
-      find_filter(:load_enclosing_resources)
-    else
-      _process_action_callbacks.detect {|c| c.filter == :load_enclosing_resources}
-    end
+    _process_action_callbacks.any? {|c| c.filter == :load_enclosing_resources}
   end
 
   module ClassMethods
@@ -557,12 +555,10 @@ private
 
   module InstanceMethods
 
-    def resource_service=(service)
-      @resource_service = service
-    end
+    attr_writer :resource_service
 
     def name_prefix
-      @name_prefix ||= ''
+      @name_prefix ||= +''
     end
 
     # name of the singular resource
@@ -581,24 +577,29 @@ private
     end
 
     # returns the controller's current resource.
+    #
+    # The instance variable is named after the resource specification (see
+    # Specification#ivar_name), which is the same name #add_enclosing_resource uses
+    # for enclosing resources.  It is deliberately not derived from #resource_name,
+    # which may be overridden for params/forms - see ResourceMethods#resource_params.
     def resource
-      instance_variable_get("@#{resource_name}")
+      instance_variable_get(resource_specification.ivar_name)
     end
 
     # sets the controller's current resource, and
     # decorates the object with a save hook, so we know if it's been saved
     def resource=(record)
-      instance_variable_set("@#{resource_name}", record)
+      instance_variable_set(resource_specification.ivar_name, record)
     end
 
     # returns the controller's current resources collection
     def resources
-      instance_variable_get("@#{resources_name}")
+      instance_variable_get(resource_specification.collection_ivar_name)
     end
 
     # sets the controller's current resource collection
     def resources=(collection)
-      instance_variable_set("@#{resources_name}", collection)
+      instance_variable_set(resource_specification.collection_ivar_name, collection)
     end
 
     # returns the immediately enclosing resource
@@ -607,9 +608,7 @@ private
     end
 
     # returns the name of the immediately enclosing resource
-    def enclosing_resource_name
-      @enclosing_resource_name
-    end
+    attr_reader :enclosing_resource_name
 
     # returns the resource service for the controller - this will be lazilly created
     # to a ResourceService, or a SingletonResourceService (if :singleton => true)
@@ -663,10 +662,12 @@ private
     def load_enclosing_resources
       namespace_segments.each {|segment| update_name_prefix("#{segment}_") }
       specifications.each_with_index do |spec, idx|
-        case spec
-          when '*' then load_wildcards_from(idx)
-          when /\A\?(.*)/ then load_wildcard($1)
-          else load_enclosing_resource_from_specification(spec)
+        if spec == '*'
+          load_wildcards_from(idx)
+        elsif spec.is_a?(String) && spec.start_with?('?')
+          load_wildcard(spec[1..])
+        else
+          load_enclosing_resource_from_specification(spec)
         end
       end
     end
@@ -700,7 +701,7 @@ private
       encls = nesting_segments.slice(enclosing_resources.size..-1)
 
       if spec = specs.find {|s| s.is_a?(Specification)}
-        spec_seg = encls.index({:segment => spec.segment, :singleton => spec.singleton?}) or ResourcesController.raise_resource_mismatch(self)
+        spec_seg = encls.index {|e| e[:segment] == spec.segment && e[:singleton] == spec.singleton?} or ResourcesController.raise_resource_mismatch(self)
         number_of_wildcards = spec_seg - (specs.index(spec) -1)
       else
         number_of_wildcards = encls.length - (specs.length - 1)
@@ -721,22 +722,32 @@ private
       update_name_prefix(options[:name_prefix] || (options[:name_prefix] == false ? '' : "#{name}_"))
       enclosing_resources << resource
       enclosing_collection_resources << resource unless options[:is_singleton]
-      instance_variable_set("@enclosing_resource_name", options[:name])
-      instance_variable_set("@#{name}", resource)
-      instance_variable_set("@#{options[:as]}", resource) if options[:as]
+      instance_variable_set(:@enclosing_resource_name, options[:name])
+      instance_variable_set(:"@#{name}", resource)
+      instance_variable_set(:"@#{options[:as]}", resource) if options[:as]
     end
 
     # The name prefix is used for forwarding urls and will be different depending on
     # which route the controller was invoked by.  The resource specifications build
     # up the name prefix as the resources are loaded.
-    def update_name_prefix(name_prefix)
-      @name_prefix = "#{@name_prefix}#{name_prefix}"
+    #
+    # Empty prefixes are a no-op, but @name_prefix is always left as a String once
+    # this has been called, so that #name_prefix never has to cope with nil.
+    def update_name_prefix(prefix)
+      @name_prefix ||= +''
+      return if prefix.nil? || prefix.empty?
+      @name_prefix = "#{@name_prefix}#{prefix}"
     end
   end
 
   # Proxy class to provide a consistent API for resource_service.  This is mostly
   # required for Singleton resources. Also allows decoration of the resource service with custom finders
   class ResourceService < BasicObject
+    # BasicObject has no #respond_to?, so #respond_to? below has no superclass method
+    # to fall back on to find the proxy's own methods - they have to be listed here.
+    PROXY_METHODS = [:controller, :service, :find, :new, :destroy,
+                     :resource_specification, :resource_class, :enclosing_resource].freeze
+
     attr_reader :controller
     delegate :resource_specification, :resource_class, :enclosing_resource, :to => :controller
 
@@ -775,7 +786,7 @@ private
     end
 
     def respond_to?(method, include_private = false)
-      super || service.respond_to?(method)
+      PROXY_METHODS.include?(method.to_sym) || service.respond_to?(method, include_private)
     end
 
     def service
