@@ -33,8 +33,6 @@ module ResourcesController
       @namespace_segments
     end
     
-    SEGMENT_REGEXPS = {}
-
     def param_keys
       params.each_key.filter_map do |k|
         k_str = k.to_s
@@ -43,11 +41,19 @@ module ResourcesController
     end
     
   private
+    # Removes the current resource segment, and everything after it, from the path,
+    # e.g. '/users/1/forums/2' => '/users/1'.
+    #
+    # This is only called from #nesting_request_path, which is memoised per request,
+    # so the pattern is built at most once per request - there is no need to cache it.
+    # The segment is escaped so that it is matched literally, as in #remove_namespace.
     def remove_current_segment(path)
-      is_singleton = respond_to?(:resource_specification) && resource_specification.singleton?
-      pattern = (SEGMENT_REGEXPS[[current_segment, is_singleton]] ||= (is_singleton ?
-        %r(/#{current_segment}(?!.*/#{current_segment}).*$) :
-        %r(/#{current_segment}(?!.+/#{current_segment}).*$)))
+      segment = Regexp.escape(current_segment.to_s)
+      pattern = if respond_to?(:resource_specification) && resource_specification.singleton?
+        %r(/#{segment}(?!.*/#{segment}).*$)
+      else
+        %r(/#{segment}(?!.+/#{segment}).*$)
+      end
       path.sub(pattern, '')
     end
     

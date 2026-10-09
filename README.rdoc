@@ -1,6 +1,6 @@
 = resources_controller
 
-{<img src="https://secure.travis-ci.org/ianwhite/resources_controller.png?branch=master" alt="Build Status" />}[http://travis-ci.org/ianwhite/resources_controller]
+{<img src="https://github.com/ianwhite/resources_controller/actions/workflows/ci.yml/badge.svg" alt="Build Status" />}[https://github.com/ianwhite/resources_controller/actions/workflows/ci.yml]
 
 is a plugin to facilitate inheritance and DRYness in your resources controllers.  It introduces some abstraction to help
 you override the default RESTful functionality in a clean and simple manner.
@@ -45,6 +45,11 @@ To get set up for development, do the following:
   bundle install
   rake spec
   rake spec:rspec_generated_specs
+
+The specs are run against Rails 8.0 and 8.1 on GitHub Actions.  To run them against a
+particular Rails version locally, set RAILS_VERSION:
+
+  RAILS_VERSION='~> 8.0.0' bundle install && bundle exec rspec
 
 == Contributors
 

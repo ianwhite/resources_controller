@@ -579,6 +579,11 @@ private
     end
 
     # returns the controller's current resource.
+    #
+    # The instance variable is named after the resource specification (see
+    # Specification#ivar_name), which is the same name #add_enclosing_resource uses
+    # for enclosing resources.  It is deliberately not derived from #resource_name,
+    # which may be overridden for params/forms - see ResourceMethods#resource_params.
     def resource
       instance_variable_get(resource_specification.ivar_name)
     end
@@ -720,16 +725,20 @@ private
       enclosing_resources << resource
       enclosing_collection_resources << resource unless options[:is_singleton]
       instance_variable_set(:@enclosing_resource_name, options[:name])
-      instance_variable_set("@#{name}", resource)
-      instance_variable_set("@#{options[:as]}", resource) if options[:as]
+      instance_variable_set(:"@#{name}", resource)
+      instance_variable_set(:"@#{options[:as]}", resource) if options[:as]
     end
 
     # The name prefix is used for forwarding urls and will be different depending on
     # which route the controller was invoked by.  The resource specifications build
     # up the name prefix as the resources are loaded.
-    def update_name_prefix(name_prefix)
-      return if name_prefix.nil? || name_prefix.empty?
-      @name_prefix = "#{@name_prefix}#{name_prefix}"
+    #
+    # Empty prefixes are a no-op, but @name_prefix is always left as a String once
+    # this has been called, so that #name_prefix never has to cope with nil.
+    def update_name_prefix(prefix)
+      @name_prefix ||= ''
+      return if prefix.nil? || prefix.empty?
+      @name_prefix = "#{@name_prefix}#{prefix}"
     end
   end
 

@@ -42,6 +42,25 @@ describe "A controller's resource_service" do
   end
 end
 
+describe "ResourcesController#update_name_prefix" do
+  before do
+    @controller = ForumsController.new
+  end
+
+  it "should accumulate the prefixes of the enclosing resources" do
+    @controller.send :update_name_prefix, 'forum_'
+    @controller.send :update_name_prefix, 'user_'
+    expect(@controller.name_prefix).to eq('forum_user_')
+  end
+
+  it "should leave name_prefix as an empty String when the given prefix is empty or nil" do
+    @controller.send :update_name_prefix, nil
+    @controller.send :update_name_prefix, ''
+    expect(@controller.instance_variable_get(:@name_prefix)).to eq('')
+    expect(@controller.name_prefix).to eq('')
+  end
+end
+
 describe "deprecated methods" do
   before do 
     @controller = ForumsController.new
