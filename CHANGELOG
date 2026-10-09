@@ -1,4 +1,5 @@
 = 5.0.0
+  * performance optimizations across routing helpers, request introspection, and instance variable access
   * require Rails >= 8.0 and Ruby >= 3.3, dropping support for older versions
 
 = 4.0.0
