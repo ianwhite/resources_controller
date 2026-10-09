@@ -119,8 +119,8 @@ describe ForumsController do
 Tried to map :resource_users_path to :forum_users_path,
 which doesn't exist. You may not have defined the route in config/routes.rb.
 
-Or, if you have unconventianal route names or name prefixes, you may need
-to explicictly set the :route option in resources_controller_for, and set
+Or, if you have unconventional route names or name prefixes, you may need
+to explicitly set the :route option in resources_controller_for, and set
 the :name_prefix option on your enclosing resources.
 
 Currently:

@@ -11,7 +11,7 @@ module ResourcesControllerTest
   end
 end
 
-ResourcesControllerTest::Application.initialize!
+ResourcesControllerTest::Application.initialize! unless ResourcesControllerTest::Application.initialized?
 
 ##########
 # Routing
