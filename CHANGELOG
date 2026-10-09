@@ -21,6 +21,7 @@
     app and could no longer run
   * gem packaging: added the MIT license and gem metadata, dropped the stale rubygems_version, and
     s.files no longer ships the specs, CI config and other development files
+  * README.rdoc is now Markdown (README.md), with the Travis badge replaced by the GitHub Actions one
   * require Rails >= 8.0 and Ruby >= 3.3, dropping support for older versions
 
 = 4.0.0

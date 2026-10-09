@@ -16,8 +16,8 @@ Gem::Specification.new do |s|
   s.description = "rc makes RESTful controllers fun"
   s.license     = "MIT"
 
-  s.files            = Dir["lib/**/*.rb", "CHANGELOG", "MIT-LICENSE", "README.rdoc"]
-  s.extra_rdoc_files = [ "README.rdoc" ]
+  s.files            = Dir["lib/**/*.rb", "CHANGELOG", "MIT-LICENSE", "README.md"]
+  s.extra_rdoc_files = [ "README.md" ]
   s.rdoc_options     = ["--charset=UTF-8"]
   s.require_path     = "lib"
 

@@ -11,7 +11,7 @@ RDoc::Task.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title    = 'ResourcesController'
   rdoc.options << '--line-numbers'
-  rdoc.rdoc_files.include('README.rdoc', 'CHANGELOG', 'MIT-LICENSE')
+  rdoc.rdoc_files.include('README.md', 'CHANGELOG', 'MIT-LICENSE')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
 
