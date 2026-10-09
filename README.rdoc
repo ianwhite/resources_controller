@@ -12,6 +12,10 @@ Add this to your Gemfile
   gem 'rc_rails'
   
 
+== Requirements
+
+Version 5.0.0 and later require Rails >= 8.0 and Ruby >= 3.3.
+
 == Rails 5 version
 
 Version 3.x of this gem is compatible with Rails 5.x
@@ -38,8 +42,7 @@ To get set up for development, do the following:
 
   git clone git://github.com/ianwhite/resources_controller
   cd resources_controller
-  cp Gemfile.lock.development Gemfile.lock
-  bundle
+  bundle install
   rake spec
   rake spec:rspec_generated_specs
 

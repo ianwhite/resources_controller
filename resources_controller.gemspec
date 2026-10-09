@@ -8,6 +8,7 @@ Gem::Specification.new do |s|
   s.name        = "rc_rails"
   s.version     = version
   s.platform    = Gem::Platform::RUBY
+  s.required_ruby_version = '>= 3.3'
   s.authors     = ["Ian White"]
   s.email       = "ian.w.white@gmail.com"
   s.homepage    = "http://github.com/ianwhite/resources_controller"
@@ -22,7 +23,7 @@ Gem::Specification.new do |s|
   s.rdoc_options     = ["--charset=UTF-8"]
   s.require_path     = "lib"
 
-  s.add_runtime_dependency "rails", '>= 5.1.1'
+  s.add_runtime_dependency "rails", '>= 8.0'
   s.add_development_dependency "rspec", '>= 3'
   s.add_development_dependency "rspec-rails", '>= 3.5'
   s.add_development_dependency 'rails-controller-testing'
