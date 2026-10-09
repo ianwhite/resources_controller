@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ResourcesController
   
   class CantMapRoute < ArgumentError #:nodoc:
@@ -45,8 +47,8 @@ module ResourcesController
       end
     end
 
-    def respond_to?(*args)
-      super(*args) || resource_named_route_helper_method?(args.first)
+    def respond_to_missing?(method, include_private = false)
+      resource_named_route_helper_method?(method) || super
     end
 
     # return true if the passed method (e.g. 'resources_path') corresponds to a defined
@@ -103,10 +105,16 @@ generated name_prefix is '#{name_prefix}'
     def route_and_method_from_resource_method_and_name_prefix(method, name_prefix)
       method_str = method.to_s
       is_resources = method_str.include?('resources_')
-      replacement = "#{name_prefix}#{is_resources ? route_name.pluralize : route_name}"
+      replacement = "#{name_prefix}#{is_resources ? resources_route_name : route_name}"
       route_method = method_str.sub(is_resources ? 'resources' : 'resource', replacement)
       route_key = route_method.end_with?('_path') ? route_method.delete_suffix('_path') : route_method.delete_suffix('_url')
       [Rails.application.routes.named_routes.get(route_key.to_sym), route_method]
+    end
+
+    # route_name is fixed for the life of the controller, and pluralize is the most
+    # expensive operation on this path, so it is memoised rather than run per call.
+    def resources_route_name
+      @resources_route_name ||= route_name.pluralize
     end
     
     # defines a method that calls the appropriate named route method, with appropriate args.

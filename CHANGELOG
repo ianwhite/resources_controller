@@ -9,6 +9,18 @@
     previously failed, were fixed
   * development setup no longer needs Gemfile.lock.development: run bundle install
   * CI moved from Travis to GitHub Actions, testing Ruby 3.3, 3.4 and 4.0 against Rails 8.0 and 8.1
+  * ResourceService#respond_to? now reports the proxy's own methods - it always returned false for
+    them, because a BasicObject has no #respond_to? for it to fall back on
+  * named route helpers are exposed through #respond_to_missing? rather than by overriding #respond_to?
+  * route_name.pluralize is memoised per controller: inflection was the most expensive operation on
+    the named route helper path
+  * lib is now frozen_string_literal: true
+  * removed the dead Rails 2 find_filter branch, spec/verify_rcov.rb, and the Rakefile's rake/rdoctask
+    fallback
+  * removed the spec:make_test_app / spec:rspec_generated_specs tasks: they generated a Rails 2-5 era
+    app and could no longer run
+  * gem packaging: added the MIT license and gem metadata, dropped the stale rubygems_version, and
+    s.files no longer ships the specs, CI config and other development files
   * require Rails >= 8.0 and Ruby >= 3.3, dropping support for older versions
 
 = 4.0.0

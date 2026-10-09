@@ -43,8 +43,7 @@ To get set up for development, do the following:
   git clone git://github.com/ianwhite/resources_controller
   cd resources_controller
   bundle install
-  rake spec
-  rake spec:rspec_generated_specs
+  bundle exec rspec
 
 The specs are run against Rails 8.0 and 8.1 on GitHub Actions.  To run them against a
 particular Rails version locally, set RAILS_VERSION:

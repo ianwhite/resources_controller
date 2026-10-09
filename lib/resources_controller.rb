@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'resources_controller/active_record/saved'
 require 'resources_controller/railtie' if defined?(Rails)
 
@@ -506,11 +508,7 @@ module ResourcesController
 
 private
   def load_enclosing_resources_filter_exists?
-    if respond_to?(:find_filter) # BC 2.0-stable branch
-      find_filter(:load_enclosing_resources)
-    else
-      _process_action_callbacks.detect {|c| c.filter == :load_enclosing_resources}
-    end
+    _process_action_callbacks.any? {|c| c.filter == :load_enclosing_resources}
   end
 
   module ClassMethods
@@ -560,7 +558,7 @@ private
     attr_writer :resource_service
 
     def name_prefix
-      @name_prefix ||= ''
+      @name_prefix ||= +''
     end
 
     # name of the singular resource
@@ -736,7 +734,7 @@ private
     # Empty prefixes are a no-op, but @name_prefix is always left as a String once
     # this has been called, so that #name_prefix never has to cope with nil.
     def update_name_prefix(prefix)
-      @name_prefix ||= ''
+      @name_prefix ||= +''
       return if prefix.nil? || prefix.empty?
       @name_prefix = "#{@name_prefix}#{prefix}"
     end
@@ -745,6 +743,11 @@ private
   # Proxy class to provide a consistent API for resource_service.  This is mostly
   # required for Singleton resources. Also allows decoration of the resource service with custom finders
   class ResourceService < BasicObject
+    # BasicObject has no #respond_to?, so #respond_to? below has no superclass method
+    # to fall back on to find the proxy's own methods - they have to be listed here.
+    PROXY_METHODS = [:controller, :service, :find, :new, :destroy,
+                     :resource_specification, :resource_class, :enclosing_resource].freeze
+
     attr_reader :controller
     delegate :resource_specification, :resource_class, :enclosing_resource, :to => :controller
 
@@ -783,7 +786,7 @@ private
     end
 
     def respond_to?(method, include_private = false)
-      super || service.respond_to?(method)
+      PROXY_METHODS.include?(method.to_sym) || service.respond_to?(method, include_private)
     end
 
     def service

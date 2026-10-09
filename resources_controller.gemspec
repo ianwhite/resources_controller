@@ -14,14 +14,19 @@ Gem::Specification.new do |s|
   s.homepage    = "http://github.com/ianwhite/resources_controller"
   s.summary     = "resources_controller-#{version}"
   s.description = "rc makes RESTful controllers fun"
+  s.license     = "MIT"
 
-  s.rubygems_version   = "2.0.3"
-
-  s.files            = `git ls-files`.split("\n")
-  s.test_files       = `git ls-files -- {spec}/*`.split("\n")
+  s.files            = Dir["lib/**/*.rb", "CHANGELOG", "MIT-LICENSE", "README.rdoc"]
   s.extra_rdoc_files = [ "README.rdoc" ]
   s.rdoc_options     = ["--charset=UTF-8"]
   s.require_path     = "lib"
+
+  s.metadata = {
+    "source_code_uri"       => "https://github.com/ianwhite/resources_controller",
+    "changelog_uri"         => "https://github.com/ianwhite/resources_controller/blob/master/CHANGELOG",
+    "bug_tracker_uri"       => "https://github.com/ianwhite/resources_controller/issues",
+    "rubygems_mfa_required" => "true"
+  }
 
   s.add_runtime_dependency "rails", '>= 8.0'
   s.add_development_dependency "rspec", '>= 3'

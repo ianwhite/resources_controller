@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ResourcesController
   # Often it won't be appropriate to reuse views, but
   # sometimes it is.  These helper methods enable reuse by referencing whatever resource the 
@@ -88,8 +90,8 @@ module ResourcesController
     end
 
     # delegate url help method creation to the controller
-    def respond_to?(*args)
-      super(*args) || controller.resource_named_route_helper_method?(args.first)
+    def respond_to_missing?(method, include_private = false)
+      controller.resource_named_route_helper_method?(method) || super
     end
   
   private

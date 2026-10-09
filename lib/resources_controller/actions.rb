@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ResourcesController
   # standard CRUD actions, with html and json responses, re-written to mnake best use of resources_cotroller.
   # This helps if you're writing controllers that you want to share via mixin or inheritance.

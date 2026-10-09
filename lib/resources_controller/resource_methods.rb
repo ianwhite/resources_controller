@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ResourcesController
   # methods which communicate with the resource_service to find/create resources
   module ResourceMethods

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ResourcesController
   # This class holds all the info that is required to find a resource, or determine a name prefix, based on a route segment
   # or segment pair (e.g. /blog or /users/3).
@@ -52,7 +54,7 @@ module ResourcesController
       plural       = name.pluralize
       @segment     = (options[:segment] && options[:segment].to_s) || plural
       @source      = (options[:source] && options[:source].to_s) || plural
-      @name_prefix = options[:name_prefix] || (options[:name_prefix] == false ? '' : "#{name}_")
+      @name_prefix = options[:name_prefix] || (options[:name_prefix] == false ? +'' : "#{name}_")
       @klass       = options[:class] || infer_class
       @key         = (options[:key] && options[:key].to_s) || name.foreign_key
       @as          = options[:as]
