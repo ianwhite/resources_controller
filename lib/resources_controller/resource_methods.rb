@@ -30,12 +30,16 @@ module ResourcesController
     end
 
 
+    EXCLUDED_PARAM_COLUMNS = %w[updated_at created_at].freeze
+
     # Never trust parameters from the scary internet, only allow the white list through.
     def resource_params
-      if self.respond_to?("#{resource_name}_params", true)
-        return self.send("#{resource_name}_params")
+      method_name = "#{resource_name}_params"
+      if respond_to?(method_name, true)
+        send(method_name)
       else
-        return params.fetch(resource_name, {}).permit( *(resource_service.content_columns.map(&:name) - [ 'updated_at', 'created_at' ]) )
+        columns = resource_service.content_columns.map(&:name) - EXCLUDED_PARAM_COLUMNS
+        params.fetch(resource_name) { {} }.permit(*columns)
       end
     end
   

@@ -102,7 +102,7 @@ module ResourcesController
         options[:url] ||= if resource.new_record?
           controller.resource_specification.singleton? ? resource_path(*args) : resources_path(*args)
         else
-          controller.resource_specification.singleton? ? resource_path(*args) : resource_path(*([resource] + args))
+          controller.resource_specification.singleton? ? resource_path(*args) : resource_path(resource, *args)
         end
       end
     end

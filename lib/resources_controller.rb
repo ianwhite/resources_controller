@@ -557,9 +557,7 @@ private
 
   module InstanceMethods
 
-    def resource_service=(service)
-      @resource_service = service
-    end
+    attr_writer :resource_service
 
     def name_prefix
       @name_prefix ||= ''
@@ -582,23 +580,23 @@ private
 
     # returns the controller's current resource.
     def resource
-      instance_variable_get("@#{resource_name}")
+      instance_variable_get(resource_specification.ivar_name)
     end
 
     # sets the controller's current resource, and
     # decorates the object with a save hook, so we know if it's been saved
     def resource=(record)
-      instance_variable_set("@#{resource_name}", record)
+      instance_variable_set(resource_specification.ivar_name, record)
     end
 
     # returns the controller's current resources collection
     def resources
-      instance_variable_get("@#{resources_name}")
+      instance_variable_get(resource_specification.collection_ivar_name)
     end
 
     # sets the controller's current resource collection
     def resources=(collection)
-      instance_variable_set("@#{resources_name}", collection)
+      instance_variable_set(resource_specification.collection_ivar_name, collection)
     end
 
     # returns the immediately enclosing resource
@@ -607,9 +605,7 @@ private
     end
 
     # returns the name of the immediately enclosing resource
-    def enclosing_resource_name
-      @enclosing_resource_name
-    end
+    attr_reader :enclosing_resource_name
 
     # returns the resource service for the controller - this will be lazilly created
     # to a ResourceService, or a SingletonResourceService (if :singleton => true)
@@ -663,10 +659,12 @@ private
     def load_enclosing_resources
       namespace_segments.each {|segment| update_name_prefix("#{segment}_") }
       specifications.each_with_index do |spec, idx|
-        case spec
-          when '*' then load_wildcards_from(idx)
-          when /\A\?(.*)/ then load_wildcard($1)
-          else load_enclosing_resource_from_specification(spec)
+        if spec == '*'
+          load_wildcards_from(idx)
+        elsif spec.is_a?(String) && spec.start_with?('?')
+          load_wildcard(spec[1..])
+        else
+          load_enclosing_resource_from_specification(spec)
         end
       end
     end
@@ -700,7 +698,7 @@ private
       encls = nesting_segments.slice(enclosing_resources.size..-1)
 
       if spec = specs.find {|s| s.is_a?(Specification)}
-        spec_seg = encls.index({:segment => spec.segment, :singleton => spec.singleton?}) or ResourcesController.raise_resource_mismatch(self)
+        spec_seg = encls.index {|e| e[:segment] == spec.segment && e[:singleton] == spec.singleton?} or ResourcesController.raise_resource_mismatch(self)
         number_of_wildcards = spec_seg - (specs.index(spec) -1)
       else
         number_of_wildcards = encls.length - (specs.length - 1)
@@ -721,7 +719,7 @@ private
       update_name_prefix(options[:name_prefix] || (options[:name_prefix] == false ? '' : "#{name}_"))
       enclosing_resources << resource
       enclosing_collection_resources << resource unless options[:is_singleton]
-      instance_variable_set("@enclosing_resource_name", options[:name])
+      instance_variable_set(:@enclosing_resource_name, options[:name])
       instance_variable_set("@#{name}", resource)
       instance_variable_set("@#{options[:as]}", resource) if options[:as]
     end
@@ -730,6 +728,7 @@ private
     # which route the controller was invoked by.  The resource specifications build
     # up the name prefix as the resources are loaded.
     def update_name_prefix(name_prefix)
+      return if name_prefix.nil? || name_prefix.empty?
       @name_prefix = "#{@name_prefix}#{name_prefix}"
     end
   end

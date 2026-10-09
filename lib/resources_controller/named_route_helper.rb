@@ -56,9 +56,9 @@ module ResourcesController
       return false unless method_str.end_with?('_path', '_url')
 
       if method_str.include?('enclosing_resource')
-        _, route_method = *route_and_method_from_enclosing_resource_method_and_name_prefix(method_str, name_prefix)
+        _, route_method = route_and_method_from_enclosing_resource_method_and_name_prefix(method_str, name_prefix)
       elsif method_str.include?('resource')
-        _, route_method = *route_and_method_from_resource_method_and_name_prefix(method_str, name_prefix)
+        _, route_method = route_and_method_from_resource_method_and_name_prefix(method_str, name_prefix)
       else
         return false
       end
@@ -88,10 +88,11 @@ generated name_prefix is '#{name_prefix}'
       if enclosing_resource
         enclosing_route = name_prefix.delete_suffix('_')
         method_str = method.to_s
-        substitution = method_str.include?('enclosing_resources') ? enclosing_route.pluralize : enclosing_route
-        route_method = method_str.sub(method_str.include?('enclosing_resources') ? 'enclosing_resources' : 'enclosing_resource', substitution)
-        route_key = route_method.delete_suffix('_path').delete_suffix('_url')
-        return [Rails.application.routes.named_routes.get(route_key.to_sym), route_method]
+        is_plural = method_str.include?('enclosing_resources')
+        substitution = is_plural ? enclosing_route.pluralize : enclosing_route
+        route_method = method_str.sub(is_plural ? 'enclosing_resources' : 'enclosing_resource', substitution)
+        route_key = route_method.end_with?('_path') ? route_method.delete_suffix('_path') : route_method.delete_suffix('_url')
+        [Rails.application.routes.named_routes.get(route_key.to_sym), route_method]
       else
         raise NoMethodError, "Tried to map :#{method} but there is no enclosing_resource for this controller"
       end
@@ -101,9 +102,10 @@ generated name_prefix is '#{name_prefix}'
     # return the [route, route_method]  for the expanded resource
     def route_and_method_from_resource_method_and_name_prefix(method, name_prefix)
       method_str = method.to_s
-      replacement = method_str.include?('resources_') ? "#{name_prefix}#{route_name.pluralize}" : "#{name_prefix}#{route_name}"
-      route_method = method_str.sub(method_str.include?('resources_') ? 'resources' : 'resource', replacement)
-      route_key = route_method.delete_suffix('_path').delete_suffix('_url')
+      is_resources = method_str.include?('resources_')
+      replacement = "#{name_prefix}#{is_resources ? route_name.pluralize : route_name}"
+      route_method = method_str.sub(is_resources ? 'resources' : 'resource', replacement)
+      route_key = route_method.end_with?('_path') ? route_method.delete_suffix('_path') : route_method.delete_suffix('_url')
       [Rails.application.routes.named_routes.get(route_key.to_sym), route_method]
     end
     
@@ -126,8 +128,8 @@ generated name_prefix is '#{name_prefix}'
     def define_resource_named_route_helper_method_for_name_prefix(method)
       method_str = method.to_s
       resource_method, name_prefix = method_str.split('_for_', 2)
-      if resource_method.match?(/enclosing_resource/)
-        route, route_method = *route_and_method_from_enclosing_resource_method_and_name_prefix(resource_method, name_prefix)
+      if resource_method.include?('enclosing_resource')
+        route, route_method = route_and_method_from_enclosing_resource_method_and_name_prefix(resource_method, name_prefix)
         required_args = (route.segment_keys - [:format, :locale]).size
 
         self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
@@ -135,22 +137,22 @@ generated name_prefix is '#{name_prefix}'
             options = args.extract_options!
             options.merge!(default_url_options)
             args = args.size < #{required_args} ? enclosing_collection_resources + args : enclosing_collection_resources - [enclosing_resource] + args
-            args = args + [options] if options.size > 0
+            args << options unless options.empty?
             send :#{route_method}, *args
           end
         end_eval
 
       else
-        route, route_method = *route_and_method_from_resource_method_and_name_prefix(resource_method, name_prefix)
+        route, route_method = route_and_method_from_resource_method_and_name_prefix(resource_method, name_prefix)
         required_args = (route.segment_keys - [:format, :locale]).size
 
         self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
           def #{method}(*args)
             options = args.extract_options!
             options.merge!(default_url_options)
-            #{"args = [resource] + args if enclosing_collection_resources.size + args.size < #{required_args}" if required_args > 0}
-            args = args + [options] if options.size > 0
-            send :#{route_method}, *(enclosing_collection_resources + args)
+            #{"args.unshift(resource) if enclosing_collection_resources.size + args.size < #{required_args}" if required_args > 0}
+            args << options unless options.empty?
+            send :#{route_method}, *enclosing_collection_resources, *args
           end
         end_eval
       end
