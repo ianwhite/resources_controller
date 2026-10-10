@@ -1,5 +1,11 @@
 = 5.0.0
   * performance optimizations across routing helpers, request introspection, and instance variable access
+  * renamed the internal RequestPathIntrospection#request_path to #rc_request_path: a route like
+    `resources :requests` generates a named route helper called request_path, which is included into
+    controllers after resources_controller's modules, and so replaced resources_controller's own method
+    (breaking enclosing resource detection).  Overriding #request_path to customise the path will no
+    longer work - use the documented :resource_path param, or override #rc_request_path (reported by
+    Robert Thau in #3)
   * the instance variable read/written by #resource and #resources is now the one named by the resource
     specification.  This means overriding #resource_name / #resources_name no longer changes which
     instance variable those accessors use

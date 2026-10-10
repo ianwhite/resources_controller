@@ -15,67 +15,87 @@ module RequestPathIntrospectionSpec
       allow(@controller).to receive(:request).and_return(double('request', :path => '/forums'))
     end
     
-    describe "#request_path" do
+    describe "#rc_request_path" do
       it "should default to request.path" do
-        expect(@controller.send(:request_path)).to eq('/forums')
+        expect(@controller.send(:rc_request_path)).to eq('/forums')
       end
       
       it " should be params[:resource_path], when set" do
         @controller.params[:resource_path] = '/foo'
-        expect(@controller.send(:request_path)).to eq('/foo')
+        expect(@controller.send(:rc_request_path)).to eq('/foo')
       end
     end
     
     describe "#nesting_request_path" do
       it "should remove the controller_name segment" do
-        allow(@controller).to receive(:request_path).and_return('/users/1/forums/2')
+        allow(@controller).to receive(:rc_request_path).and_return('/users/1/forums/2')
         expect(@controller.send(:nesting_request_path)).to eq('/users/1')
       end
       
       it "when resource_specification present, would remove that segment" do
         allow(@controller).to receive(:resource_specification).and_return(ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :segment => 'foromas'))
-        allow(@controller).to receive(:request_path).and_return('/users/1/foromas/2')
+        allow(@controller).to receive(:rc_request_path).and_return('/users/1/foromas/2')
         expect(@controller.send(:nesting_request_path)).to eq('/users/1')
       end
       
       it "should remove only the controller_name segment, when nesting is same name" do
-        allow(@controller).to receive(:request_path).and_return('/forums/1/forums/2')
+        allow(@controller).to receive(:rc_request_path).and_return('/forums/1/forums/2')
         expect(@controller.send(:nesting_request_path)).to eq('/forums/1')
       end
 
       it "should remove the controller_name segment, even when id matches controller name" do
-        allow(@controller).to receive(:request_path).and_return('/forums/1/forums/forums.atom')
+        allow(@controller).to receive(:rc_request_path).and_return('/forums/1/forums/forums.atom')
         expect(@controller.send(:nesting_request_path)).to eq('/forums/1')
       end
 
       it "should remove only the controller_name segment even when nesting is same name" do
         allow(@controller).to receive(:resource_specification).and_return(ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :singleton => true))
-        allow(@controller).to receive(:request_path).and_return('/users/1/forum/forum.atom')
+        allow(@controller).to receive(:rc_request_path).and_return('/users/1/forum/forum.atom')
         expect(@controller.send(:nesting_request_path)).to eq('/users/1/forum')
       end
 
       it "should match the current segment literally, when it contains regexp characters" do
         allow(@controller).to receive(:resource_specification).and_return(ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :segment => 'v1.0'))
-        allow(@controller).to receive(:request_path).and_return('/v1X0/2')
+        allow(@controller).to receive(:rc_request_path).and_return('/v1X0/2')
         expect(@controller.send(:nesting_request_path)).to eq('/v1X0/2')
       end
       
       it "should remove any controller namespace" do
         allow(@controller).to receive(:controller_path).and_return('some/name/space/forums')
-        allow(@controller).to receive(:request_path).and_return('/some/name/space/users/1/secret/forums')
+        allow(@controller).to receive(:rc_request_path).and_return('/some/name/space/users/1/secret/forums')
         expect(@controller.send(:nesting_request_path)).to eq('/users/1/secret')
       end
     end
+
+    describe "when a named route helper called request_path is in the controller" do
+      # `resources :requests` defines a public request_path helper, and Rails includes the
+      # url_helpers module into controllers after resources_controller's modules, so the
+      # helper wins the name lookup.  resources_controller must not depend on that name.
+      before do
+        shadow = Module.new do
+          def request_path(*)
+            raise "resources_controller called the route helper instead of reading the request path"
+          end
+        end
+        @klass.send(:include, shadow)
+      end
+
+      it "should still read the path of the request" do
+        allow(@controller.request).to receive(:path).and_return('/users/1/forums')
+        expect(@controller.send(:rc_request_path)).to eq('/users/1/forums')
+        expect(@controller.send(:nesting_request_path)).to eq('/users/1')
+      end
+    end
     
-    it "#namespace_segments should return [] segments if NOT present in request_path" do
+    it "#namespace_segments should return [] segments if NOT present in rc_request_path" do
       allow(@controller).to receive(:controller_path).and_return('some/name/space/forums')
-      allow(@controller).to receive(:request_path).and_return('/SAM/name/space/users/1/secret/forums')
+      allow(@controller).to receive(:rc_request_path).and_return('/SAM/name/space/users/1/secret/forums')
       expect(@controller.send(:namespace_segments)).to eq([])
     end
     
-    it "#namespace_segments should return namespace segments if present in request_path" do
+    it "#namespace_segments should return namespace segments if present in rc_request_path" do
       allow(@controller).to receive(:controller_path).and_return('some/name/space/forums')
-      allow(@controller).to receive(:request_path).and_return('/some/name/space/users/1/secret/forums')
+      allow(@controller).to receive(:rc_request_path).and_return('/some/name/space/users/1/secret/forums')
       expect(@controller.send(:namespace_segments)).to eq(['some', 'name', 'space'])
     end
     

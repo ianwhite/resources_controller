@@ -7,12 +7,17 @@ module ResourcesController
   # these methods are aware of resource specifications specified either by map_enclosing_resource.
   module RequestPathIntrospection
   protected
-    def request_path
-      @request_path ||= params[:resource_path] || request.path
+    # NOTE: this is deliberately not called #request_path.  A route like
+    # `resources :requests` generates a named route helper called request_path, and the
+    # url_helpers module is included into the controller after this one, so it wins the
+    # name lookup - resources_controller would then read the helper's value instead of
+    # the path of the current request.  See spec/lib/request_path_introspection_spec.rb.
+    def rc_request_path
+      @rc_request_path ||= params[:resource_path] || request.path
     end
     
     def nesting_request_path
-      @nesting_request_path ||= remove_namespace(remove_current_segment(request_path))
+      @nesting_request_path ||= remove_namespace(remove_current_segment(rc_request_path))
     end
     
     # returns an array of hashes like {:segment => 'forum', :singleton => false}
@@ -29,7 +34,7 @@ module ResourcesController
         @namespace_segments = if namespace.empty?
           []
         else
-          request_path.start_with?("/#{namespace}") ? namespace.split('/') : []
+          rc_request_path.start_with?("/#{namespace}") ? namespace.split('/') : []
         end
       end
       @namespace_segments

@@ -21,7 +21,7 @@ describe "ResourcesController#enclosing_resource_name" do
     @controller = TagsController.new
     info = mock_model(Info, :tags => [])
     allow(@controller).to receive(:current_user).and_return(mock_model(User, :info => info))
-    allow(@controller).to receive(:request_path).and_return('/account/info/tags')
+    allow(@controller).to receive(:rc_request_path).and_return('/account/info/tags')
     allow(@controller).to receive(:params).and_return({})
     @controller.send :load_enclosing_resources
   end
