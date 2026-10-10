@@ -74,6 +74,7 @@ The following people have made contributions to resources_controller.  Please le
 * Tim Pope
 * Tom ten Thij
 * Sergei Serdyuk
+* Robert Thau
 
 ## License
 
