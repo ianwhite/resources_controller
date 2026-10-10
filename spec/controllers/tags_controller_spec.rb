@@ -8,7 +8,7 @@ describe TagsController do
       allow(@tag).to receive(:to_param).and_return('2')
       allow(Tag).to receive(:find).and_return(@tag)
     
-      allow(@controller).to receive(:request_path).and_return('/tags/2')
+      allow(@controller).to receive(:rc_request_path).and_return('/tags/2')
       get :show, params: { :id => "2" }
     end
   
@@ -66,7 +66,7 @@ describe TagsController do
     end
   
     def do_get
-      allow(@controller).to receive(:request_path).and_return('/tags/index')
+      allow(@controller).to receive(:rc_request_path).and_return('/tags/index')
       get :index
     end
 

@@ -26,7 +26,7 @@ describe TagsController do
       allow(@tag).to receive(:to_param).and_return('3')
       allow(@post_tags).to receive(:find).and_return(@tag)
     
-      allow(@controller).to receive(:request_path).and_return('/forums/1/posts/1/tags/3')
+      allow(@controller).to receive(:rc_request_path).and_return('/forums/1/posts/1/tags/3')
       get :show, params: { :forum_id => "1", :post_id => "2", :id => "3" }
     end
   
@@ -68,7 +68,7 @@ describe TagsController do
       @other_post  = Post.create :forum_id => @forum.id
       @other_tag   = Tag.create :taggable_id => @other_post.id, :taggable_type => 'Post'
     
-      allow(@controller).to receive(:request_path).and_return("/forums/:id/posts/:id/tags")
+      allow(@controller).to receive(:rc_request_path).and_return("/forums/:id/posts/:id/tags")
       get :index, params: { :forum_id => @forum.id, :post_id => @post.id }
       @resource_service = controller.send :resource_service
     end
@@ -105,7 +105,7 @@ describe TagsController do
     end
   
     def do_get
-      allow(@controller).to receive(:request_path).and_return("/forums/1/posts/2/tags")
+      allow(@controller).to receive(:rc_request_path).and_return("/forums/1/posts/2/tags")
       get :index, params: { :forum_id => '1', :post_id => '2' }
     end
 
