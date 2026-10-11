@@ -11,8 +11,9 @@ module RequestPathIntrospectionSpec
       @controller = @klass.new
       allow(@controller).to receive(:controller_name).and_return('forums')
       allow(@controller).to receive(:controller_path).and_return('forums')
-      allow(@controller).to receive(:params).and_return({})
-      allow(@controller).to receive(:request).and_return(double('request', :path => '/forums'))
+      @request = ActionDispatch::TestRequest.create
+      @request.path = '/forums'
+      allow(@controller).to receive(:request).and_return(@request)
     end
     
     describe "#rc_request_path" do
@@ -20,9 +21,58 @@ module RequestPathIntrospectionSpec
         expect(@controller.send(:rc_request_path)).to eq('/forums')
       end
       
-      it " should be params[:resource_path], when set" do
-        @controller.params[:resource_path] = '/foo'
-        expect(@controller.send(:rc_request_path)).to eq('/foo')
+      it "should honor a route-defined resource_path alias" do
+        @request.path = '/'
+        @request.path_parameters = Rails.application.routes.recognize_path('/', :method => :get)
+
+        expect(@controller.send(:rc_request_path)).to eq('/forums')
+      end
+
+      it "should honor a route-defined alias over query parameters" do
+        @request = ActionDispatch::Request.new(Rack::MockRequest.env_for(
+          '/create_forum?resource_path=%2Ftags'
+        ))
+        @request.path_parameters = Rails.application.routes.recognize_path('/create_forum', :method => :get)
+        allow(@controller).to receive(:request).and_return(@request)
+
+        expect(@controller.send(:rc_request_path)).to eq('/forums')
+      end
+
+      it "should ignore query parameters that remove the enclosing resource" do
+        @request = ActionDispatch::Request.new(Rack::MockRequest.env_for(
+          '/account/forums/123.json?resource_path=%2Fforums'
+        ))
+        allow(@controller).to receive(:request).and_return(@request)
+
+        expect(@controller.params[:resource_path]).to eq('/forums')
+        expect(@controller.send(:rc_request_path)).to eq('/account/forums/123.json')
+        expect(@controller.send(:nesting_request_path)).to eq('/account')
+      end
+
+      it "should ignore body parameters that remove the enclosing resource" do
+        @request = ActionDispatch::Request.new(Rack::MockRequest.env_for(
+          '/account/forums/123.json', :method => 'POST', :input => 'resource_path=%2Fforums',
+          'CONTENT_TYPE' => 'application/x-www-form-urlencoded'
+        ))
+        allow(@controller).to receive(:request).and_return(@request)
+
+        expect(@controller.params[:resource_path]).to eq('/forums')
+        expect(@controller.send(:rc_request_path)).to eq('/account/forums/123.json')
+        expect(@controller.send(:nesting_request_path)).to eq('/account')
+      end
+
+      it "should memoize the request path fallback" do
+        expect(@controller.send(:rc_request_path)).to eq('/forums')
+        @request.path = '/tags'
+        expect(@controller.send(:rc_request_path)).to eq('/forums')
+      end
+
+      it "should memoize the route-defined alias" do
+        @request.path_parameters[:resource_path] = '/forums'
+        expect(@controller.send(:rc_request_path)).to eq('/forums')
+        @request.path_parameters[:resource_path] = '/tags'
+        @controller.params[:resource_path] = '/tags'
+        expect(@controller.send(:rc_request_path)).to eq('/forums')
       end
     end
     

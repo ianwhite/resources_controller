@@ -150,9 +150,12 @@ end_str
     #end
   end
 
-  describe ForumsController, " requesting garbage url" do
-    it "should raise ResourcesController::Specification::NoClassFoundError" do
-      expect { get :index, params: { :resource_path => "/forums/\ncrayzeee" } }.to raise_error(ResourcesController::Specification::NoClassFoundError)
+  describe ForumsController, " requesting a garbage resource_path parameter" do
+    it "should ignore the parameter and find forums" do
+      get :index, params: { :resource_path => "/forums/\ncrayzeee" }
+
+      expect(response).to have_http_status(:ok)
+      expect(assigns[:forums]).to eq(Forum.all)
     end
   end
 
