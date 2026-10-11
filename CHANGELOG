@@ -1,3 +1,10 @@
+= 5.0.2
+  * read :resource_path aliases only from request.path_parameters, preventing query and body parameters
+    from removing enclosing resources and bypassing the current user's scoped association.  Route-defined
+    aliases, request.path fallback and memoization are preserved
+  * add regression coverage for query/body overrides, scoped resource lookup and deletion, route-defined
+    aliases and request path memoization
+
 = 5.0.1
   * renamed the internal RequestPathIntrospection#request_path to #rc_request_path: a route like
     `resources :requests` generates a named route helper called request_path, which is included into

@@ -27,9 +27,15 @@ describe AccountsController do
     end    
   end
 
-  describe AccountsController, " requesting garbage url" do
-    it "should raise ResourcesController::Specification::NoClassFoundError" do
-      expect { get :show, params: { :resource_path => "/crayzeee" }}.to raise_error(ResourcesController::Specification::NoClassFoundError)
+  describe AccountsController, " requesting a garbage resource_path parameter" do
+    include AccountsControllerSpecHelper
+
+    it "should ignore the parameter and find the current user" do
+      setup_mocks
+      get :show, params: { :resource_path => "/crayzeee" }
+
+      expect(response).to have_http_status(:ok)
+      expect(assigns[:account]).to eq(@current_user)
     end
   end
   

@@ -13,7 +13,7 @@ module ResourcesController
     # name lookup - resources_controller would then read the helper's value instead of
     # the path of the current request.  See spec/lib/request_path_introspection_spec.rb.
     def rc_request_path
-      @rc_request_path ||= params[:resource_path] || request.path
+      @rc_request_path ||= request.path_parameters[:resource_path] || request.path
     end
     
     def nesting_request_path
