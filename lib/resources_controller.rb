@@ -755,20 +755,20 @@ private
       @controller = controller
     end
 
-    def method_missing(method, *args, **kwargs, &block)
-      service.__send__(method, *args, **kwargs, &block)
+    def method_missing(method, ...)
+      service.__send__(method, ...)
     end
 
-    def find(*args, **kwargs, &block)
+    def find(...)
       resource_specification.find ? resource_specification.find_custom(controller) : super
     end
 
     # build association on the enclosing resource if there is one, otherwise call new
-    def new(*args, **kwargs, &block)
+    def new(...)
       if enclosing_resource
-        service.build(*args, **kwargs, &block)
+        service.build(...)
       else
-        service.new(*args, **kwargs, &block)
+        service.new(...)
       end
     end
 
@@ -806,11 +806,11 @@ private
     end
 
     # build association on the enclosing resource if there is one, otherwise call new
-    def new(*args, **kwargs, &block)
+    def new(...)
       if enclosing_resource
-        enclosing_resource.send("build_#{resource_specification.source}", *args, **kwargs, &block)
+        enclosing_resource.send("build_#{resource_specification.source}", ...)
       else
-        service.new(*args, **kwargs, &block)
+        service.new(...)
       end
     end
 
