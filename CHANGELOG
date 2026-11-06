@@ -1,3 +1,7 @@
+= 5.0.3
+  * use native argument forwarding in resource service proxies to reduce temporary allocations,
+    with regression coverage for positional hashes, keywords, blocks, and custom finders
+
 = 5.0.2
   * read :resource_path aliases only from request.path_parameters, preventing query and body parameters
     from removing enclosing resources and bypassing the current user's scoped association.  Route-defined
