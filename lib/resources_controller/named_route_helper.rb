@@ -34,16 +34,16 @@ module ResourcesController
   # methods
   module NamedRouteHelper
 
-    def method_missing(method, *args, &block)
+    def method_missing(method, ...)
       # TODO: test that methods are only defined once
-      if resource_named_route_helper_method?(method, raise_error = true) 
+      if resource_named_route_helper_method?(method, true)
         define_resource_named_route_helper_method(method)
-        send(method, *args)
+        send(method, ...)
       elsif resource_named_route_helper_method_for_name_prefix?(method)
         define_resource_named_route_helper_method_for_name_prefix(method)
-        send(method, *args)
+        send(method, ...)
       else
-        super(method, *args, &block)
+        super
       end
     end
 
@@ -52,15 +52,15 @@ module ResourcesController
     end
 
     # return true if the passed method (e.g. 'resources_path') corresponds to a defined
-    # named route helper method
+    # named route helper method (checked via respond_to? without querying named_routes)
     def resource_named_route_helper_method?(resource_method, raise_error = false)
       method_str = resource_method.to_s
       return false unless method_str.end_with?('_path', '_url')
 
       if method_str.include?('enclosing_resource')
-        _, route_method = route_and_method_from_enclosing_resource_method_and_name_prefix(method_str, name_prefix)
+        route_method = route_method_from_enclosing_resource_method_and_name_prefix(method_str, name_prefix)
       elsif method_str.include?('resource')
-        _, route_method = route_and_method_from_resource_method_and_name_prefix(method_str, name_prefix)
+        route_method = route_method_from_resource_method_and_name_prefix(method_str, name_prefix)
       else
         return false
       end
@@ -84,31 +84,42 @@ generated name_prefix is '#{name_prefix}'
       end_str
     end
     
-    # passed something like (^|.*_)enclosing_resource(s)_.*(url|path)\z, will 
-    # return the [route, route_method]  for the expanded resource
-    def route_and_method_from_enclosing_resource_method_and_name_prefix(method, name_prefix)
-      if enclosing_resource
-        enclosing_route = name_prefix.delete_suffix('_')
-        method_str = method.to_s
-        is_plural = method_str.include?('enclosing_resources')
-        substitution = is_plural ? enclosing_route.pluralize : enclosing_route
-        route_method = method_str.sub(is_plural ? 'enclosing_resources' : 'enclosing_resource', substitution)
-        route_key = route_method.end_with?('_path') ? route_method.delete_suffix('_path') : route_method.delete_suffix('_url')
-        [Rails.application.routes.named_routes.get(route_key.to_sym), route_method]
-      else
+    def route_method_from_enclosing_resource_method_and_name_prefix(method, name_prefix)
+      unless enclosing_resource
         raise NoMethodError, "Tried to map :#{method} but there is no enclosing_resource for this controller"
       end
+
+      enclosing_route = name_prefix.delete_suffix('_')
+      method_str = method.to_s
+      is_plural = method_str.include?('enclosing_resources')
+      substitution = is_plural ? enclosing_route.pluralize : enclosing_route
+      method_str.sub(is_plural ? 'enclosing_resources' : 'enclosing_resource', substitution)
     end
-    
-    # passed something like (^|.*_)resource(s)_.*(url|path)\z, will 
+
+    # passed something like (^|.*_)enclosing_resource(s)_.*(url|path)\z, will
     # return the [route, route_method]  for the expanded resource
-    def route_and_method_from_resource_method_and_name_prefix(method, name_prefix)
+    def route_and_method_from_enclosing_resource_method_and_name_prefix(method, name_prefix)
+      route_method = route_method_from_enclosing_resource_method_and_name_prefix(method, name_prefix)
+      [named_route_for_helper_method(route_method), route_method]
+    end
+
+    def route_method_from_resource_method_and_name_prefix(method, name_prefix)
       method_str = method.to_s
       is_resources = method_str.include?('resources_')
       replacement = "#{name_prefix}#{is_resources ? resources_route_name : route_name}"
-      route_method = method_str.sub(is_resources ? 'resources' : 'resource', replacement)
-      route_key = route_method.end_with?('_path') ? route_method.delete_suffix('_path') : route_method.delete_suffix('_url')
-      [Rails.application.routes.named_routes.get(route_key.to_sym), route_method]
+      method_str.sub(is_resources ? 'resources' : 'resource', replacement)
+    end
+
+    # passed something like (^|.*_)resource(s)_.*(url|path)\z, will
+    # return the [route, route_method]  for the expanded resource
+    def route_and_method_from_resource_method_and_name_prefix(method, name_prefix)
+      route_method = route_method_from_resource_method_and_name_prefix(method, name_prefix)
+      [named_route_for_helper_method(route_method), route_method]
+    end
+
+    def named_route_for_helper_method(route_method)
+      route_key = route_method.delete_suffix(route_method.end_with?('_path') ? '_path' : '_url')
+      Rails.application.routes.named_routes.get(route_key.to_sym)
     end
 
     # route_name is fixed for the life of the controller, and pluralize is the most
@@ -120,17 +131,33 @@ generated name_prefix is '#{name_prefix}'
     # defines a method that calls the appropriate named route method, with appropriate args.
     def define_resource_named_route_helper_method(method)
       self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
-        def #{method}(*args)
-          send "#{method}_for_\#{name_prefix}", *args
+        def #{method}(...)
+          if name_prefix.to_s.empty?
+            #{method}_for_(...)
+          else
+            send(:"#{method}_for_\#{name_prefix}", ...)
+          end
         end
       end_eval
     end
 
     def resource_named_route_helper_method_for_name_prefix?(method)
       method_str = method.to_s
-      return false unless method_str.include?('_for_')
+      idx = method_str.index('_for_')
+      return false unless idx
 
-      resource_named_route_helper_method?(method_str.split('_for_', 2).first)
+      resource_named_route_helper_method?(method_str[0, idx])
+    end
+
+    def extract_resource_url_options(args)
+      du_opts = default_url_options
+      if args.last.is_a?(Hash) && args.last.extractable_options?
+        options = args.pop
+        options.merge!(du_opts) unless du_opts.empty?
+        options
+      elsif !du_opts.empty?
+        du_opts.dup
+      end
     end
 
     def define_resource_named_route_helper_method_for_name_prefix(method)
@@ -142,11 +169,10 @@ generated name_prefix is '#{name_prefix}'
 
         self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
           def #{method}(*args)
-            options = args.extract_options!
-            options.merge!(default_url_options)
-            args = args.size < #{required_args} ? enclosing_collection_resources + args : enclosing_collection_resources - [enclosing_resource] + args
-            args << options unless options.empty?
-            send :#{route_method}, *args
+            options = extract_resource_url_options(args)
+            encl = args.size < #{required_args} ? enclosing_collection_resources : enclosing_collection_resources - [enclosing_resource]
+            args << options if options && !options.empty?
+            #{route_method}(*encl, *args)
           end
         end_eval
 
@@ -156,11 +182,10 @@ generated name_prefix is '#{name_prefix}'
 
         self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
           def #{method}(*args)
-            options = args.extract_options!
-            options.merge!(default_url_options)
+            options = extract_resource_url_options(args)
             #{"args.unshift(resource) if enclosing_collection_resources.size + args.size < #{required_args}" if required_args > 0}
-            args << options unless options.empty?
-            send :#{route_method}, *enclosing_collection_resources, *args
+            args << options if options && !options.empty?
+            #{route_method}(*enclosing_collection_resources, *args)
           end
         end_eval
       end

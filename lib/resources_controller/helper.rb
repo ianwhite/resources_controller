@@ -52,6 +52,7 @@ module ResourcesController
     # Calls form_for with the appropriate action and method for the resource
     #
     # resource.new_record? is used to decide between a create or update action
+    # (unless both :html[:method] and :url are provided)
     #
     # You can optionally pass a resource object, default is to use self.resource
     #
@@ -80,12 +81,12 @@ module ResourcesController
 
     # Delegate named_route helper method to the controller.  Create the delegation
     # to short circuit the method_missing call for future invocations.
-    def method_missing(method, *args, &block)
+    def method_missing(method, ...)
       if controller.resource_named_route_helper_method?(method)
         self.class.send(:delegate, method, :to => :controller)
-        controller.send(method, *args)
+        controller.send(method, ...)
       else
-        super(method, *args, &block)
+        super
       end
     end
 
@@ -96,15 +97,18 @@ module ResourcesController
   
   private
     def form_for_resource_options(resource, resource_name, options)
-      options.dup.tap do |options|
-        options[:html] ||= {}
-        options[:html][:method] ||= resource.new_record? ? :post : :put
-        options[:as] = resource_name
-        args = options[:url_options] ? [options.delete(:url_options)] : []
-        options[:url] ||= if resource.new_record?
-          controller.resource_specification.singleton? ? resource_path(*args) : resources_path(*args)
+      options.dup.tap do |opts|
+        is_new = nil
+        opts[:html] ||= {}
+        opts[:html][:method] ||= (is_new = resource.new_record?) ? :post : :put
+        opts[:as] = resource_name
+        url_options = opts[:url_options] ? opts.delete(:url_options) : nil
+        opts[:url] ||= if controller.resource_specification.singleton?
+          url_options ? resource_path(url_options) : resource_path
+        elsif is_new.nil? ? resource.new_record? : is_new
+          url_options ? resources_path(url_options) : resources_path
         else
-          controller.resource_specification.singleton? ? resource_path(*args) : resource_path(resource, *args)
+          url_options ? resource_path(resource, url_options) : resource_path(resource)
         end
       end
     end

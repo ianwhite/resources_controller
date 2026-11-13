@@ -84,6 +84,97 @@ describe "ResourcesController#update_name_prefix" do
   end
 end
 
+describe "ResourcesController::Specification" do
+  it "should keep singleton key false and compute collection_ivar_name lazily" do
+    spec = ResourcesController::Specification.new(:account, :singleton => true, :class => User)
+    expect(spec.key).to eq(false)
+    expect(spec.instance_variable_get(:@collection_ivar_name)).to be_nil
+    expect(spec.collection_ivar_name).to eq(:@accounts)
+  end
+
+  it "should treat false for :segment, :source, and :key as absent" do
+    spec = ResourcesController::Specification.new(:forum, :segment => false, :source => false, :key => false)
+    expect(spec.segment).to eq('forums')
+    expect(spec.source).to eq('forums')
+    expect(spec.klass).to eq(Forum)
+    expect(spec.key).to eq('forum_id')
+  end
+end
+
+describe "ResourcesController#add_enclosing_resource hook" do
+  it "should invoke add_enclosing_resource overrides during load_enclosing_resources" do
+    forum = Forum.create!
+    klass = Class.new(ApplicationController) do
+      resources_controller_for :posts, :in => :forum
+      attr_reader :added_enclosing
+
+      private
+
+      def add_enclosing_resource(resource, options = {})
+        (@added_enclosing ||= []) << [resource, options[:name]]
+        super
+      end
+    end
+
+    controller = klass.new
+    req = ActionDispatch::TestRequest.create
+    req.path = "/forums/#{forum.id}/posts"
+    allow(controller).to receive(:request).and_return(req)
+    allow(controller).to receive(:params).and_return(ActionController::Parameters.new(:forum_id => forum.id.to_s))
+
+    controller.send(:load_enclosing_resources)
+    expect(controller.added_enclosing).to eq([[forum, 'forum']])
+    expect(controller.instance_variable_get(:@forum)).to eq(forum)
+  end
+
+  it "should support :as on a mapped wildcard specification" do
+    account = User.create!
+    klass = Class.new(ApplicationController) do
+      resources_controller_for :tags, :in => '?taggable'
+    end
+
+    controller = klass.new
+    controller.instance_variable_set(:@current_user, account)
+    req = ActionDispatch::TestRequest.create
+    req.path = '/account/tags'
+    allow(controller).to receive(:request).and_return(req)
+    allow(controller).to receive(:params).and_return(ActionController::Parameters.new)
+
+    controller.send(:load_enclosing_resources)
+    expect(controller.instance_variable_get(:@account)).to eq(account)
+    expect(controller.instance_variable_get(:@taggable)).to eq(account)
+  end
+
+  it "should raise ResourceMismatch when nesting segments are exhausted for a specification" do
+    klass = Class.new(ApplicationController) do
+      resources_controller_for :posts, :in => :forum
+    end
+
+    controller = klass.new
+    req = ActionDispatch::TestRequest.create
+    req.path = '/posts'
+    allow(controller).to receive(:request).and_return(req)
+    allow(controller).to receive(:params).and_return(ActionController::Parameters.new)
+
+    expect { controller.send(:load_enclosing_resources) }.to raise_error(ResourcesController::ResourceMismatch)
+  end
+
+  it "should raise ResourceMismatch when wildcard lookup exhausts nesting segments" do
+    user = User.create!
+    klass = Class.new(ApplicationController) do
+      resources_controller_for :tags, :in => [:user, '?taggable', :forum]
+    end
+
+    controller = klass.new
+    req = ActionDispatch::TestRequest.create
+    req.path = "/users/#{user.id}/tags"
+    allow(controller).to receive(:request).and_return(req)
+    allow(controller).to receive(:params).and_return(ActionController::Parameters.new(:user_id => user.id.to_s))
+
+    expect { controller.send(:load_enclosing_resources) }.to raise_error(ResourcesController::ResourceMismatch)
+  end
+end
+
 describe "deprecated methods" do
   before do 
     @controller = ForumsController.new

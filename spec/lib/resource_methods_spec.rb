@@ -77,6 +77,23 @@ module ResourceMethodsSpec
         expect(@controller.send(:destroy_resource, "42")).to eq(user)
       end
     end
+
+    describe "#resource_params fallback" do
+      it "permits content columns excluding timestamps" do
+        columns = [
+          double(:name => 'login'),
+          double(:name => 'created_at'),
+          double(:name => 'updated_at')
+        ]
+        allow(User).to receive(:content_columns).and_return(columns)
+        allow(@controller).to receive(:params).and_return(
+          ActionController::Parameters.new(:user => { :login => 'alice', :created_at => '2026-01-01', :updated_at => '2026-01-02' })
+        )
+        permitted = @controller.send(:resource_params)
+        expect(permitted.permitted?).to be true
+        expect(permitted.to_h).to eq('login' => 'alice')
+      end
+    end
   end
   
   class MySingletonController < ActionController::Base

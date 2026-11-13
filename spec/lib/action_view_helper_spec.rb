@@ -115,4 +115,22 @@ describe "Helper#form_for_resource (when resource is existing record)" do
     expect(@view).to receive(:form_for).with(@resource, {:as => 'forum', :html => {:method => :put}, :url => '/forums/1'})
     @view.form_for_resource{}
   end
+
+  it 'should not call new_record? when :url and :html[:method] are both provided' do
+    custom_resource = double('CustomResource')
+    expect(custom_resource).not_to receive(:new_record?)
+    expect(@view).to receive(:form_for).with(custom_resource, {:as => 'forum', :html => {:method => :patch}, :url => '/custom'})
+    @view.form_for_resource(custom_resource, :url => '/custom', :html => {:method => :patch}) {}
+  end
+
+  it 'should forward keyword arguments and blocks when delegating named route helpers' do
+    forwarded = nil
+    allow(@controller).to receive(:edit_resource_path) do |*args, **kwargs, &block|
+      forwarded = [args, kwargs, block&.call]
+      '/forums/1/edit?tab=settings'
+    end
+
+    expect(@view.edit_resource_path(tab: 'settings') { :ok }).to eq('/forums/1/edit?tab=settings')
+    expect(forwarded).to eq([[], {:tab => 'settings'}, :ok])
+  end
 end

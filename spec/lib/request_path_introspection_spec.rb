@@ -149,7 +149,20 @@ module RequestPathIntrospectionSpec
       expect(@controller.send(:namespace_segments)).to eq(['some', 'name', 'space'])
     end
     
+    it "#namespace_segments should return a mutable empty array when controller_path matches controller_name" do
+      segments = @controller.send(:namespace_segments)
+      expect(segments).to eq([])
+      segments << 'custom'
+      expect(@controller.send(:namespace_segments)).to eq(['custom'])
+    end
+
     describe "#nesting_segments" do
+      it "should return [] without scanning params when nesting_request_path is empty" do
+        @controller.params[:user_id] = '1'
+        expect(@controller).not_to receive(:param_keys)
+        expect(@controller.send(:nesting_segments)).to eq([])
+      end
+
       describe "when params include :user_id" do
         before do
           @controller.params[:user_id] = '1'

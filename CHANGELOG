@@ -1,3 +1,17 @@
+= 5.1.0
+  * performance improvements across named route helpers, request introspection, wildcard loading,
+    form_for_resource, parameter filtering, and Specification initialization:
+    - defer Rails named route lookups in NamedRouteHelper until helper method generation, checking
+      route availability via respond_to? and replacing dynamic send calls with direct route calls
+    - extract NamedRouteHelper#extract_resource_url_options using du_opts.dup / in-place merge! and
+      forward arguments cleanly with `...` across NamedRouteHelper and Helper#method_missing
+    - scan RequestPathIntrospection path segments by index without array shifting, and simplify
+      segment_for_key / resource_params / load_wildcards_from loops to avoid temporary allocations
+    - avoid redundant #new_record? calls in Helper#form_for_resource_options and skip eager
+      pluralization / foreign_key inflection in Specification when options already supply them
+  * raise ResourceMismatch instead of NoMethodError when nesting segments are exhausted in
+    load_enclosing_resource_from_specification, and forward blocks/keywords via method_missing
+
 = 5.0.3
   * use native argument forwarding in resource service proxies to reduce temporary allocations,
     with regression coverage for positional hashes, keywords, blocks, and custom finders
