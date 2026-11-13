@@ -40,7 +40,10 @@ module ResourcesController
       if respond_to?(method_name, true)
         send(method_name)
       else
-        columns = resource_service.content_columns.map(&:name) - EXCLUDED_PARAM_COLUMNS
+        columns = resource_service.content_columns.filter_map do |c|
+          col_name = c.name
+          col_name unless EXCLUDED_PARAM_COLUMNS.include?(col_name)
+        end
         params.fetch(resource_name) { {} }.permit(*columns)
       end
     end

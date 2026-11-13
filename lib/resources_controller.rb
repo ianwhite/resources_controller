@@ -682,9 +682,11 @@ private
       segment = seg[:segment]
       singleton = seg[:singleton]
 
-      if resource_specification_map[segment]
-        spec = resource_specification_map[segment]
-        spec = spec.dup.tap {|s| s.as = as} if as
+      if (spec = resource_specification_map[segment])
+        if as
+          spec = spec.dup
+          spec.as = as
+        end
       else
         spec = Specification.new(singleton ? segment : segment.singularize, :singleton => singleton, :as => as)
       end
@@ -697,24 +699,43 @@ private
     # and how many single wildcards are prior to that.  What is left over from
     # the current route enclosing names will be the number of wildcards we need to load
     def load_wildcards_from(start)
-      specs = specifications.slice(start..-1)
-      encls = nesting_segments.slice(enclosing_resources.size..-1)
+      specs = specifications
+      segments = nesting_segments
+      encl_offset = enclosing_resources.size
 
-      if spec = specs.find {|s| s.is_a?(Specification)}
-        spec_seg = encls.index {|e| e[:segment] == spec.segment && e[:singleton] == spec.singleton?} or ResourcesController.raise_resource_mismatch(self)
-        number_of_wildcards = spec_seg - (specs.index(spec) -1)
+      spec_idx = nil
+      idx = start
+      while idx < specs.length
+        if specs[idx].is_a?(Specification)
+          spec_idx = idx
+          break
+        end
+        idx += 1
+      end
+
+      if spec_idx
+        spec = specs[spec_idx]
+        seg_idx = encl_offset
+        while seg_idx < segments.length
+          e = segments[seg_idx]
+          break if e[:segment] == spec.segment && e[:singleton] == spec.singleton?
+          seg_idx += 1
+        end
+        ResourcesController.raise_resource_mismatch(self) if seg_idx >= segments.length
+        number_of_wildcards = (seg_idx - encl_offset) - (spec_idx - start - 1)
       else
-        number_of_wildcards = encls.length - (specs.length - 1)
+        number_of_wildcards = (segments.length - encl_offset) - (specs.length - start - 1)
       end
 
       number_of_wildcards.times { load_wildcard }
     end
 
     def load_enclosing_resource_from_specification(spec)
-      spec.segment == nesting_segments[enclosing_resources.size][:segment] or ResourcesController.raise_resource_mismatch(self)
-      spec.find_from(self).tap do |resource|
-        add_enclosing_resource(resource, :name => spec.name, :name_prefix => spec.name_prefix, :is_singleton => spec.singleton?, :as => spec.as)
-      end
+      seg = nesting_segments[enclosing_resources.size]
+      (seg && spec.segment == seg[:segment]) or ResourcesController.raise_resource_mismatch(self)
+      resource = spec.find_from(self)
+      add_enclosing_resource(resource, :name => spec.name, :name_prefix => spec.name_prefix, :is_singleton => spec.singleton?, :as => spec.as)
+      resource
     end
 
     def add_enclosing_resource(resource, options = {})
@@ -722,7 +743,7 @@ private
       update_name_prefix(options[:name_prefix] || (options[:name_prefix] == false ? '' : "#{name}_"))
       enclosing_resources << resource
       enclosing_collection_resources << resource unless options[:is_singleton]
-      instance_variable_set(:@enclosing_resource_name, options[:name])
+      @enclosing_resource_name = options[:name]
       instance_variable_set(:"@#{name}", resource)
       instance_variable_set(:"@#{options[:as]}", resource) if options[:as]
     end
@@ -795,7 +816,7 @@ private
   end
 
   class SingletonResourceService < ResourceService
-    def find(*args, **kwargs)
+    def find(...)
       if resource_specification.find
         resource_specification.find_custom(controller)
       elsif controller.enclosing_resources.size > 0
@@ -814,7 +835,7 @@ private
       end
     end
 
-    def destroy(*args, **kwargs)
+    def destroy(...)
       find.destroy
     end
 

@@ -17,7 +17,7 @@ module ResourcesController
     class NoClassFoundError < NameError
     end
       
-    attr_reader :name, :source, :klass, :key, :name_prefix, :segment, :find, :ivar_name, :collection_ivar_name
+    attr_reader :name, :source, :klass, :key, :name_prefix, :segment, :find, :ivar_name
     attr_accessor :as
     
     # factory for Specification and SingletonSpecification
@@ -51,15 +51,25 @@ module ResourcesController
       options.assert_valid_keys(:class, :source, :key, :find, :name_prefix, :segment, :as)
       @name        = spec_name.to_s
       @find        = block || options.delete(:find)
-      plural       = name.pluralize
-      @segment     = (options[:segment] && options[:segment].to_s) || plural
-      @source      = (options[:source] && options[:source].to_s) || plural
-      @name_prefix = options[:name_prefix] || (options[:name_prefix] == false ? +'' : "#{name}_")
+      @segment     = options[:segment] ? options[:segment].to_s : nil
+      @source      = options[:source]  ? options[:source].to_s  : nil
+      unless @segment && @source
+        plural = @name.pluralize
+        @segment ||= plural
+        @source  ||= plural
+        @collection_ivar_name = :"@#{plural}"
+      end
+      @name_prefix = options[:name_prefix] || (options[:name_prefix] == false ? +'' : "#{@name}_")
       @klass       = options[:class] || infer_class
-      @key         = (options[:key] && options[:key].to_s) || name.foreign_key
+      @key         = singleton? ? false : (options[:key] ? options[:key].to_s : @name.foreign_key)
       @as          = options[:as]
-      @ivar_name   = :"@#{name}"
-      @collection_ivar_name = :"@#{plural}"
+      @ivar_name   = :"@#{@name}"
+    end
+
+    # returns the plural collection instance variable symbol (e.g. :@users),
+    # computed lazily when :segment and :source are both supplied
+    def collection_ivar_name
+      @collection_ivar_name ||= :"@#{name.pluralize}"
     end
 
     # returns false

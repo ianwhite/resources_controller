@@ -22,29 +22,39 @@ module ResourcesController
     
     # returns an array of hashes like {:segment => 'forum', :singleton => false}
     def nesting_segments
-      @nesting_segments ||= segments_for_path_and_keys(nesting_request_path, param_keys)
+      @nesting_segments ||= begin
+        path = nesting_request_path
+        path.empty? || path == '/' ? [] : segments_for_path_and_keys(path, param_keys)
+      end
     end
     
     # returns an array of segments correspopnding to the namespace of the controller.
     # If your controller is at a non standard location wrt it's path, you can modify this array in a before filter
     # to help resources_controller do the right thing
     def namespace_segments
-      unless @namespace_segments
-        namespace = controller_path.delete_suffix(controller_name).delete_suffix('/')
-        @namespace_segments = if namespace.empty?
+      @namespace_segments ||= begin
+        path = controller_path
+        name = controller_name
+        if path == name
           []
         else
-          rc_request_path.start_with?("/#{namespace}") ? namespace.split('/') : []
+          namespace = path.delete_suffix(name).delete_suffix('/')
+          if namespace.empty? || !rc_request_path.start_with?("/#{namespace}")
+            []
+          else
+            namespace.split('/')
+          end
         end
       end
-      @namespace_segments
     end
     
     def param_keys
-      params.each_key.filter_map do |k|
+      keys = []
+      params.each_key do |k|
         k_str = k.to_s
-        k_str if k_str.end_with?('_id')
+        keys << k_str if k_str.end_with?('_id')
       end
+      keys
     end
     
   private
@@ -77,16 +87,18 @@ module ResourcesController
     end
     
     def segments_for_path_and_keys(path, keys)
-      key_segments = keys.map{|k| segment_for_key(k)}
+      key_segments = keys.map {|k| segment_for_key(k)}
       path_segments = path.delete_prefix('/').split('/')
       segments = []
-      while path_segments.any? do
-        segment = path_segments.shift
+      i = 0
+      while i < path_segments.length
+        segment = path_segments[i]
         if key_segments.include?(segment)
           segments << {:segment => segment, :singleton => false}
-          path_segments.shift # swallow following :id
+          i += 2 # swallow following :id
         else
           segments << {:segment => segment, :singleton => true}
+          i += 1
         end
       end
       segments
@@ -94,13 +106,15 @@ module ResourcesController
     
     def segment_for_key(key)
       key_str = key.to_s
-      if respond_to?(:specifications) && spec = specifications.find{|s| s.respond_to?(:key) && s.key == key_str}
-        spec.segment
-      elsif spec = resource_specification_map.values.find{|s| s.key == key_str}
-        spec.segment
-      else
-        key_str.delete_suffix('_id').pluralize
+      if respond_to?(:specifications) && (spec = specifications.find {|s| s.respond_to?(:key) && s.key == key_str})
+        return spec.segment
       end
+
+      resource_specification_map.each_value do |spec|
+        return spec.segment if spec.key == key_str
+      end
+
+      key_str.delete_suffix('_id').pluralize
     end
   end
 end
