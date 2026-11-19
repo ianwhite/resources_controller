@@ -47,6 +47,16 @@ module ResourceMethodsSpec
         expect(user).to receive(:destroy).and_return(user)
         expect(@controller.send(:destroy_resource, "42")).to eq(user)
       end
+
+      it "#find_resource(false) and #destroy_resource(false) should fall back to params[:id]" do
+        allow(@controller).to receive(:params).and_return(ActionController::Parameters.new(:id => "99"))
+        expect(User).to receive(:find).with("99").and_return(user = double)
+        expect(@controller.send(:find_resource, false)).to eq(user)
+
+        expect(User).to receive(:find).with("99").and_return(user2 = double)
+        expect(user2).to receive(:destroy).and_return(user2)
+        expect(@controller.send(:destroy_resource, false)).to eq(user2)
+      end
     end
       
     describe "when an enclosing resource is added (a forum)" do
@@ -92,6 +102,45 @@ module ResourceMethodsSpec
         permitted = @controller.send(:resource_params)
         expect(permitted.permitted?).to be true
         expect(permitted.to_h).to eq('login' => 'alice')
+      end
+
+      it "honors an overridden resource_name when dispatching to *_params" do
+        custom_class = Class.new(ActionController::Base) do
+          resources_controller_for :users
+
+          def resource_name
+            'member'
+          end
+
+          private
+
+          def member_params
+            {:login => 'from_member_params'}
+          end
+        end
+
+        expect(custom_class.new.send(:resource_params)).to eq(:login => 'from_member_params')
+      end
+    end
+
+    describe "#new_resource params lookup" do
+      it "does not look up the same param key twice when resource_name matches model singular" do
+        params = ActionController::Parameters.new
+        expect(params).to receive(:[]).with('user').once.and_return(nil)
+        allow(@controller).to receive(:params).and_return(params)
+        expect(User).to receive(:new).with({})
+        @controller.send(:new_resource)
+      end
+
+      it "falls back to params[resource_name] when resource_name differs from model singular" do
+        custom_class = Class.new(ActionController::Base) do
+          resources_controller_for :member, :class => User
+        end
+        controller = custom_class.new
+        params = ActionController::Parameters.new(:member => {:login => 'bob'})
+        allow(controller).to receive(:params).and_return(params)
+        expect(User).to receive(:new).with(params[:member])
+        controller.send(:new_resource)
       end
     end
   end

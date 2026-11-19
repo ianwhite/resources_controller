@@ -17,6 +17,9 @@ module ResourcesController
     class NoClassFoundError < NameError
     end
       
+    VALID_OPTION_KEYS = %i[class source key find name_prefix segment as].freeze
+    SIMPLE_NAME_PATTERN = /\A[a-z0-9_]+\z/
+
     attr_reader :name, :source, :klass, :key, :name_prefix, :segment, :find, :ivar_name
     attr_accessor :as
     
@@ -48,28 +51,40 @@ module ResourcesController
     #
     # Passing a block is the same as passing :find => Proc
     def initialize(spec_name, options = {}, &block)
-      options.assert_valid_keys(:class, :source, :key, :find, :name_prefix, :segment, :as)
+      validate_option_keys(options)
       @name        = spec_name.to_s
       @find        = block || options.delete(:find)
       @segment     = options[:segment] ? options[:segment].to_s : nil
       @source      = options[:source]  ? options[:source].to_s  : nil
       unless @segment && @source
         plural = @name.pluralize
+        @plural_name = plural.dup.freeze
         @segment ||= plural
         @source  ||= plural
         @collection_ivar_name = :"@#{plural}"
       end
       @name_prefix = options[:name_prefix] || (options[:name_prefix] == false ? +'' : "#{@name}_")
       @klass       = options[:class] || infer_class
-      @key         = singleton? ? false : (options[:key] ? options[:key].to_s : @name.foreign_key)
+      @key         = singleton? ? false : (options[:key] ? options[:key].to_s : default_foreign_key)
       @as          = options[:as]
       @ivar_name   = :"@#{@name}"
+    end
+
+    # returns the frozen plural name string (e.g. 'users'),
+    # computed lazily when :segment and :source are both supplied
+    def plural_name
+      @plural_name ||= @name.pluralize.freeze
     end
 
     # returns the plural collection instance variable symbol (e.g. :@users),
     # computed lazily when :segment and :source are both supplied
     def collection_ivar_name
-      @collection_ivar_name ||= :"@#{name.pluralize}"
+      @collection_ivar_name ||= :"@#{plural_name}"
+    end
+
+    # returns the strong-parameters method symbol (e.g. :user_params), computed lazily
+    def params_method_name
+      @params_method_name ||= :"#{@name}_params"
     end
 
     # returns false
@@ -94,6 +109,20 @@ module ResourcesController
     end
   
   private
+    def validate_option_keys(options)
+      return if options.empty?
+
+      options.each_key do |k|
+        unless VALID_OPTION_KEYS.include?(k)
+          raise ArgumentError, "Unknown key: #{k.inspect}. Valid keys are: #{VALID_OPTION_KEYS.map(&:inspect).join(', ')}"
+        end
+      end
+    end
+
+    def default_foreign_key
+      SIMPLE_NAME_PATTERN.match?(@name) ? "#{@name}_id" : @name.foreign_key
+    end
+
     def infer_class
       ((source && source.classify) || name.camelize).constantize
     rescue NameError => e
@@ -109,10 +138,16 @@ module ResourcesController
     # * <tt>:source:</tt> a singular string or symbol (e.g. :blog).  This is used to find the class or association name
     # * <tt>:segment:</tt> (e.g. 'blog') the segment name in the route that is matched
     def initialize(spec_name, options = {}, &block)
-      options[:segment] ||= spec_name.to_s
-      options[:source]  ||= spec_name.to_s
+      name_str = spec_name.to_s
+      options[:segment] ||= name_str
+      options[:source]  ||= name_str
       
-      super(spec_name, options, &block)
+      super(name_str, options, &block)
+    end
+
+    # returns the association builder method symbol (e.g. :build_info), computed lazily
+    def build_method_name
+      @build_method_name ||= :"build_#{@source}"
     end
 
     # returns true

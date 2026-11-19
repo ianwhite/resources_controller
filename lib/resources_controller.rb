@@ -458,6 +458,7 @@ module ResourcesController
 
     unless included_modules.include? ResourcesController::InstanceMethods
       class_attribute :specifications, :route_name
+      class_attribute :plural_route_name, :plural_route_name_source, :instance_accessor => false
       extend  ResourcesController::ClassMethods
       helper  ResourcesController::Helper
       include ResourcesController::InstanceMethods, ResourcesController::NamedRouteHelper
@@ -481,7 +482,10 @@ module ResourcesController
     nested_in(*options.delete(:in)) if options[:in]
 
     class_attribute :resource_specification, :instance_writer => false
-    self.resource_specification = Specification.new(name, options, &block)
+    spec = Specification.new(name, options, &block)
+    self.resource_specification = spec
+    self.plural_route_name_source = self.route_name.dup.freeze
+    self.plural_route_name = ((self.route_name == spec.name && !spec.singleton?) ? spec.plural_name : self.route_name.pluralize).freeze
   end
 
   # Creates a resource specification mapping.  Use this to specify how to find an enclosing resource that
@@ -568,7 +572,7 @@ private
 
     # name of the resource collection
     def resources_name
-      @resources_name ||= resource_specification.name.pluralize
+      @resources_name ||= +resource_specification.plural_name
     end
 
     # returns the controller's resource class
@@ -662,7 +666,9 @@ private
     def load_enclosing_resources
       namespace_segments.each {|segment| update_name_prefix("#{segment}_") }
       specifications.each_with_index do |spec, idx|
-        if spec == '*'
+        if spec.is_a?(Specification)
+          load_enclosing_resource_from_specification(spec)
+        elsif spec == '*'
           load_wildcards_from(idx)
         elsif spec.is_a?(String) && spec.start_with?('?')
           load_wildcard(spec[1..])
@@ -740,7 +746,8 @@ private
 
     def add_enclosing_resource(resource, options = {})
       name = options[:name] || resource.class.name.underscore
-      update_name_prefix(options[:name_prefix] || (options[:name_prefix] == false ? '' : "#{name}_"))
+      prefix = options[:name_prefix]
+      update_name_prefix(prefix || (prefix == false ? '' : "#{name}_"))
       enclosing_resources << resource
       enclosing_collection_resources << resource unless options[:is_singleton]
       @enclosing_resource_name = options[:name]
@@ -770,10 +777,21 @@ private
                      :resource_specification, :resource_class, :enclosing_resource].freeze
 
     attr_reader :controller
-    delegate :resource_specification, :resource_class, :enclosing_resource, :to => :controller
 
     def initialize(controller)
       @controller = controller
+    end
+
+    def resource_specification
+      controller.resource_specification
+    end
+
+    def resource_class
+      controller.resource_class
+    end
+
+    def enclosing_resource
+      controller.enclosing_resource
     end
 
     def method_missing(method, ...)
@@ -781,7 +799,8 @@ private
     end
 
     def find(...)
-      resource_specification.find ? resource_specification.find_custom(controller) : super
+      spec = resource_specification
+      spec.find ? spec.find_custom(controller) : service.__send__(:find, ...)
     end
 
     # build association on the enclosing resource if there is one, otherwise call new
@@ -811,16 +830,21 @@ private
     end
 
     def service
-      @service ||= enclosing_resource ? enclosing_resource.send(resource_specification.source) : resource_class
+      @service ||= if (encl = enclosing_resource)
+        encl.send(resource_specification.source)
+      else
+        resource_class
+      end
     end
   end
 
   class SingletonResourceService < ResourceService
     def find(...)
-      if resource_specification.find
-        resource_specification.find_custom(controller)
+      spec = resource_specification
+      if spec.find
+        spec.find_custom(controller)
       elsif controller.enclosing_resources.size > 0
-        enclosing_resource.send(resource_specification.source)
+        enclosing_resource.send(spec.source)
       else
         ::ResourcesController.raise_cant_find_singleton(controller.resource_name, controller.resource_class)
       end
@@ -828,8 +852,10 @@ private
 
     # build association on the enclosing resource if there is one, otherwise call new
     def new(...)
-      if enclosing_resource
-        enclosing_resource.send("build_#{resource_specification.source}", ...)
+      if (encl = enclosing_resource)
+        spec = resource_specification
+        build_method = spec.respond_to?(:build_method_name) ? spec.build_method_name : :"build_#{spec.source}"
+        encl.send(build_method, ...)
       else
         service.new(...)
       end

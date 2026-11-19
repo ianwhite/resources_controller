@@ -11,23 +11,31 @@ module ResourcesController
 
     # finds the resource, using the passed id, defaults to the current params[:id]
     def find_resource(id = nil)
-      id ||= respond_to?(:params) && params.is_a?(ActionController::Parameters) && params[:id]
+      unless id
+        id = respond_to?(:params) && (p = params).is_a?(ActionController::Parameters) && p[:id]
+      end
       resource_service.find id
     end
 
     # makes a new resource, if attributes are not supplied, determine them from the
     # params hash and the current resource_class, or resource_name (the latter left in for BC)
-    def new_resource(attributes = nil, &block)
-      if attributes.blank? && respond_to?(:params) && params.is_a?(ActionController::Parameters)
-        resource_form_name = ActiveModel::Naming.singular(resource_class)
-        attributes = params[resource_form_name] || params[resource_name] || {}
+    def new_resource(attributes = nil, &)
+      if attributes.blank? && respond_to?(:params)
+        p = params
+        if p.is_a?(ActionController::Parameters)
+          resource_form_name = ActiveModel::Naming.singular(resource_class)
+          name = resource_name
+          attributes = p[resource_form_name] || (name == resource_form_name ? nil : p[name]) || {}
+        end
       end
-      resource_service.new attributes, &block
+      resource_service.new(attributes, &)
     end
     
     # destroys and returns the resource, using the passed id, defaults to the current params[:id]
     def destroy_resource(id = nil)
-      id ||= respond_to?(:params) && params.is_a?(ActionController::Parameters) && params[:id]
+      unless id
+        id = respond_to?(:params) && (p = params).is_a?(ActionController::Parameters) && p[:id]
+      end
       resource_service.destroy id
     end
 
@@ -36,7 +44,9 @@ module ResourcesController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def resource_params
-      method_name = "#{resource_name}_params"
+      name = resource_name
+      spec = resource_specification
+      method_name = name == spec.name ? spec.params_method_name : :"#{name}_params"
       if respond_to?(method_name, true)
         send(method_name)
       else
@@ -44,7 +54,7 @@ module ResourcesController
           col_name = c.name
           col_name unless EXCLUDED_PARAM_COLUMNS.include?(col_name)
         end
-        params.fetch(resource_name) { {} }.permit(*columns)
+        params.fetch(name) { {} }.permit(*columns)
       end
     end
   

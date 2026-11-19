@@ -21,6 +21,10 @@ module ResourceServiceForwardingSpec
     def build(attributes, validate:)
       [:build, attributes, validate, yield(:build)]
     end
+
+    def destroy(id, filters = nil, force: false)
+      [:destroy, id, filters, force]
+    end
   end
 
   Controller = Struct.new(:resource_class, :enclosing_resource, :resource_specification)
@@ -56,6 +60,26 @@ module ResourceServiceForwardingSpec
       result = proxy.find(42, filters, limit: 2) { |operation| "block #{operation}" }
 
       expect(result).to eq([:find, 42, filters, 2, 'block find'])
+    end
+
+    it "calls service.find directly without falling back to method_missing" do
+      expect(proxy).not_to receive(:method_missing)
+
+      result = proxy.find(42, filters, limit: 2) { |operation| "block #{operation}" }
+      expect(result).to eq([:find, 42, filters, 2, 'block find'])
+    end
+
+    it "invokes private #find on the underlying service and respects #controller overrides" do
+      private_find_service = Class.new do
+        private
+        def find(id); [:private_find, id]; end
+      end.new
+      alt_controller = Controller.new(private_find_service, nil, specification)
+      overriding_proxy = Class.new(ResourcesController::ResourceService) do
+        define_method(:controller) { alt_controller }
+      end.new(controller)
+
+      expect(overriding_proxy.find(7)).to eq([:private_find, 7])
     end
 
     context "with a custom finder block" do
@@ -96,6 +120,41 @@ module ResourceServiceForwardingSpec
 
         expect(result).to eq([:build, attributes, false, 'block build'])
       end
+
+      it "forwards positional and keyword arguments through destroy to both find and service.destroy without forwarding blocks" do
+        destroyed = nil
+        find_block_given = nil
+        destroy_block_given = nil
+        allow(service).to receive(:find).with(42, filters, limit: 2) do |*_a, **_kw, &blk|
+          find_block_given = !blk.nil?
+          :found_record
+        end
+        allow(service).to receive(:destroy).with(42, filters, limit: 2) do |*a, **kw, &blk|
+          destroy_block_given = !blk.nil?
+          destroyed = [a, kw]
+        end
+
+        expect(proxy.destroy(42, filters, limit: 2) { raise 'block should not be forwarded' }).to eq(:found_record)
+        expect(destroyed).to eq([[42, filters], {:limit => 2}])
+        expect(find_block_given).to eq(false)
+        expect(destroy_block_given).to eq(false)
+      end
+
+      it "respects subclass overrides of enclosing_resource and resource_specification" do
+        custom_proxy_class = Class.new(ResourcesController::ResourceService) do
+          def enclosing_resource
+            nil
+          end
+
+          def resource_specification
+            ResourcesController::Specification.new(:item, :class => Service) { :overridden_custom_find }
+          end
+        end
+
+        custom_proxy = custom_proxy_class.new(controller)
+        expect(custom_proxy.find(42)).to eq(:overridden_custom_find)
+        expect(custom_proxy.new(attributes, validate: false) { |op| "block #{op}" }).to eq([:new, attributes, false, 'block new'])
+      end
     end
 
     context "with a singleton resource service" do
@@ -115,6 +174,22 @@ module ResourceServiceForwardingSpec
           result = proxy.new(attributes, validate: false) { |operation| "block #{operation}" }
 
           expect(result).to eq([:build_item, attributes, false, 'block build_item'])
+        end
+
+        it "respects subclass overrides of enclosing_resource and resource_specification" do
+          custom_singleton_class = Class.new(ResourcesController::SingletonResourceService) do
+            def enclosing_resource
+              nil
+            end
+
+            def resource_specification
+              ResourcesController::Specification.new(:item, :singleton => true, :class => Service) { :overridden_singleton_find }
+            end
+          end
+
+          custom_proxy = custom_singleton_class.new(controller)
+          expect(custom_proxy.find).to eq(:overridden_singleton_find)
+          expect(custom_proxy.new(attributes, validate: false) { |op| "block #{op}" }).to eq([:new, attributes, false, 'block new'])
         end
       end
     end

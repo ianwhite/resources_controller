@@ -109,6 +109,50 @@ module RequestPathIntrospectionSpec
         allow(@controller).to receive(:rc_request_path).and_return('/v1X0/2')
         expect(@controller.send(:nesting_request_path)).to eq('/v1X0/2')
       end
+
+      it "should handle multibyte UTF-8 paths and consecutive matching segments" do
+        allow(@controller).to receive(:rc_request_path).and_return('/café/forums/2')
+        expect(@controller.send(:nesting_request_path)).to eq('/café')
+
+        @controller.instance_variable_set(:@nesting_request_path, nil)
+        allow(@controller).to receive(:rc_request_path).and_return('/日本語/forums')
+        expect(@controller.send(:nesting_request_path)).to eq('/日本語')
+
+        @controller.instance_variable_set(:@nesting_request_path, nil)
+        allow(@controller).to receive(:rc_request_path).and_return('/ééééé/forums')
+        expect(@controller.send(:nesting_request_path)).to eq('/ééééé')
+
+        @controller.instance_variable_set(:@nesting_request_path, nil)
+        allow(@controller).to receive(:rc_request_path).and_return('/日本語/forums/forums')
+        expect(@controller.send(:nesting_request_path)).to eq('/日本語')
+
+        @controller.instance_variable_set(:@nesting_request_path, nil)
+        allow(@controller).to receive(:rc_request_path).and_return('/forums/forums/forums')
+        expect(@controller.send(:nesting_request_path)).to eq('/forums')
+
+        @controller.instance_variable_set(:@nesting_request_path, nil)
+        allow(@controller).to receive(:resource_specification).and_return(ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :segment => 'a/a'))
+        allow(@controller).to receive(:rc_request_path).and_return('/日本語/a/a/a/a')
+        expect(@controller.send(:nesting_request_path)).to eq('/日本語')
+
+        @controller.instance_variable_set(:@nesting_request_path, nil)
+        allow(@controller).to receive(:resource_specification).and_return(ResourcesController::Specification.new(:forum, :class => RequestPathIntrospectionSpec::Forum, :singleton => true, :segment => 'a/a'))
+        allow(@controller).to receive(:rc_request_path).and_return('/x/a/a/a/a')
+        expect(@controller.send(:nesting_request_path)).to eq('/x/a')
+      end
+
+      it "should return a fresh mutable string from remove_current_segment on no-match and byte-0 match" do
+        unmatched = +'/other/1'
+        res_unmatched = @controller.send(:remove_current_segment, unmatched)
+        expect(res_unmatched).to eq('/other/1')
+        expect(res_unmatched).not_to equal(unmatched)
+        expect(res_unmatched.frozen?).to eq(false)
+
+        matched = +'/forums/1'
+        res_matched = @controller.send(:remove_current_segment, matched)
+        expect(res_matched).to eq('')
+        expect(res_matched.frozen?).to eq(false)
+      end
       
       it "should remove any controller namespace" do
         allow(@controller).to receive(:controller_path).and_return('some/name/space/forums')
@@ -212,6 +256,33 @@ module RequestPathIntrospectionSpec
         
         it "('user_id') should return 'users'" do
           expect(@controller.send(:segment_for_key, 'user_id')).to eq('users')
+        end
+      end
+
+      describe "when a subclass overrides a mapped enclosing resource key" do
+        before do
+          @klass.map_enclosing_resource :user, :segment => 'peeps', :key => 'old_user_id', :class => RequestPathIntrospectionSpec::User
+          @subklass = Class.new(@klass) do
+            map_enclosing_resource :user, :segment => 'peeps', :key => 'new_user_id', :class => RequestPathIntrospectionSpec::User
+          end
+          @subcontroller = @subklass.new
+        end
+
+        it "should stay in sync with overridden, reassigned, mutated, and duck-typed mappings" do
+          expect(@subcontroller.send(:segment_for_key, 'new_user_id')).to eq('peeps')
+          expect(@subcontroller.send(:segment_for_key, 'old_user_id')).to eq('old_users')
+          expect(@controller.send(:segment_for_key, 'old_user_id')).to eq('peeps')
+
+          duck_spec = Struct.new(:key, :segment).new('duck_id', 'ducks_custom')
+          @subklass.resource_specification_map = { 'ducks_custom' => duck_spec }
+          expect(@subcontroller.send(:segment_for_key, 'duck_id')).to eq('ducks_custom')
+
+          duck_spec2 = Struct.new(:key, :segment).new('other_id', 'others_custom')
+          @subklass.resource_specification_map['others_custom'] = duck_spec2
+          expect(@subcontroller.send(:segment_for_key, 'other_id')).to eq('others_custom')
+
+          allow(@subcontroller).to receive(:specifications).and_return([Struct.new(:key, :segment).new('spec_id', 'spec_seg')])
+          expect(@subcontroller.send(:segment_for_key, 'spec_id')).to eq('spec_seg')
         end
       end
     end

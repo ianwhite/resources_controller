@@ -1,3 +1,19 @@
+= 5.1.1
+  * follow-up non-invasive performance optimizations across path introspection, resource services,
+    specifications, named route helpers, and controller helpers:
+    - replace per-request lookahead Regexp compilation in RequestPathIntrospection#remove_current_segment
+      with UTF-8-safe byte-indexed substring search (with character-index fallback for multi-slash segments)
+    - call service.__send__(:find, ...) directly in ResourceService#find instead of falling back through
+      super/method_missing, replace ActiveSupport delegate wrappers with lightweight controller readers,
+      and reuse lazy SingletonSpecification#build_method_name
+    - fast-path Specification option validation and default foreign_key derivation, and add lazy
+      plural_name / params_method_name helpers reused by #resources_name and #resource_params
+    - precompute class-level plural_route_name in resources_controller_for (invalidated if route_name
+      changes), guard empty enclosing/args splats and eql? filtering in NamedRouteHelper generated helpers,
+      and read name_prefix once per dispatch
+    - reduce redundant params lookups in ResourceMethods (#find_resource, #new_resource, #destroy_resource),
+      use anonymous block forwarding in #new_resource, and remove .tap in Helper#form_for_resource_options
+
 = 5.1.0
   * performance improvements across named route helpers, request introspection, wildcard loading,
     form_for_resource, parameter filtering, and Specification initialization:
