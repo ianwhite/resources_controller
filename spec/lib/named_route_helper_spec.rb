@@ -84,4 +84,119 @@ describe "ResourcesController::NamedRouteHelper" do
     expect(tag_controller.enclosing_resource_path).to eq('/forums/1?locale=en')
     expect(tag_controller.enclosing_resource_path(9, :foo => 'bar')).to eq('/forums/9?foo=bar&locale=en')
   end
+
+  it "should dispatch cached prefixes directly across multiple nestings without method_missing" do
+    fresh_class = Class.new(ApplicationController) do
+      resources_controller_for :tags
+    end
+    sub_class = Class.new(fresh_class)
+    forum = Forum.new(:id => 1)
+    post = Post.new(:id => 2)
+    tag = Tag.new(:id => 3)
+
+    c1 = fresh_class.new
+    c1.request = ActionDispatch::TestRequest.create
+    c1.send(:add_enclosing_resource, forum, :name => 'forum')
+    c1.resource = tag
+    expect(c1.resource_path).to eq('/forums/1/tags/3')
+    expect(c1.enclosing_resource_path(99)).to eq('/forums/99')
+
+    c2 = fresh_class.new
+    c2.request = ActionDispatch::TestRequest.create
+    c2.send(:add_enclosing_resource, forum, :name => 'forum')
+    c2.send(:add_enclosing_resource, post, :name => 'post')
+    c2.resource = tag
+    expect(c2.resource_path).to eq('/forums/1/posts/2/tags/3')
+    expect(c2.enclosing_resource_path).to eq('/forums/1/posts/2')
+
+    c_sub = sub_class.new
+    c_sub.request = ActionDispatch::TestRequest.create
+    c_sub.send(:add_enclosing_resource, forum, :name => 'forum')
+    c_sub.resource = tag
+
+    # After warmup, helpers dispatch to already-defined prefixed methods without hitting method_missing
+    expect(c1).not_to receive(:method_missing)
+    expect(c2).not_to receive(:method_missing)
+    expect(c_sub).not_to receive(:method_missing)
+    expect(c1.resource_path(tag)).to eq('/forums/1/tags/3')
+    expect(c2.resource_path(99)).to eq('/forums/1/posts/2/tags/99')
+    expect(c_sub.resource_path(tag)).to eq('/forums/1/tags/3')
+
+    # Parent adding a new prefix after subclass registered its own prefix still works via fallback
+    user = User.new(:id => 4, :login => 'alice')
+    address = Address.new(:id => 5)
+    c_sub_addr = sub_class.new
+    c_sub_addr.request = ActionDispatch::TestRequest.create
+    c_sub_addr.send(:add_enclosing_resource, user, :name => 'user')
+    c_sub_addr.send(:add_enclosing_resource, address, :name => 'address')
+    c_sub_addr.resource = tag
+    expect(c_sub_addr.resource_path).to eq('/users/alice/addresses/5/tags/3')
+
+    c_parent_post = fresh_class.new
+    c_parent_post.request = ActionDispatch::TestRequest.create
+    c_parent_post.send(:add_enclosing_resource, forum, :name => 'forum')
+    c_parent_post.send(:add_enclosing_resource, post, :name => 'post')
+    c_parent_post.resource = tag
+    expect(c_parent_post.resource_path).to eq('/forums/1/posts/2/tags/3')
+  end
+
+  it "should preserve eql? semantics when filtering enclosing_collection_resources" do
+    fresh_class = Class.new(ApplicationController) do
+      resources_controller_for :tags
+    end
+    eq_only = Class.new do
+      def initialize(param)
+        @param = param
+      end
+
+      def to_param
+        @param
+      end
+
+      def ==(_other)
+        true
+      end
+
+      def eql?(other)
+        equal?(other)
+      end
+    end
+
+    first = eq_only.new('1')
+    second = eq_only.new('2')
+    ctrl = fresh_class.new
+    ctrl.request = ActionDispatch::TestRequest.create
+    ctrl.send(:add_enclosing_resource, first, :name => 'forum')
+    ctrl.send(:add_enclosing_resource, second, :name => 'post')
+
+    # `enclosing_resources_path` (forum_posts_path) has required_args == 1;
+    # passing 1 arg filters out only `second` (eql?), leaving `first` intact.
+    expect(ctrl.enclosing_resources_path(99)).to eq('/forums/1/posts.99')
+  end
+
+  it "should reuse class-level plural_route_name and still honor route_name overrides" do
+    expect(@controller.send(:resources_route_name)).to equal(ForumsController.plural_route_name)
+    expect(@controller.send(:resources_route_name)).to eq('forums')
+
+    class_override = Class.new(ApplicationController) do
+      resources_controller_for :forums
+      self.route_name = 'board'
+    end
+    expect(class_override.new.send(:resources_route_name)).to eq('boards')
+
+    mutated_class = Class.new(ApplicationController) do
+      resources_controller_for :forums
+    end
+    mutated_class.route_name.replace('board')
+    expect(mutated_class.new.send(:resources_route_name)).to eq('boards')
+
+    instance_override = Class.new(ApplicationController) do
+      resources_controller_for :forums
+
+      def route_name
+        'topic'
+      end
+    end
+    expect(instance_override.new.send(:resources_route_name)).to eq('topics')
+  end
 end

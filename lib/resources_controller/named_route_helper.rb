@@ -122,20 +122,26 @@ generated name_prefix is '#{name_prefix}'
       Rails.application.routes.named_routes.get(route_key.to_sym)
     end
 
-    # route_name is fixed for the life of the controller, and pluralize is the most
-    # expensive operation on this path, so it is memoised rather than run per call.
+    # route_name is fixed for the life of the controller class, so its plural form is
+    # precomputed on the class and only pluralized per instance if route_name is overridden.
     def resources_route_name
-      @resources_route_name ||= route_name.pluralize
+      current = route_name
+      if self.class.respond_to?(:plural_route_name_source) && current == self.class.plural_route_name_source
+        self.class.plural_route_name
+      else
+        @resources_route_name ||= current.pluralize
+      end
     end
     
     # defines a method that calls the appropriate named route method, with appropriate args.
     def define_resource_named_route_helper_method(method)
       self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
         def #{method}(...)
-          if name_prefix.to_s.empty?
+          prefix = name_prefix.to_s
+          if prefix.empty?
             #{method}_for_(...)
           else
-            send(:"#{method}_for_\#{name_prefix}", ...)
+            send(:"#{method}_for_\#{prefix}", ...)
           end
         end
       end_eval
@@ -151,7 +157,7 @@ generated name_prefix is '#{name_prefix}'
 
     def extract_resource_url_options(args)
       du_opts = default_url_options
-      if args.last.is_a?(Hash) && args.last.extractable_options?
+      if !args.empty? && (last = args.last).is_a?(Hash) && last.extractable_options?
         options = args.pop
         options.merge!(du_opts) unless du_opts.empty?
         options
@@ -170,9 +176,25 @@ generated name_prefix is '#{name_prefix}'
         self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
           def #{method}(*args)
             options = extract_resource_url_options(args)
-            encl = args.size < #{required_args} ? enclosing_collection_resources : enclosing_collection_resources - [enclosing_resource]
+            encl = enclosing_collection_resources
+            if args.size >= #{required_args} && !encl.empty?
+              target = enclosing_resource
+              encl = if encl.size == 1 && encl[0].eql?(target)
+                nil
+              else
+                encl.reject { |r| r.eql?(target) }
+              end
+            end
             args << options if options && !options.empty?
-            #{route_method}(*encl, *args)
+            if encl.nil? || encl.empty?
+              args.empty? ? #{route_method} : #{route_method}(*args)
+            elsif args.empty?
+              #{route_method}(*encl)
+            elsif encl.size == 1
+              #{route_method}(encl[0], *args)
+            else
+              #{route_method}(*encl, *args)
+            end
           end
         end_eval
 
@@ -183,9 +205,18 @@ generated name_prefix is '#{name_prefix}'
         self.class.send :module_eval, <<-end_eval, __FILE__, __LINE__
           def #{method}(*args)
             options = extract_resource_url_options(args)
-            #{"args.unshift(resource) if enclosing_collection_resources.size + args.size < #{required_args}" if required_args > 0}
+            encl = enclosing_collection_resources
+            #{"args.unshift(resource) if encl.size + args.size < #{required_args}" if required_args > 0}
             args << options if options && !options.empty?
-            #{route_method}(*enclosing_collection_resources, *args)
+            if encl.empty?
+              args.empty? ? #{route_method} : #{route_method}(*args)
+            elsif args.empty?
+              #{route_method}(*encl)
+            elsif encl.size == 1
+              #{route_method}(encl[0], *args)
+            else
+              #{route_method}(*encl, *args)
+            end
           end
         end_eval
       end

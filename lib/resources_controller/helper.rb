@@ -97,20 +97,20 @@ module ResourcesController
   
   private
     def form_for_resource_options(resource, resource_name, options)
-      options.dup.tap do |opts|
-        is_new = nil
-        opts[:html] ||= {}
-        opts[:html][:method] ||= (is_new = resource.new_record?) ? :post : :put
-        opts[:as] = resource_name
-        url_options = opts[:url_options] ? opts.delete(:url_options) : nil
-        opts[:url] ||= if controller.resource_specification.singleton?
-          url_options ? resource_path(url_options) : resource_path
-        elsif is_new.nil? ? resource.new_record? : is_new
-          url_options ? resources_path(url_options) : resources_path
-        else
-          url_options ? resource_path(resource, url_options) : resource_path(resource)
-        end
+      opts = options.dup
+      is_new = nil
+      opts[:html] ||= {}
+      opts[:html][:method] ||= (is_new = resource.new_record?) ? :post : :put
+      opts[:as] = resource_name
+      url_options = opts.delete(:url_options) if opts[:url_options]
+      opts[:url] ||= if controller.resource_specification.singleton?
+        url_options ? resource_path(url_options) : resource_path
+      elsif is_new.nil? ? resource.new_record? : is_new
+        url_options ? resources_path(url_options) : resources_path
+      else
+        url_options ? resource_path(resource, url_options) : resource_path(resource)
       end
+      opts
     end
   end
 end

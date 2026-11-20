@@ -61,17 +61,27 @@ module ResourcesController
     # Removes the current resource segment, and everything after it, from the path,
     # e.g. '/users/1/forums/2' => '/users/1'.
     #
-    # This is only called from #nesting_request_path, which is memoised per request,
-    # so the pattern is built at most once per request - there is no need to cache it.
-    # The segment is escaped so that it is matched literally, as in #remove_namespace.
+    # Uses direct byte-indexed substring search rather than compiling a lookahead
+    # Regexp per request, so the segment is matched literally with minimal allocations.
     def remove_current_segment(path)
-      segment = Regexp.escape(current_segment.to_s)
-      pattern = if respond_to?(:resource_specification) && resource_specification.singleton?
-        %r(/#{segment}(?!.*/#{segment}).*$)
-      else
-        %r(/#{segment}(?!.+/#{segment}).*$)
+      needle = "/#{current_segment}"
+      last = path.byterindex(needle)
+      return path.dup unless last
+
+      singleton = respond_to?(:resource_specification) && resource_specification.singleton?
+      if needle.byteindex('/', 1)
+        char_last = path.rindex(needle)
+        start = char_last - needle.length + (singleton ? 1 : 0)
+        return path[0, path.index(needle, start > 0 ? start : 0)]
       end
-      path.sub(pattern, '')
+
+      idx = if singleton
+        last
+      else
+        len = needle.bytesize
+        last >= len && path.byteslice(last - len, len) == needle ? last - len : last
+      end
+      path.byteslice(0, idx)
     end
     
     def current_segment
@@ -106,12 +116,14 @@ module ResourcesController
     
     def segment_for_key(key)
       key_str = key.to_s
-      if respond_to?(:specifications) && (spec = specifications.find {|s| s.respond_to?(:key) && s.key == key_str})
-        return spec.segment
+      if respond_to?(:specifications)
+        specifications.each do |s|
+          return s.segment if s.respond_to?(:key) && s.key == key_str
+        end
       end
 
       resource_specification_map.each_value do |spec|
-        return spec.segment if spec.key == key_str
+        return spec.segment if spec.respond_to?(:key) && spec.key == key_str
       end
 
       key_str.delete_suffix('_id').pluralize

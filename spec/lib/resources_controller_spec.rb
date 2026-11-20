@@ -82,6 +82,18 @@ describe "ResourcesController#update_name_prefix" do
     expect(@controller.instance_variable_get(:@name_prefix)).to eq('')
     expect(@controller.name_prefix).to eq('')
   end
+
+  it "should handle a frozen @name_prefix safely and not mutate retained earlier references" do
+    @controller.send :update_name_prefix, 'forum_'
+    earlier = @controller.name_prefix
+    @controller.send :update_name_prefix, 'user_'
+    expect(earlier).to eq('forum_')
+    expect(@controller.name_prefix).to eq('forum_user_')
+
+    @controller.instance_variable_set(:@name_prefix, 'forum_'.freeze)
+    @controller.send :update_name_prefix, 'user_'
+    expect(@controller.name_prefix).to eq('forum_user_')
+  end
 end
 
 describe "ResourcesController::Specification" do
@@ -90,6 +102,8 @@ describe "ResourcesController::Specification" do
     expect(spec.key).to eq(false)
     expect(spec.instance_variable_get(:@collection_ivar_name)).to be_nil
     expect(spec.collection_ivar_name).to eq(:@accounts)
+    expect(spec.plural_name).to eq('accounts')
+    expect(spec.build_method_name).to eq(:build_account)
   end
 
   it "should treat false for :segment, :source, and :key as absent" do
@@ -98,6 +112,29 @@ describe "ResourcesController::Specification" do
     expect(spec.source).to eq('forums')
     expect(spec.klass).to eq(Forum)
     expect(spec.key).to eq('forum_id')
+  end
+
+  it "should validate option keys and expose lazy params_method_name" do
+    expect {
+      ResourcesController::Specification.new(:forum, :bogus => true)
+    }.to raise_error(ArgumentError, /Unknown key: :bogus/)
+
+    spec = ResourcesController::Specification.new('Admin::Forum', :class => Forum)
+    expect(spec.key).to eq('forum_id')
+    expect(spec.params_method_name).to eq(:"Admin::Forum_params")
+  end
+
+  it "should return an independent mutable string from controller#resources_name without corrupting Specification" do
+    spec = ForumsController.resource_specification
+    c1 = ForumsController.new
+    c2 = ForumsController.new
+    expect(c1.resources_name).to eq('forums')
+
+    c1.resources_name << '_mutated'
+    expect(spec.plural_name).to eq('forums')
+    expect(spec.segment).to eq('forums')
+    expect(spec.source).to eq('forums')
+    expect(c2.resources_name).to eq('forums')
   end
 end
 
@@ -125,6 +162,53 @@ describe "ResourcesController#add_enclosing_resource hook" do
     controller.send(:load_enclosing_resources)
     expect(controller.added_enclosing).to eq([[forum, 'forum']])
     expect(controller.instance_variable_get(:@forum)).to eq(forum)
+  end
+
+  it "should respect rewritten :name and :as in add_enclosing_resource overrides" do
+    forum = Forum.create!
+    klass = Class.new(ApplicationController) do
+      resources_controller_for :posts, :in => :forum
+
+      private
+
+      def add_enclosing_resource(resource, options = {})
+        super(resource, options.merge(:name => 'board', :as => 'parent_board'))
+      end
+    end
+
+    controller = klass.new
+    req = ActionDispatch::TestRequest.create
+    req.path = "/forums/#{forum.id}/posts"
+    allow(controller).to receive(:request).and_return(req)
+    allow(controller).to receive(:params).and_return(ActionController::Parameters.new(:forum_id => forum.id.to_s))
+
+    controller.send(:load_enclosing_resources)
+    expect(controller.instance_variable_get(:@board)).to eq(forum)
+    expect(controller.instance_variable_get(:@parent_board)).to eq(forum)
+    expect(controller.instance_variable_defined?(:@forum)).to eq(false)
+  end
+
+  it "should load enclosing resources from duck-typed mapped specifications without ivar_name" do
+    forum = Forum.create!
+    duck_spec = Struct.new(:segment, :key, :name, :name_prefix, :as) do
+      def singleton?; false; end
+      def find_from(_controller); Forum.first; end
+    end.new('boards', 'board_id', 'board', 'board_', 'parent_board')
+
+    klass = Class.new(ApplicationController) do
+      resources_controller_for :posts
+    end
+    klass.resource_specification_map = { 'boards' => duck_spec }
+
+    controller = klass.new
+    req = ActionDispatch::TestRequest.create
+    req.path = "/boards/#{forum.id}/posts"
+    allow(controller).to receive(:request).and_return(req)
+    allow(controller).to receive(:params).and_return(ActionController::Parameters.new(:board_id => forum.id.to_s))
+
+    controller.send(:load_enclosing_resources)
+    expect(controller.instance_variable_get(:@board)).to eq(forum)
+    expect(controller.instance_variable_get(:@parent_board)).to eq(forum)
   end
 
   it "should support :as on a mapped wildcard specification" do

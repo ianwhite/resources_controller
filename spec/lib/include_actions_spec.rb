@@ -19,6 +19,10 @@ module IncludeActionsSpec
     include_actions Actions, :except => [:foo, :bar]
   end
 
+  class StringOptionsController < ActionController::Base
+    include_actions Actions, :only => ['bar', :faz]
+  end
+
   describe "Include actions use case" do
     it "ActionController should have actions from actions module" do
       expect(ActionsController.action_methods).to eq(['foo', 'bar', 'faz'].to_set)
@@ -30,6 +34,11 @@ module IncludeActionsSpec
     
     it "ExceptFooBarController should not have :foo, :bar from actions module" do
       expect(ExceptFooBarController.action_methods).to eq(['faz'].to_set)
+    end
+
+    it "StringOptionsController should handle string and symbol action names" do
+      expect(StringOptionsController.action_methods).to eq(['bar', 'faz'].to_set)
+      expect(Actions.action_methods_to_remove(:only => :foo)).to all(be_a(String))
     end
   end
 end

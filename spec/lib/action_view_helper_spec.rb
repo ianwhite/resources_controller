@@ -69,6 +69,12 @@ describe "Helper#form_for_resource (when resource is new record)" do
     expect(@view).to receive(:form_for).with(@resource, {:as => 'forum', :html => {:method => :post}, :url => '/forums'})
     @view.form_for_resource{}
   end
+
+  it 'should preserve falsey :url_options entries in form options' do
+    expect(@view).to receive(:resources_path).with(no_args).and_return('/forums')
+    expect(@view).to receive(:form_for).with(@resource, {:as => 'forum', :html => {:method => :post}, :url => '/forums', :url_options => nil})
+    @view.form_for_resource(:url_options => nil) {}
+  end
 end
 
 describe "Helper#form_for_resource (when resource is new record) and resource is singleton" do
